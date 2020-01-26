@@ -25,69 +25,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("//build_test:build.bzl", "build_test")
-load("//graphviz:graphviz.bzl", "gen_dot")
-load("//parser:parser.bzl", "genlex", "genyacc")
+def gen_dot(name=None, src=None, out=None):
+  if not src:
+    fail("src must be provided")
+  if not name:
+    fail("name must be provided")
+  if not out:
+    fail("out must be provided")
 
-######## build_test
-genrule(
-  name = "build_test_target",
-  outs = ["build_test_target.txt"],
-  cmd = "touch $@",
-)
-
-build_test(
-  name = "build_test_test",
-  targets = [":build_test_target"],
-)
-
-######## genlex/genyacc
-
-genyacc(
-  name = "parser",
-  src = "parser.y",
-)
-
-genlex(
-  name = "lexer",
-  src = "lexer.l",
-)
-
-cc_library(
-  name = "parser_build",
-  srcs = [
-    ":lexer",
-    ":parser",
-  ],
-  hdrs = [
-    ":lexer",
-    ":parser",
-    "gen.lexer.h",
-  ],
-  copts = [ # because bison
-    "-fexceptions",
-    "-Wno-sign-compare",
-  ],
-)
-
-build_test(
-  name = "parser_test",
-  targets = [
-    ":parser_build",
-  ],
-)
-
-######## gen_dot
-
-gen_dot(
-    name = "gen_dot_png",
-    src = ":gen_dot_test.dot",
-    out = ":gen_dot_test.png",
-)
-
-build_test(
-  name = "gen_dot_test",
-  targets = [
-    ":gen_dot_png",
-  ],
-)
+  native.genrule(
+    name = name,
+    outs = [out],
+    srcs = [src],
+    cmd = "dot -Tpng -o$(location %s) $(location %s) " % (out, src),
+  )
