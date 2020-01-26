@@ -55,26 +55,17 @@ genlex(
 cc_library(
   name = "parser_build",
   srcs = [
-    #"parser.cc",
     ":lexer",
     ":parser",
   ],
   hdrs = [
-    #"parser.h",
     ":lexer",
     ":parser",
     "gen.lexer.h",
-    #"gen.parser.h",
   ],
   copts = [ # because bison
     "-fexceptions",
     "-Wno-sign-compare",
-  ],
-  deps = [
-    #":ast",
-    #":parser_support",
-    #"@com_google_absl//absl/strings",
-    #"@com_github_gflags_gflags//:gflags",
   ],
 )
 
