@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
   h << header;
 
   for(int i = 1; i < argc; i++) {
-    // Things needed to turn a path into symbol name.
+    // Things needed to turn a path into a symbol name.
     const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
       {"/", "_"}, {".", "_"}, {"-", "_"}
     };
@@ -77,13 +77,13 @@ int main(int argc, char** argv) {
     std::string start = absl::StrCat("_binary_", var_name, "_start");
     std::string end = absl::StrCat("_binary_", var_name, "_end");
 
-    // Do a bunch of magic to get the workspace reletive path.
-    // This is complicated by generted file being in a differnt place
-    // and by the paths chnaging for the tools vs. result builds.
+    // Do a bunch of magic to get the workspace relative path.
+    // This is complicated by generated file being in a different places
+    // and by the paths changing for the tools vs. result builds.
     absl::string_view file_name = argv[i];
-    ConsumePrefix(&file_name, FLAGS_gendir);
-    ConsumePrefix(&file_name, "/");
-    ConsumePrefix(&file_name, absl::StrCat("external/", FLAGS_workspace, "/"));
+    absl::ConsumePrefix(&file_name, FLAGS_gendir);
+    absl::ConsumePrefix(&file_name, "/");
+    absl::ConsumePrefix(&file_name, absl::StrCat("external/", FLAGS_workspace, "/"));
     var_name = absl::StrReplaceAll(file_name, rep);
 
     cc << "extern const char " << start << ", " << end << ";\n"
