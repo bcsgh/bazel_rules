@@ -25,62 +25,39 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("//build_test:build.bzl", "build_test")
-load("//parser:parser.bzl", "genlex", "genyacc")
+def genlex(name, src, data=[]):
+  c = "%s.yy.cc" % name
+  h = "%s.yy.h" % name
+  cmd = "flex --outfile=$(@D)/%s --header-file=$(@D)/%s $(location %s)" % (c, h, src)
+  native.genrule(
+    name = name + "_gen",
+    outs = [c, h],
+    srcs = [src] + data,
+    cmd = cmd
+  )
+  native.filegroup(
+    name = name,
+    srcs = [c, h]
+  )
 
-######## build_test
-genrule(
-  name = "build_test_target",
-  outs = ["build_test_target.txt"],
-  cmd = "touch $@",
-)
-
-build_test(
-  name = "build_test_test",
-  targets = [":build_test_target"],
-)
-
-######## genlex/genyacc
-
-genyacc(
-  name = "parser",
-  src = "parser.y",
-)
-
-genlex(
-  name = "lexer",
-  src = "lexer.l",
-)
-
-cc_library(
-  name = "parser_build",
-  srcs = [
-    #"parser.cc",
-    ":lexer",
-    ":parser",
-  ],
-  hdrs = [
-    #"parser.h",
-    ":lexer",
-    ":parser",
-    "gen.lexer.h",
-    #"gen.parser.h",
-  ],
-  copts = [ # because bison
-    "-fexceptions",
-    "-Wno-sign-compare",
-  ],
-  deps = [
-    #":ast",
-    #":parser_support",
-    #"@com_google_absl//absl/strings",
-    #"@com_github_gflags_gflags//:gflags",
-  ],
-)
-
-build_test(
-  name = "parser_test",
-  targets = [
-    ":parser_build",
-  ],
-)
+def genyacc(name, src, data=[]):
+  c = "%s.tab.cc" % name
+  h = "%s.tab.h" % name
+  cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)
+  outs = [
+    c, h,
+    # TODO: figure out how to not generate these for every invocation.
+    "stack.hh",
+    "position.hh",
+    "location.hh"
+  ]
+  native.genrule(
+    name = name + "_gen",
+    outs = outs,
+    srcs = [src] + data,
+    cmd = cmd
+  )
+  native.filegroup(
+    name = name,
+    srcs = outs
+  )
