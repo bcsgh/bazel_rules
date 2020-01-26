@@ -55,11 +55,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  auto header = R"(
-// Generated code.
-#include <cstddef>
-#include <utility>
-
+  auto header = R"(// Generated code.
 #include "absl/strings/string_view.h"
 
 )";
@@ -86,12 +82,17 @@ int main(int argc, char** argv) {
     absl::ConsumePrefix(&file_name, absl::StrCat("external/", FLAGS_workspace, "/"));
     var_name = absl::StrReplaceAll(file_name, rep);
 
-    cc << "extern const char " << start << ", " << end << ";\n"
-       << "extern const absl::string_view " << var_name
-       << "{&" << start << ", absl::string_view::size_type(&" << end << " - &" << start << ")};\n";
+    cc << "// " << file_name << "\n"
+       << "extern const char " << start << ";\n"
+       << "extern const char " << end << ";\n"
+       << "extern const ::absl::string_view " << var_name << "{\n"
+       << "    &" << start << ",\n"
+       << "    ::absl::string_view::size_type(\n"
+       << "        &" << end << " -\n"
+       << "        &" << start << ")};\n\n";
 
     h << "// " << file_name << "\n"
-      << "extern const absl::string_view " << var_name << ";\n";
+      << "extern const ::absl::string_view " << var_name << ";\n\n";
 
   }
 
