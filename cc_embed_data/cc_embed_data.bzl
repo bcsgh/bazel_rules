@@ -25,97 +25,50 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("//build_test:build.bzl", "build_test")
-load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
-load("//graphviz:graphviz.bzl", "gen_dot")
-load("//parser:parser.bzl", "genlex", "genyacc")
+# implementation from:
+# https://stackoverflow.com/a/7779766/1343
+# http://www.math.utah.edu/docs/info/ld_2.html
+# https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 
-######## build_test
-genrule(
-  name = "build_test_target",
-  outs = ["build_test_target.txt"],
-  cmd = "touch $@",
-)
+def cc_embed_data(name=None, srcs=None):
+  if not srcs:
+    fail("srcs must be provided")
+  if not name:
+    fail("name must be provided")
 
-build_test(
-  name = "build_test_test",
-  targets = [":build_test_target"],
-)
+  cc = name + "_emebed_data.cc"
+  h = name + "_emebed_data.h"
+  o = name + "_emebed_data.o"
 
-######## cc_embed_data
+  native.genrule(
+    name = name + "_make_emebed_src",
+    outs = [cc, h],
+    srcs = srcs,
+    tools = ["@bazel_rules//cc_embed_data:make_emebed_data"],
+    cmd = " ".join([
+        "$(location @bazel_rules//cc_embed_data:make_emebed_data)",
+          "--h=$(location %s) --cc=$(location %s)" % (h, cc),
+          "--gendir=$(GENDIR) --workspace=$$(basename $$PWD)",
+          "$(SRCS)",
+    ])
+  )
 
-SRCS = glob(
-    ["*"],
-    exclude = ["*.h", "*.cc"],
-)
+  native.genrule(
+    name = name + "_make_embed_obj",
+    outs = [o],
+    srcs = srcs,
+    cmd = (
+      "$(CC) $(CC_FLAGS) -nostdlib -o $(location %s) -no-pie -Xlinker -r -Wl,-b -Wl,binary $(SRCS)"
+    ) % (o),
+    toolchains = [
+      "@bazel_tools//tools/cpp:current_cc_toolchain",
+      "@bazel_rules//cc_embed_data:cc_flags",
+    ],
+  )
 
-cc_embed_data(
-    name = "cc_embed_data_example",
-    srcs = SRCS,
-)
-
-build_test(
-  name = "cc_embed_data_build_test",
-  targets = [":cc_embed_data_example"],
-)
-
-cc_test(
-  name = "cc_embed_data_test",
-  srcs = ["cc_embed_data_test.cc"],
-  data = SRCS,
-  deps = [
-    ":cc_embed_data_example",
-    "@com_google_googletest//:gtest_main",
-  ],
-)
-
-######## genlex/genyacc
-
-genyacc(
-  name = "parser",
-  src = "parser.y",
-)
-
-genlex(
-  name = "lexer",
-  src = "lexer.l",
-)
-
-cc_library(
-  name = "parser_build",
-  srcs = [
-    ":lexer",
-    ":parser",
-  ],
-  hdrs = [
-    ":lexer",
-    ":parser",
-    "gen.lexer.h",
-  ],
-  copts = [ # because bison
-    "-fexceptions",
-    "-Wno-sign-compare",
-  ],
-)
-
-build_test(
-  name = "parser_test",
-  targets = [
-    ":parser_build",
-  ],
-)
-
-######## gen_dot
-
-gen_dot(
-    name = "gen_dot_png",
-    src = ":gen_dot_test.dot",
-    out = ":gen_dot_test.png",
-)
-
-build_test(
-  name = "gen_dot_test",
-  targets = [
-    ":gen_dot_png",
-  ],
-)
+  native.cc_library(
+    name = name,
+    srcs = [cc, o],
+    hdrs = [h],
+    deps = ["@com_google_absl//absl/strings"]
+  )

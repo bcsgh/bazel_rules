@@ -25,97 +25,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("//build_test:build.bzl", "build_test")
-load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
-load("//graphviz:graphviz.bzl", "gen_dot")
-load("//parser:parser.bzl", "genlex", "genyacc")
+load("@bazel_tools//tools/cpp:cc_flags_supplier.bzl", "cc_flags_supplier")
 
-######## build_test
-genrule(
-  name = "build_test_target",
-  outs = ["build_test_target.txt"],
-  cmd = "touch $@",
+cc_flags_supplier(
+    name = "cc_flags",
+    visibility = ["//visibility:public"],
 )
 
-build_test(
-  name = "build_test_test",
-  targets = [":build_test_target"],
-)
-
-######## cc_embed_data
-
-SRCS = glob(
-    ["*"],
-    exclude = ["*.h", "*.cc"],
-)
-
-cc_embed_data(
-    name = "cc_embed_data_example",
-    srcs = SRCS,
-)
-
-build_test(
-  name = "cc_embed_data_build_test",
-  targets = [":cc_embed_data_example"],
-)
-
-cc_test(
-  name = "cc_embed_data_test",
-  srcs = ["cc_embed_data_test.cc"],
-  data = SRCS,
-  deps = [
-    ":cc_embed_data_example",
-    "@com_google_googletest//:gtest_main",
-  ],
-)
-
-######## genlex/genyacc
-
-genyacc(
-  name = "parser",
-  src = "parser.y",
-)
-
-genlex(
-  name = "lexer",
-  src = "lexer.l",
-)
-
-cc_library(
-  name = "parser_build",
-  srcs = [
-    ":lexer",
-    ":parser",
-  ],
-  hdrs = [
-    ":lexer",
-    ":parser",
-    "gen.lexer.h",
-  ],
-  copts = [ # because bison
-    "-fexceptions",
-    "-Wno-sign-compare",
-  ],
-)
-
-build_test(
-  name = "parser_test",
-  targets = [
-    ":parser_build",
-  ],
-)
-
-######## gen_dot
-
-gen_dot(
-    name = "gen_dot_png",
-    src = ":gen_dot_test.dot",
-    out = ":gen_dot_test.png",
-)
-
-build_test(
-  name = "gen_dot_test",
-  targets = [
-    ":gen_dot_png",
-  ],
+cc_binary(
+    name = "make_emebed_data",
+    srcs = ["make_emebed_data.cc"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+        "@com_google_absl//absl/strings",
+    ],
+    visibility = ["//visibility:public"],
 )
