@@ -57,9 +57,18 @@ def cc_embed_data(name=None, srcs=None):
     name = name + "_make_embed_obj",
     outs = [o],
     srcs = srcs,
-    cmd = (
-      "$(CC) $(CC_FLAGS) -nostdlib -o $(location %s) -no-pie -Xlinker -r -Wl,-b -Wl,binary $(SRCS)"
-    ) % (o),
+    cmd = " ".join([
+        "$(CC) $(CC_FLAGS)",   # Compiler and default flags.
+        "-nostdlib",           # This is just data, no libs needed.
+        "-o $(location %s)" %  (o),  # Output file name
+        "-no-pie",             # Avoid position independent executable.
+        "-Wl,-r",              # Make relocatable output (don't resolve stuff).
+        "-Wl,--format=binary"  # Just read in the files.
+      ] + [
+        # The files need to be passed via `-Wl,...` so that the
+        # compiler won't try to handle file of know type itself.
+        "-Wl,$(location %s)" % src for src in srcs
+      ]),
     toolchains = [
       "@bazel_tools//tools/cpp:current_cc_toolchain",
       "@bazel_rules//cc_embed_data:cc_flags",

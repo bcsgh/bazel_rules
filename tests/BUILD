@@ -44,10 +44,7 @@ build_test(
 
 ######## cc_embed_data
 
-SRCS = glob(
-    ["*"],
-    exclude = ["*.h", "*.cc"],
-)
+SRCS = glob(["*"])
 
 cc_embed_data(
     name = "cc_embed_data_example",
