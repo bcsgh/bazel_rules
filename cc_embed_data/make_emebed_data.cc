@@ -85,15 +85,16 @@ int main(int argc, char** argv) {
     cc << "// " << file_name << "\n"
        << "extern const char " << start << ";\n"
        << "extern const char " << end << ";\n"
-       << "extern const ::absl::string_view " << var_name << "{\n"
-       << "    &" << start << ",\n"
+       << "::absl::string_view " << var_name << "() {\n"
+       << "  static ::absl::string_view ret{&" << start << ",\n"
        << "    ::absl::string_view::size_type(\n"
        << "        &" << end << " -\n"
-       << "        &" << start << ")};\n\n";
+       << "        &" << start << ")};\n"
+       << "  return ret;\n"
+       << "}\n\n";
 
     h << "// " << file_name << "\n"
-      << "extern const ::absl::string_view " << var_name << ";\n\n";
-
+      << "::absl::string_view " << var_name << "();\n\n";
   }
 
   cc << "// Done\n\n";

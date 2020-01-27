@@ -48,22 +48,22 @@ std::string ReadFile(const std::string &path) {
 
 TEST(CcEmbedData, Basic) {
   EXPECT_EQ(ReadFile("tests/BUILD"),
-            ::tests_BUILD);
+            ::tests_BUILD());
 
   EXPECT_EQ(ReadFile("tests/cc_embed_data_test.cc"),
-            ::tests_cc_embed_data_test_cc);
+            ::tests_cc_embed_data_test_cc());
 
   EXPECT_EQ(ReadFile("tests/gen.lexer.h"),
-            ::tests_gen_lexer_h);
+            ::tests_gen_lexer_h());
 
   EXPECT_EQ(ReadFile("tests/gen_dot_test.dot"),
-            ::tests_gen_dot_test_dot);
+            ::tests_gen_dot_test_dot());
 
   EXPECT_EQ(ReadFile("tests/lexer.l"),
-            ::tests_lexer_l);
+            ::tests_lexer_l());
 
   EXPECT_EQ(ReadFile("tests/parser.y"),
-            ::tests_parser_y);
+            ::tests_parser_y());
 }
 
 }  // namespace
