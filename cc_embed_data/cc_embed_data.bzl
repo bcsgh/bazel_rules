@@ -30,65 +30,67 @@
 # http://www.math.utah.edu/docs/info/ld_2.html
 # https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 
-def cc_embed_data(name=None, srcs=None, namespace=None):
-  if not srcs:
-    fail("srcs must be provided")
-  if not name:
-    fail("name must be provided")
+def cc_embed_data(name = None, srcs = None, namespace = None):
+    if not srcs:
+        fail("srcs must be provided")
+    if not name:
+        fail("name must be provided")
 
-  cc = name + "_emebed_data.cc"
-  h = name + "_emebed_data.h"
-  o = name + "_emebed_data.o"
+    cc = name + "_emebed_data.cc"
+    h = name + "_emebed_data.h"
+    o = name + "_emebed_data.o"
 
-  PREFIX = "$$(dirname $(rootpath %s) | sed 's|[^0-9A-Za-z]|_|g')_%s" % (cc, name)
+    PREFIX = "$$(dirname $(rootpath %s) | sed 's|[^0-9A-Za-z]|_|g')_%s" % (cc, name)
 
-  native.genrule(
-    name = name + "_make_emebed_src",
-    outs = [cc, h],
-    srcs = srcs,
-    tools = ["@bazel_rules//cc_embed_data:make_emebed_data"],
-    cmd = " ".join([
-        "$(location @bazel_rules//cc_embed_data:make_emebed_data)",
-          "--h=$(location %s)" % (h),
-          "--cc=$(location %s)" % (cc),
-          "--gendir=$(GENDIR)",
-          "--workspace=$$(basename $$PWD)",
-          "--namespace=%s" % (namespace or ""),
-          "--symbol_prefix=%s" % PREFIX,
-          "$(SRCS)",
-    ])
-  )
+    native.genrule(
+        name = name + "_make_emebed_src",
+        outs = [cc, h],
+        srcs = srcs,
+        tools = ["@bazel_rules//cc_embed_data:make_emebed_data"],
+        cmd = " ".join([
+            "$(location @bazel_rules//cc_embed_data:make_emebed_data)",
+            "--h=$(location %s)" % (h),
+            "--cc=$(location %s)" % (cc),
+            "--gendir=$(GENDIR)",
+            "--workspace=$$(basename $$PWD)",
+            "--namespace=%s" % (namespace or ""),
+            "--symbol_prefix=%s" % PREFIX,
+            "$(SRCS)",
+        ]),
+    )
 
-  native.genrule(
-    name = name + "_make_embed_obj",
-    outs = [o],
-    srcs = srcs + [cc],  # include `cc` just to ask about its path.
-    cmd = " ; ".join([
-        "PREFIX=%s" % PREFIX,
-      ] + [
-        # Copy the inputs to fixed locations
-        "cp $(location %s) $${PREFIX}_%d" % (srcs[i], i) for i in range(len(srcs))
-      ]) + " ; " + " ".join([
-        "$(CC) $(CC_FLAGS)",   # Compiler and default flags.
-        "-nostdlib",           # This is just data, no libs needed.
-        "-o $(location %s)" %  (o),  # Output file name
-        "-no-pie",             # Avoid position independent executable.
-        "-Wl,-r",              # Make relocatable output (don't resolve stuff).
-        "-Wl,--format=binary"  # Just read in the files.
-      ] + [
-        # The files need to be passed via `-Wl,...` so that the
-        # compiler won't try to handle file of know type itself.
-        "-Wl,$${PREFIX}_%d" % i for i in range(len(srcs))
-      ]),
-    toolchains = [
-      "@bazel_tools//tools/cpp:current_cc_toolchain",
-      "@bazel_rules//cc_embed_data:cc_flags",
-    ],
-  )
+    native.genrule(
+        name = name + "_make_embed_obj",
+        outs = [o],
+        srcs = srcs + [cc],  # include `cc` just to ask about its path.
+        cmd = " ; ".join([
+            "PREFIX=%s" % PREFIX,
+        ] + [
+            # Copy the inputs to fixed locations
+            "cp $(location %s) $${PREFIX}_%d" % (srcs[i], i)
+            for i in range(len(srcs))
+        ]) + " ; " + " ".join([
+            "$(CC) $(CC_FLAGS)",  # Compiler and default flags.
+            "-nostdlib",  # This is just data, no libs needed.
+            "-o $(location %s)" % (o),  # Output file name
+            "-no-pie",  # Avoid position independent executable.
+            "-Wl,-r",  # Make relocatable output (don't resolve stuff).
+            "-Wl,--format=binary",  # Just read in the files.
+        ] + [
+            # The files need to be passed via `-Wl,...` so that the
+            # compiler won't try to handle file of know type itself.
+            "-Wl,$${PREFIX}_%d" % i
+            for i in range(len(srcs))
+        ]),
+        toolchains = [
+            "@bazel_tools//tools/cpp:current_cc_toolchain",
+            "@bazel_rules//cc_embed_data:cc_flags",
+        ],
+    )
 
-  native.cc_library(
-    name = name,
-    srcs = [cc, o],
-    hdrs = [h],
-    deps = ["@com_google_absl//absl/strings"]
-  )
+    native.cc_library(
+        name = name,
+        srcs = [cc, o],
+        hdrs = [h],
+        deps = ["@com_google_absl//absl/strings"],
+    )

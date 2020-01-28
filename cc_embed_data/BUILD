@@ -35,10 +35,10 @@ cc_flags_supplier(
 cc_binary(
     name = "make_emebed_data",
     srcs = ["make_emebed_data.cc"],
+    visibility = ["//visibility:public"],
     deps = [
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
         "@com_google_absl//absl/strings",
     ],
-    visibility = ["//visibility:public"],
 )

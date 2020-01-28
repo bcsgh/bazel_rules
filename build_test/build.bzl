@@ -28,9 +28,9 @@
 # A basic test that always passes, as long as everythin in `targets` builds.
 # This is usefull, for example, with a genrule.
 def build_test(name = None, targets = []):
-  native.sh_test(
-      name = name,
-      srcs = ["@bazel_rules//build_test:blank.sh"],
-      data = targets,
-      timeout="short",
-  )
+    native.sh_test(
+        name = name,
+        srcs = ["@bazel_rules//build_test:blank.sh"],
+        data = targets,
+        timeout = "short",
+    )

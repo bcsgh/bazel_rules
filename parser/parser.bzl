@@ -25,39 +25,40 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def genlex(name, src, data=[]):
-  c = "%s.yy.cc" % name
-  h = "%s.yy.h" % name
-  cmd = "flex --outfile=$(@D)/%s --header-file=$(@D)/%s $(location %s)" % (c, h, src)
-  native.genrule(
-    name = name + "_gen",
-    outs = [c, h],
-    srcs = [src] + data,
-    cmd = cmd
-  )
-  native.filegroup(
-    name = name,
-    srcs = [c, h]
-  )
+def genlex(name, src, data = []):
+    c = "%s.yy.cc" % name
+    h = "%s.yy.h" % name
+    cmd = "flex --outfile=$(@D)/%s --header-file=$(@D)/%s $(location %s)" % (c, h, src)
+    native.genrule(
+        name = name + "_gen",
+        outs = [c, h],
+        srcs = [src] + data,
+        cmd = cmd,
+    )
+    native.filegroup(
+        name = name,
+        srcs = [c, h],
+    )
 
-def genyacc(name, src, data=[]):
-  c = "%s.tab.cc" % name
-  h = "%s.tab.h" % name
-  cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)
-  outs = [
-    c, h,
-    # TODO: figure out how to not generate these for every invocation.
-    "stack.hh",
-    "position.hh",
-    "location.hh"
-  ]
-  native.genrule(
-    name = name + "_gen",
-    outs = outs,
-    srcs = [src] + data,
-    cmd = cmd
-  )
-  native.filegroup(
-    name = name,
-    srcs = outs
-  )
+def genyacc(name, src, data = []):
+    c = "%s.tab.cc" % name
+    h = "%s.tab.h" % name
+    cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)
+    outs = [
+        c,
+        h,
+        # TODO: figure out how to not generate these for every invocation.
+        "stack.hh",
+        "position.hh",
+        "location.hh",
+    ]
+    native.genrule(
+        name = name + "_gen",
+        outs = outs,
+        srcs = [src] + data,
+        cmd = cmd,
+    )
+    native.filegroup(
+        name = name,
+        srcs = outs,
+    )

@@ -25,17 +25,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def gen_dot(name=None, src=None, out=None):
-  if not src:
-    fail("src must be provided")
-  if not name:
-    fail("name must be provided")
-  if not out:
-    fail("out must be provided")
+def gen_dot(name = None, src = None, out = None):
+    if not src:
+        fail("src must be provided")
+    if not name:
+        fail("name must be provided")
+    if not out:
+        fail("out must be provided")
 
-  native.genrule(
-    name = name,
-    outs = [out],
-    srcs = [src],
-    cmd = "dot -Tpng -o$(location %s) $(location %s) " % (out, src),
-  )
+    native.genrule(
+        name = name,
+        outs = [out],
+        srcs = [src],
+        cmd = "dot -Tpng -o$(location %s) $(location %s) " % (out, src),
+    )
