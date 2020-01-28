@@ -28,31 +28,32 @@
 #include <fstream>
 #include <iostream>
 
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/strip.h"
-#include "gflags/gflags.h"
 
-DEFINE_string(cc, "", "The generated source");
-DEFINE_string(h, "", "The generated header");
+ABSL_FLAG(std::string, cc, "", "The generated source");
+ABSL_FLAG(std::string, h, "", "The generated header");
 
-DEFINE_string(gendir, "", "The $(GENDIR) directory used by blaze");
-DEFINE_string(workspace, "", "The named of the WORKSPACE in use");
-DEFINE_string(namespace, "", "The C++ namespace to put the API in.");
+ABSL_FLAG(std::string, gendir, "", "The $(GENDIR) directory used by blaze");
+ABSL_FLAG(std::string, workspace, "", "The named of the WORKSPACE in use");
+ABSL_FLAG(std::string, namespace, "", "The C++ namespace to put the API in.");
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  auto args = absl::ParseCommandLine(argc, argv);
 
   std::ofstream cc, h;
-  cc.open(FLAGS_cc, std::ios::out);
+  cc.open(absl::GetFlag(FLAGS_cc), std::ios::out);
   if(cc.fail()) {
-    std::cerr << FLAGS_cc << ": " << std::strerror(errno);
+    std::cerr << absl::GetFlag(FLAGS_cc) << ": " << std::strerror(errno);
     return 1;
   }
 
-  h.open(FLAGS_h, std::ios::out);
+  h.open(absl::GetFlag(FLAGS_h), std::ios::out);
   if(h.fail()) {
-    std::cerr << FLAGS_h << ": " << std::strerror(errno);
+    std::cerr << absl::GetFlag(FLAGS_h) << ": " << std::strerror(errno);
     return 1;
   }
 
@@ -64,22 +65,23 @@ int main(int argc, char** argv) {
   std::vector<Item> items;
 
   // Generate the names:
-  for(int i = 1; i < argc; i++) {
+  for(int i = 1, size = args.size(); i < size; i++) {
     // Things needed to turn a path into a symbol name.
     const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
       {"/", "_"}, {".", "_"}, {"-", "_"}
     };
 
     // The generated object file is from the original names.
-    std::string var_name = absl::StrReplaceAll(argv[i], rep);
+    std::string var_name = absl::StrReplaceAll(args[i], rep);
 
     // Do a bunch of magic to get the workspace relative path.
     // This is complicated by generated file being in a different places
     // and by the paths changing for the tools vs. result builds.
-    absl::string_view file_name = argv[i];
-    absl::ConsumePrefix(&file_name, FLAGS_gendir);
+    absl::string_view file_name = args[i];
+    absl::ConsumePrefix(&file_name, absl::GetFlag(FLAGS_gendir));
     absl::ConsumePrefix(&file_name, "/");
-    absl::ConsumePrefix(&file_name, absl::StrCat("external/", FLAGS_workspace, "/"));
+    auto ws = absl::StrCat("external/", absl::GetFlag(FLAGS_workspace), "/");
+    absl::ConsumePrefix(&file_name, ws);
 
     items.emplace_back(Item{
       file_name,
@@ -90,10 +92,12 @@ int main(int argc, char** argv) {
 
   // Set up using a namespace is requested.
   std::string ns_open, ns_close;
-  if (!FLAGS_namespace.empty()) {
-    std::cerr << "Using " << FLAGS_namespace << "\n";
-    ns_open = absl::StrCat("namespace ", FLAGS_namespace, " {\n");
-    ns_close = absl::StrCat("}  // namespace ", FLAGS_namespace, "\n");
+  if (!absl::GetFlag(FLAGS_namespace).empty()) {
+    std::cerr << "Using " << absl::GetFlag(FLAGS_namespace) << "\n";
+    ns_open = absl::StrCat("namespace ", absl::GetFlag(FLAGS_namespace),
+                           " {\n");
+    ns_close = absl::StrCat("}  // namespace ", absl::GetFlag(FLAGS_namespace),
+                            "\n");
   }
 
   auto header = R"(// Generated code.
