@@ -25,10 +25,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-cc_library(visibility=["//visibility:public"],
+cc_library(
     name = "parser_support",
     srcs = ["parser_support.cc"],
     hdrs = ["parser_support.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "@com_google_absl//absl/strings:str_format",
     ],
