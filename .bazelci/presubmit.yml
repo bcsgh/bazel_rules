@@ -1,0 +1,17 @@
+---
+buildifier: latest
+tasks:
+  ubuntu_default_compiler:
+    platform: ubuntu1604
+    build_targets:
+    - "..."
+    test_targets:
+    - "..."
+  ubuntu_clanf:
+    platform: ubuntu1604
+    environment:
+      CC: clang
+    build_targets:
+    - "..."
+    test_targets:
+    - "..."
