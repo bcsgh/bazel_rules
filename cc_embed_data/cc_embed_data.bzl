@@ -57,7 +57,10 @@ def cc_embed_data(name=None, srcs=None):
     name = name + "_make_embed_obj",
     outs = [o],
     srcs = srcs,
-    cmd = " ".join([
+    cmd = " ; ".join([
+        # Copy the inputs to fixed locations
+        "cp $(location %s) src_%d" % (srcs[i], i) for i in range(len(srcs))
+      ]) + " ; " + " ".join([
         "$(CC) $(CC_FLAGS)",   # Compiler and default flags.
         "-nostdlib",           # This is just data, no libs needed.
         "-o $(location %s)" %  (o),  # Output file name
@@ -67,7 +70,7 @@ def cc_embed_data(name=None, srcs=None):
       ] + [
         # The files need to be passed via `-Wl,...` so that the
         # compiler won't try to handle file of know type itself.
-        "-Wl,$(location %s)" % src for src in srcs
+        "-Wl,src_%d" % i for i in range(len(srcs))
       ]),
     toolchains = [
       "@bazel_tools//tools/cpp:current_cc_toolchain",

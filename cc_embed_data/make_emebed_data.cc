@@ -62,6 +62,13 @@ int main(int argc, char** argv) {
   cc << header;
   h << header;
 
+  struct Item {
+    absl::string_view file_name;
+    std::string var_name;
+    std::string symbol_name;
+  };
+  std::vector<Item> items;
+
   for(int i = 1; i < argc; i++) {
     // Things needed to turn a path into a symbol name.
     const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
@@ -70,8 +77,6 @@ int main(int argc, char** argv) {
 
     // The generated object file is from the original names.
     std::string var_name = absl::StrReplaceAll(argv[i], rep);
-    std::string start = absl::StrCat("_binary_", var_name, "_start");
-    std::string end = absl::StrCat("_binary_", var_name, "_end");
 
     // Do a bunch of magic to get the workspace relative path.
     // This is complicated by generated file being in a different places
@@ -80,21 +85,21 @@ int main(int argc, char** argv) {
     absl::ConsumePrefix(&file_name, FLAGS_gendir);
     absl::ConsumePrefix(&file_name, "/");
     absl::ConsumePrefix(&file_name, absl::StrCat("external/", FLAGS_workspace, "/"));
-    var_name = absl::StrReplaceAll(file_name, rep);
+    Item item{file_name, absl::StrReplaceAll(file_name, rep), absl::StrCat("_binary_src_", (i-1), "_")};
 
-    cc << "// " << file_name << "\n"
-       << "extern const char " << start << ";\n"
-       << "extern const char " << end << ";\n"
-       << "::absl::string_view " << var_name << "() {\n"
-       << "  static ::absl::string_view ret{&" << start << ",\n"
+    h << "// " << item.file_name << "\n"
+      << "::absl::string_view " << item.var_name << "();\n\n";
+
+    cc << "// " << item.file_name << "\n"
+       << "extern const char " << item.symbol_name << "start;\n"
+       << "extern const char " << item.symbol_name << "end;\n"
+       << "::absl::string_view " << item.var_name << "() {\n"
+       << "  static ::absl::string_view ret{&" << item.symbol_name << "start,\n"
        << "    ::absl::string_view::size_type(\n"
-       << "        &" << end << " -\n"
-       << "        &" << start << ")};\n"
+       << "        &" << item.symbol_name << "end -\n"
+       << "        &" << item.symbol_name << "start)};\n"
        << "  return ret;\n"
        << "}\n\n";
-
-    h << "// " << file_name << "\n"
-      << "::absl::string_view " << var_name << "();\n\n";
   }
 
   cc << "// Done\n\n";
