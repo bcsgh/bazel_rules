@@ -49,6 +49,7 @@ SRCS = glob(["*"])
 cc_embed_data(
     name = "cc_embed_data_example",
     srcs = SRCS,
+    namespace = "test_ns",
 )
 
 build_test(

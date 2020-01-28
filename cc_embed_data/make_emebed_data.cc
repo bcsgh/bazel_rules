@@ -38,6 +38,7 @@ DEFINE_string(h, "", "The generated header");
 
 DEFINE_string(gendir, "", "The $(GENDIR) directory used by blaze");
 DEFINE_string(workspace, "", "The named of the WORKSPACE in use");
+DEFINE_string(namespace, "", "The C++ namespace to put the API in.");
 
 int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -55,13 +56,6 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  auto header = R"(// Generated code.
-#include "absl/strings/string_view.h"
-
-)";
-  cc << header;
-  h << header;
-
   struct Item {
     absl::string_view file_name;
     std::string var_name;
@@ -69,6 +63,7 @@ int main(int argc, char** argv) {
   };
   std::vector<Item> items;
 
+  // Generate the names:
   for(int i = 1; i < argc; i++) {
     // Things needed to turn a path into a symbol name.
     const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
@@ -85,14 +80,47 @@ int main(int argc, char** argv) {
     absl::ConsumePrefix(&file_name, FLAGS_gendir);
     absl::ConsumePrefix(&file_name, "/");
     absl::ConsumePrefix(&file_name, absl::StrCat("external/", FLAGS_workspace, "/"));
-    Item item{file_name, absl::StrReplaceAll(file_name, rep), absl::StrCat("_binary_src_", (i-1), "_")};
 
+    items.emplace_back(Item{
+      file_name,
+      absl::StrReplaceAll(file_name, rep),
+      absl::StrCat("_binary_src_", (i-1), "_"),
+    });
+  }
+
+  // Set up using a namespace is requested.
+  std::string ns_open, ns_close;
+  if (!FLAGS_namespace.empty()) {
+    std::cerr << "Using " << FLAGS_namespace << "\n";
+    ns_open = absl::StrCat("namespace ", FLAGS_namespace, " {\n");
+    ns_close = absl::StrCat("}  // namespace ", FLAGS_namespace, "\n");
+  }
+
+  auto header = R"(// Generated code.
+#include "absl/strings/string_view.h"
+
+)";
+
+  /////// The header.
+  h << header << ns_open;
+  for (const auto& item : items) {
     h << "// " << item.file_name << "\n"
       << "::absl::string_view " << item.var_name << "();\n\n";
+  }
+  h << ns_close << "// Done\n\n";
 
+  /////// The implementation.
+  cc << header << "/////// linker provided globals\n\n";
+  for (const auto& item : items) {
     cc << "// " << item.file_name << "\n"
        << "extern const char " << item.symbol_name << "start;\n"
-       << "extern const char " << item.symbol_name << "end;\n"
+       << "extern const char " << item.symbol_name << "end;\n";
+  }
+
+  cc << "\n/////// Getter functions.\n" << ns_open << "\n";
+
+  for (const auto& item : items) {
+    cc << "// " << item.file_name << "\n"
        << "::absl::string_view " << item.var_name << "() {\n"
        << "  static ::absl::string_view ret{&" << item.symbol_name << "start,\n"
        << "    ::absl::string_view::size_type(\n"
@@ -102,8 +130,7 @@ int main(int argc, char** argv) {
        << "}\n\n";
   }
 
-  cc << "// Done\n\n";
-  h << "// Done\n\n";
+  cc << ns_close << "// Done\n\n";
 
   return 0;
 }

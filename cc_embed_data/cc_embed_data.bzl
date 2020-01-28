@@ -30,7 +30,7 @@
 # http://www.math.utah.edu/docs/info/ld_2.html
 # https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 
-def cc_embed_data(name=None, srcs=None):
+def cc_embed_data(name=None, srcs=None, namespace=None):
   if not srcs:
     fail("srcs must be provided")
   if not name:
@@ -47,8 +47,11 @@ def cc_embed_data(name=None, srcs=None):
     tools = ["@bazel_rules//cc_embed_data:make_emebed_data"],
     cmd = " ".join([
         "$(location @bazel_rules//cc_embed_data:make_emebed_data)",
-          "--h=$(location %s) --cc=$(location %s)" % (h, cc),
-          "--gendir=$(GENDIR) --workspace=$$(basename $$PWD)",
+          "--h=$(location %s)" % (h),
+          "--cc=$(location %s)" % (cc),
+          "--gendir=$(GENDIR)",
+          "--workspace=$$(basename $$PWD)",
+          "--namespace=%s" % (namespace or ""),
           "$(SRCS)",
     ])
   )
