@@ -40,6 +40,8 @@ def cc_embed_data(name=None, srcs=None, namespace=None):
   h = name + "_emebed_data.h"
   o = name + "_emebed_data.o"
 
+  PREFIX = "$$(dirname $(rootpath %s) | sed 's|[^0-9A-Za-z]|_|g')_%s" % (cc, name)
+
   native.genrule(
     name = name + "_make_emebed_src",
     outs = [cc, h],
@@ -52,6 +54,7 @@ def cc_embed_data(name=None, srcs=None, namespace=None):
           "--gendir=$(GENDIR)",
           "--workspace=$$(basename $$PWD)",
           "--namespace=%s" % (namespace or ""),
+          "--symbol_prefix=%s" % PREFIX,
           "$(SRCS)",
     ])
   )
@@ -59,10 +62,12 @@ def cc_embed_data(name=None, srcs=None, namespace=None):
   native.genrule(
     name = name + "_make_embed_obj",
     outs = [o],
-    srcs = srcs,
+    srcs = srcs + [cc],  # include `cc` just to ask about its path.
     cmd = " ; ".join([
+        "PREFIX=%s" % PREFIX,
+      ] + [
         # Copy the inputs to fixed locations
-        "cp $(location %s) src_%d" % (srcs[i], i) for i in range(len(srcs))
+        "cp $(location %s) $${PREFIX}_%d" % (srcs[i], i) for i in range(len(srcs))
       ]) + " ; " + " ".join([
         "$(CC) $(CC_FLAGS)",   # Compiler and default flags.
         "-nostdlib",           # This is just data, no libs needed.
@@ -73,7 +78,7 @@ def cc_embed_data(name=None, srcs=None, namespace=None):
       ] + [
         # The files need to be passed via `-Wl,...` so that the
         # compiler won't try to handle file of know type itself.
-        "-Wl,src_%d" % i for i in range(len(srcs))
+        "-Wl,$${PREFIX}_%d" % i for i in range(len(srcs))
       ]),
     toolchains = [
       "@bazel_tools//tools/cpp:current_cc_toolchain",

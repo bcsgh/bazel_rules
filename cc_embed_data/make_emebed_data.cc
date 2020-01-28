@@ -40,6 +40,8 @@ ABSL_FLAG(std::string, h, "", "The generated header");
 ABSL_FLAG(std::string, gendir, "", "The $(GENDIR) directory used by blaze");
 ABSL_FLAG(std::string, workspace, "", "The named of the WORKSPACE in use");
 ABSL_FLAG(std::string, namespace, "", "The C++ namespace to put the API in.");
+ABSL_FLAG(std::string, symbol_prefix, "",
+          "The prefix of the linker generated globals.");
 
 int main(int argc, char** argv) {
   auto args = absl::ParseCommandLine(argc, argv);
@@ -86,7 +88,7 @@ int main(int argc, char** argv) {
     items.emplace_back(Item{
       file_name,
       absl::StrReplaceAll(file_name, rep),
-      absl::StrCat("_binary_src_", (i-1), "_"),
+      absl::StrCat("_binary_", absl::GetFlag(FLAGS_symbol_prefix), "_", (i-1), "_"),
     });
   }
 
