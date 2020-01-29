@@ -31,14 +31,31 @@
 
 #include "gtest/gtest.h"
 
-namespace parser {
+namespace parser_support {
 namespace {
 
 TEST(ParserSupport, Reference) {
   std::string s = "hello";
-  error(&s, 1, 2, 3, 4, "world");
-  error(nullptr, 1, 2, 1, 4, "world");
+  struct {
+    struct {
+    std::string *filename;
+    int line, column;
+  } begin, end;
+  } x;
+  x.begin.filename = &s;
+  x.begin.line = 1;
+  x.begin.column = 2;
+  x.begin.filename = &s;
+  x.end.line = 3;
+  x.end.column = 4;
+
+  Error(x, "world");
+
+  x.begin.filename = nullptr;
+  x.begin.filename = nullptr;
+
+  Error(x, "world");
 }
 
 }  // namespace
-}  // namespace parser
+}  // namespace parser_support
