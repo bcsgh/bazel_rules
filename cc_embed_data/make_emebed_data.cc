@@ -88,7 +88,8 @@ int main(int argc, char** argv) {
     items.emplace_back(Item{
       file_name,
       absl::StrReplaceAll(file_name, rep),
-      absl::StrCat("_binary_", absl::GetFlag(FLAGS_symbol_prefix), "_", (i-1), "_"),
+      absl::StrCat("_binary_", absl::GetFlag(FLAGS_symbol_prefix),
+                   "_", (i-1), "_"),
     });
   }
 
@@ -102,16 +103,22 @@ int main(int argc, char** argv) {
                             "\n");
   }
 
-  auto header = R"(// Generated code.
+  constexpr char header[] = R"(// Generated code.
 #include "absl/strings/string_view.h"
+#include "absl/types/span.h"
 
 )";
+  constexpr char decl[] =
+    "absl::Span<std::pair<absl::string_view, absl::string_view>> EmbedIndex()";
 
   /////// The header.
   h << header << ns_open;
   for (const auto& item : items) {
     h << "// " << item.file_name << "\n"
       << "::absl::string_view " << item.var_name << "();\n\n";
+  }
+  if (!absl::GetFlag(FLAGS_namespace).empty()) {
+    h << decl << ";\n\n";
   }
   h << ns_close << "// Done\n\n";
 
@@ -134,6 +141,21 @@ int main(int argc, char** argv) {
        << "        &" << item.symbol_name << "start)};\n"
        << "  return ret;\n"
        << "}\n\n";
+  }
+
+  if (!absl::GetFlag(FLAGS_namespace).empty()) {
+    cc << decl << R"( {
+  static std::pair<absl::string_view, absl::string_view> kRet[] = {
+)";
+
+    for (const auto& item : items) {
+      cc << "    {\"" << item.file_name << "\", " << item.var_name << "()},\n";
+    }
+    cc << R"(  };
+  return kRet;
+}
+
+)";
   }
 
   cc << ns_close << "// Done\n\n";

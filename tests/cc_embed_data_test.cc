@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "tests/cc_embed_data_example_emebed_data.h"
 
@@ -47,23 +48,24 @@ std::string ReadFile(const std::string &path) {
 }
 
 TEST(CcEmbedData, Basic) {
-  EXPECT_EQ(ReadFile("tests/BUILD"),
-            ::test_ns::tests_BUILD());
+  // Check that all files match.
+  std::map<std::string, std::string> idx;
+  for (const auto& i : test_ns::EmbedIndex()) {
+    idx.emplace(i.first, i.second);
 
-  EXPECT_EQ(ReadFile("tests/cc_embed_data_test.cc"),
-            ::test_ns::tests_cc_embed_data_test_cc());
+    EXPECT_EQ(ReadFile(std::string{i.first}), i.second) << i.first;
+  }
 
-  EXPECT_EQ(ReadFile("tests/gen.lexer.h"),
-            ::test_ns::tests_gen_lexer_h());
+  // Check for the expected files.
+  using ::testing::Contains;
+  using ::testing::Key;
 
-  EXPECT_EQ(ReadFile("tests/gen_dot_test.dot"),
-            ::test_ns::tests_gen_dot_test_dot());
-
-  EXPECT_EQ(ReadFile("tests/lexer.l"),
-            ::test_ns::tests_lexer_l());
-
-  EXPECT_EQ(ReadFile("tests/parser.y"),
-            ::test_ns::tests_parser_y());
+  EXPECT_THAT(idx, Contains(Key("tests/BUILD")));
+  EXPECT_THAT(idx, Contains(Key("tests/cc_embed_data_test.cc")));
+  EXPECT_THAT(idx, Contains(Key("tests/gen.lexer.h")));
+  EXPECT_THAT(idx, Contains(Key("tests/gen_dot_test.dot")));
+  EXPECT_THAT(idx, Contains(Key("tests/lexer.l")));
+  EXPECT_THAT(idx, Contains(Key("tests/parser.y")));
 }
 
 }  // namespace

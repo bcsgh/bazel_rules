@@ -92,5 +92,8 @@ def cc_embed_data(name = None, srcs = None, namespace = None):
         name = name,
         srcs = [cc, o],
         hdrs = [h],
-        deps = ["@com_google_absl//absl/strings"],
+        deps = [
+            "@com_google_absl//absl/strings",
+            "@com_google_absl//absl/types:span",
+        ],
     )
