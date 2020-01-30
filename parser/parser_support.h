@@ -43,12 +43,11 @@ namespace parser_support {
 void Error(const std::string* filename, int bl, int bc, int el, int ec,
            const std::string& msg);
 
-template<class L>
+template <class L>
 void Error(L const& loc, std::string const& msg) {
   Error(loc.begin.filename, loc.begin.line, loc.begin.column, loc.end.line,
         loc.end.column, msg);
 }
-
 
 }  // namespace parser_support
 

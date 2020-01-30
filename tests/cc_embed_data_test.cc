@@ -35,7 +35,7 @@
 
 namespace {
 
-std::string ReadFile(const std::string &path) {
+std::string ReadFile(const std::string& path) {
   std::ifstream ifs{path.c_str(),
                     std::ios::in | std::ios::binary | std::ios::ate};
 

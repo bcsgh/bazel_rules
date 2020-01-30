@@ -48,13 +48,13 @@ int main(int argc, char** argv) {
 
   std::ofstream cc, h;
   cc.open(absl::GetFlag(FLAGS_cc), std::ios::out);
-  if(cc.fail()) {
+  if (cc.fail()) {
     std::cerr << absl::GetFlag(FLAGS_cc) << ": " << std::strerror(errno);
     return 1;
   }
 
   h.open(absl::GetFlag(FLAGS_h), std::ios::out);
-  if(h.fail()) {
+  if (h.fail()) {
     std::cerr << absl::GetFlag(FLAGS_h) << ": " << std::strerror(errno);
     return 1;
   }
@@ -67,10 +67,10 @@ int main(int argc, char** argv) {
   std::vector<Item> items;
 
   // Generate the names:
-  for(int i = 1, size = args.size(); i < size; i++) {
+  for (int i = 1, size = args.size(); i < size; i++) {
     // Things needed to turn a path into a symbol name.
     const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
-      {"/", "_"}, {".", "_"}, {"-", "_"}
+        {"/", "_"}, {".", "_"}, {"-", "_"}  //
     };
 
     // The generated object file is from the original names.
@@ -86,10 +86,10 @@ int main(int argc, char** argv) {
     absl::ConsumePrefix(&file_name, ws);
 
     items.emplace_back(Item{
-      file_name,
-      absl::StrReplaceAll(file_name, rep),
-      absl::StrCat("_binary_", absl::GetFlag(FLAGS_symbol_prefix),
-                   "_", (i-1), "_"),
+        file_name,
+        absl::StrReplaceAll(file_name, rep),
+        absl::StrCat("_binary_", absl::GetFlag(FLAGS_symbol_prefix), "_",
+                     (i - 1), "_"),
     });
   }
 
@@ -97,10 +97,10 @@ int main(int argc, char** argv) {
   std::string ns_open, ns_close;
   if (!absl::GetFlag(FLAGS_namespace).empty()) {
     std::cerr << "Using " << absl::GetFlag(FLAGS_namespace) << "\n";
-    ns_open = absl::StrCat("namespace ", absl::GetFlag(FLAGS_namespace),
-                           " {\n");
-    ns_close = absl::StrCat("}  // namespace ", absl::GetFlag(FLAGS_namespace),
-                            "\n");
+    ns_open =
+        absl::StrCat("namespace ", absl::GetFlag(FLAGS_namespace), " {\n");
+    ns_close =
+        absl::StrCat("}  // namespace ", absl::GetFlag(FLAGS_namespace), "\n");
   }
 
   constexpr char header[] = R"(// Generated code.
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 
 )";
   constexpr char decl[] =
-    "absl::Span<std::pair<absl::string_view, absl::string_view>> EmbedIndex()";
+      R"(absl::Span<std::pair<absl::string_view, absl::string_view>> EmbedIndex())";
 
   /////// The header.
   h << header << ns_open;

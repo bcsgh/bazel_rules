@@ -38,9 +38,9 @@ TEST(ParserSupport, Reference) {
   std::string s = "hello";
   struct {
     struct {
-    std::string *filename;
-    int line, column;
-  } begin, end;
+      std::string *filename;
+      int line, column;
+    } begin, end;
   } x;
   x.begin.filename = &s;
   x.begin.line = 1;
