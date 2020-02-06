@@ -1,0 +1,18 @@
+# NOTE: I've not yet been able to get this to build from source inside Bazel.
+# For now, just grab/extract the tarball and run `./configre && make`. 
+cc_library(
+    name = "microhttpd",
+    srcs = ["src/microhttpd/.libs/libmicrohttpd.a"],
+    hdrs = ["src/include/microhttpd.h"],
+    visibility = ["//visibility:public"],
+    strip_include_prefix = "src/include"
+)
+
+#load("@rules_foreign_cc//tools/build_defs:configure.bzl", "configure_make")
+#configure_make(
+#    name = "microhttpd",
+#    lib_source = "libmicrohttpd-0.9.69",
+#    make_commands = ["make"],  # ???
+#    visibility = ["//visibility:public"],
+#)
+

@@ -1,0 +1,153 @@
+cc_library(
+    name = "libhttpserver",
+    hdrs = ["src/httpserver.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":basic_auth_fail_response",
+        ":deferred_response",
+        ":digest_auth_fail_response",
+        ":file_response",
+        ":http_endpoint",
+        ":http_request",
+        ":http_utils",
+        ":string_utilities",
+        ":webserver",
+    ],
+)
+
+cc_library(
+    name = "basic_auth_fail_response",
+    srcs = ["src/basic_auth_fail_response.cpp"],
+    hdrs = ["src/httpserver/basic_auth_fail_response.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [":webserver"],
+)
+
+cc_library(
+    name = "deferred_response",
+    srcs = ["src/deferred_response.cpp"],
+    hdrs = ["src/httpserver/deferred_response.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [":webserver"],
+)
+
+cc_library(
+    name = "digest_auth_fail_response",
+    srcs = ["src/digest_auth_fail_response.cpp"],
+    hdrs = ["src/httpserver/digest_auth_fail_response.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [":webserver"],
+)
+
+cc_library(
+    name = "file_response",
+    srcs = ["src/file_response.cpp"],
+    hdrs = ["src/httpserver/file_response.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [
+        ":http_utils",
+        ":webserver",
+    ],
+)
+
+cc_library(
+    name = "http_endpoint",
+    srcs = ["src/details/http_endpoint.cpp"],
+    hdrs = ["src/httpserver/details/http_endpoint.hpp"],
+    copts = ["-fexceptions"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [":http_utils"],
+)
+
+cc_library(
+    name = "http_request",
+    srcs = ["src/http_request.cpp"],
+    hdrs = ["src/httpserver/http_request.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [":http_utils"],
+)
+
+cc_library(
+    name = "http_utils",
+    srcs = ["src/http_utils.cpp"],
+    hdrs = ["src/httpserver/http_utils.hpp"],
+    copts = ["-fexceptions"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = [
+        "HTTPSERVER_COMPILATION",
+        "MHD_NO_DEPRECATION",  # ignore use of MHD_HTTP_UNORDERED_COLLECTION
+    ],
+    deps = [
+        ":string_utilities",
+        "@org_gnu_microhttpd//:microhttpd",
+    ],
+)
+
+cc_library(
+    name = "string_utilities",
+    srcs = ["src/string_utilities.cpp"],
+    hdrs = ["src/httpserver/string_utilities.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+)
+
+cc_library(
+    name = "webserver",
+    srcs = [
+        "src/http_resource.cpp",
+        "src/http_response.cpp",
+        "src/string_response.cpp",
+        "src/webserver.cpp",
+    ],
+    hdrs = [
+        "src/gettext.h",
+        "src/httpserver/create_webserver.hpp",
+        "src/httpserver/details/modded_request.hpp",
+        "src/httpserver/http_resource.hpp",
+        "src/httpserver/http_response.hpp",
+        "src/httpserver/string_response.hpp",
+        "src/httpserver/webserver.hpp",
+    ],
+    copts = ["-fexceptions"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
+    deps = [
+        ":http_endpoint",
+        ":http_request",
+        ":http_utils",
+        "@org_gnu_microhttpd//:microhttpd",
+    ],
+)
