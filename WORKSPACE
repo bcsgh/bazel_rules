@@ -5,7 +5,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 git_repository(
     name = "rules_foreign_cc",
-    commit = "ed3db61a55c13da311d875460938c42ee8bbc2a5",  # current as of 2020/02/03
+    commit = "bafdc9d274c7ad4aee4b60b3c640764c506ba3bb",  # current as of 2020/02/12
     remote = "git://github.com/bazelbuild/rules_foreign_cc.git",
 )
 
