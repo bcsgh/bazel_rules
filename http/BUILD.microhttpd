@@ -1,18 +1,16 @@
-# NOTE: I've not yet been able to get this to build from source inside Bazel.
-# For now, just grab/extract the tarball and run `./configre && make`. 
-cc_library(
+# Building this may need one or more of the following:
+# sudo apt-get install autotools-dev
+# sudo apt-get install autoconf
+# sudo apt-get install libtool
+# sudo apt-get install autopoint
+# sudo apt-get install libpthread-stubs0-dev
+
+load("@rules_foreign_cc//tools/build_defs:configure.bzl", "configure_make")
+configure_make(
     name = "microhttpd",
-    srcs = ["src/microhttpd/.libs/libmicrohttpd.a"],
-    hdrs = ["src/include/microhttpd.h"],
+    lib_source = ".",
+    static_libraries = ["libmicrohttpd.a"],
+    configure_options = ["--disable-doc", "--disable-examples"],
+    configure_env_vars = {"CFLAGS": "-Wno-error"},
     visibility = ["//visibility:public"],
-    strip_include_prefix = "src/include"
 )
-
-#load("@rules_foreign_cc//tools/build_defs:configure.bzl", "configure_make")
-#configure_make(
-#    name = "microhttpd",
-#    lib_source = "libmicrohttpd-0.9.69",
-#    make_commands = ["make"],  # ???
-#    visibility = ["//visibility:public"],
-#)
-
