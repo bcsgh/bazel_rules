@@ -5,7 +5,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 git_repository(
     name = "rules_foreign_cc",
-    commit = "bafdc9d274c7ad4aee4b60b3c640764c506ba3bb",  # current as of 2020/02/12
+    commit = "d54c78ab86b40770ee19f0949db9d74a831ab9f0",  # current as of 2020/11/11
+    shallow_since = "1603722361 +0100",
     remote = "git://github.com/bazelbuild/rules_foreign_cc.git",
 )
 
@@ -16,13 +17,14 @@ rules_foreign_cc_dependencies([])
 git_repository(
     name = "com_google_googletest",
     remote = "git://github.com/google/googletest.git",
-    tag = "release-1.10.0",  # current as of 2020/1/25
+    tag = "release-1.10.0",  # current as of 2020/11/11
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "44427702614d7b86b064ba06a390f5eb2f85dbf6",  # current as of 2020/1/25
+    commit = "0453e1653372fd719557aa70eaad34f691e0d5ae",  # current as of 2020/11/11
+    shallow_since = "1605107847 -0500",
     remote = "git://github.com/abseil/abseil-cpp.git",
 )
 
@@ -30,7 +32,8 @@ git_repository(
 new_git_repository(
     name = "com_github_etr_libhttpserver",
     build_file = "@bazel_rules//http:BUILD.libhttpserver",
-    commit = "e0fd7a27568caf82fad9cbe2e4dd3ce7a7532fc0",  # current as of 2020/02/03
+    commit = "c9746044d4b5c849f2b484087e110dd2a6e55308",  # current as of 2020/11/11
+    shallow_since = "1599973128 -0800",
     remote = "git://github.com/etr/libhttpserver.git",
     #tag = "v0.11.1",  # old
 )
