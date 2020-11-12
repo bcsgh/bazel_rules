@@ -52,7 +52,7 @@ def cc_embed_data(name = None, srcs = None, namespace = None):
             "--h=$(location %s)" % (h),
             "--cc=$(location %s)" % (cc),
             "--gendir=$(GENDIR)",
-            "--workspace=$$(basename $$PWD)",
+            "--workspace=%s" % (native.repository_name().lstrip("@")),
             "--namespace=%s" % (namespace or ""),
             "--symbol_prefix=%s" % PREFIX,
             "$(SRCS)",
