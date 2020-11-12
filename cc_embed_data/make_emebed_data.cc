@@ -73,9 +73,6 @@ int main(int argc, char** argv) {
         {"/", "_"}, {".", "_"}, {"-", "_"}  //
     };
 
-    // The generated object file is from the original names.
-    std::string var_name = absl::StrReplaceAll(args[i], rep);
-
     // Do a bunch of magic to get the workspace relative path.
     // This is complicated by generated file being in a different places
     // and by the paths changing for the tools vs. result builds.
