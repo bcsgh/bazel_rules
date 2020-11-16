@@ -40,7 +40,7 @@ def genlex(name, src, data = []):
         srcs = [c, h],
     )
 
-def genyacc(name, src, data = []):
+def genyacc(name, src, data = [], graph=False, report=False):
     c = "%s.tab.cc" % name
     h = "%s.tab.h" % name
     cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)
@@ -52,6 +52,16 @@ def genyacc(name, src, data = []):
         "position.hh",
         "location.hh",
     ]
+
+    if graph:
+        g = "%s.dot" % name
+        cmd += " --graph=$(@D)/%s" % g
+        outs += [g]
+    if report:
+        r = "%s.output" % name
+        cmd += " --verbose --report=all"
+        outs += [r]
+
     native.genrule(
         name = name + "_gen",
         outs = outs,
