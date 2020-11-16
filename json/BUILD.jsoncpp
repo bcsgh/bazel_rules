@@ -31,7 +31,8 @@ genrule(
 )
 
 cc_library(
-visibility=["//visibility:public"],    name = "json",
+    name = "json",
+    visibility=["//visibility:public"],
     srcs = [
         "dist/jsoncpp.cpp",
     ],
