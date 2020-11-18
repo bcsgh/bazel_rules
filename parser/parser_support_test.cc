@@ -36,6 +36,8 @@ namespace {
 
 TEST(ParserSupport, Reference) {
   std::string s = "hello";
+  ScannerExtra extra;
+  extra.filename = &s;
   struct {
     struct {
       std::string *filename;
@@ -49,12 +51,12 @@ TEST(ParserSupport, Reference) {
   x.end.line = 3;
   x.end.column = 4;
 
-  Error(x, "world");
+  Error(x, "world", &extra);
 
   x.begin.filename = nullptr;
   x.begin.filename = nullptr;
 
-  Error(x, "world");
+  Error(x, "world", &extra);
 }
 
 }  // namespace

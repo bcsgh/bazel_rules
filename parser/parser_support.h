@@ -28,9 +28,20 @@
 #ifndef PARSER_PARSER_SUPPORT_H_
 #define PARSER_PARSER_SUPPORT_H_
 
+#include <functional>
 #include <string>
 
 namespace parser_support {
+
+// A state object passed to the lexer and parser.
+// For the lexer, use ${yy}set_extra/${yy}get_extra
+// For the paser use %parse-param
+struct ScannerExtra {
+  // The file name being handled.
+  std::string* filename;
+  // The sink for output from the generated code.
+  std::function<void(const std::string&)> outp;
+};
 
 // Print an error message to STDEFF
 // Args:
@@ -41,12 +52,12 @@ namespace parser_support {
 //  ec: end column number
 //  msg: an arbitrary message.
 void Error(const std::string* filename, int bl, int bc, int el, int ec,
-           const std::string& msg);
+           const std::string& msg, const ScannerExtra* e);
 
 template <class L>
-void Error(L const& loc, std::string const& msg) {
+void Error(L const& loc, std::string const& msg, const ScannerExtra* e) {
   Error(loc.begin.filename, loc.begin.line, loc.begin.column, loc.end.line,
-        loc.end.column, msg);
+        loc.end.column, msg, e);
 }
 
 }  // namespace parser_support

@@ -35,14 +35,18 @@
 namespace parser_support {
 
 void Error(const std::string* filename, int bl, int bc, int el, int ec,
-           const std::string& msg) {
+           const std::string& msg, const ScannerExtra* e) {
+  auto outp = e->outp ? e->outp : [](const std::string &s) {
+    absl::FPrintF(stderr, "%s", s);
+  };
+
   const char* fn = filename ? filename->c_str() : "??";
   if (bl == el) {
-    absl::FPrintF(stderr, "error %s:%d:[%d,%d]: %s\n",  //
-                  fn, bl, bc, ec, msg.c_str());
+    outp(absl::StrFormat("error %s:%d:[%d,%d]: %s\n",  //
+                         fn, bl, bc, ec, msg.c_str()));
   } else {
-    absl::FPrintF(stderr, "error %s:%d:%d to %d:%d: %s\n",  //
-                  fn, bl, bc, el, ec, msg.c_str());
+    outp(absl::StrFormat("error %s:%d:%d to %d:%d: %s\n",  //
+                         fn, bl, bc, el, ec, msg.c_str()));
   }
 }
 
