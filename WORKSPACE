@@ -16,8 +16,8 @@ rules_foreign_cc_dependencies([])
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "0e202cdbe36b87b4fb68de2b5295a794a10c5cf8",  # current as of 2020/11/12
-    shallow_since = "1605205962 -0500",
+    commit = "b1fbd33c06cdb0024c67733c6fdec2009d17b384",  # current as of 2020/11/28
+    shallow_since = "1606207587 -0500",
     remote = "git://github.com/google/googletest.git",
 )
 
