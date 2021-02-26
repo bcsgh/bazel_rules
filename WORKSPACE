@@ -16,16 +16,16 @@ rules_foreign_cc_dependencies([])
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "b1fbd33c06cdb0024c67733c6fdec2009d17b384",  # current as of 2020/11/28
-    shallow_since = "1606207587 -0500",
+    commit = "609281088cfefc76f9d0ce82e1ff6c30cc3591e5",  # current as of 2021/02/17
+    shallow_since = "1613065794 -0500",
     remote = "git://github.com/google/googletest.git",
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "5d8fc9192245f0ea67094af57399d7931d6bd53f",  # current as of 2020/11/28
-    shallow_since = "1606203805 -0500",
+    commit = "143a27800eb35f4568b9be51647726281916aac9",  # current as of 2021/02/17
+    shallow_since = "1613186346 -0500",
     remote = "git://github.com/abseil/abseil-cpp.git",
 )
 
@@ -33,8 +33,8 @@ git_repository(
 new_git_repository(
     name = "com_github_etr_libhttpserver",
     build_file = "@bazel_rules//http:BUILD.libhttpserver",
-    commit = "7cb4eb8454ab936fcf2c54a61cc4d71a65f14680",  # current as of 2020/11/28
-    shallow_since = "1605998057 -0800",
+    commit = "ec973dc883b0d33f81c7f69b66dd5770ba14e695",  # current as of 2021/02/17
+    shallow_since = "1607724471 -0800",
     remote = "git://github.com/etr/libhttpserver.git",
     #tag = "v0.11.1",  # old
 )
