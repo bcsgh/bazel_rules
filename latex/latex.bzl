@@ -35,13 +35,15 @@ def tex_to_pdf(name=None, src=None, pdf=None, runs=2, data=[]):
 
   i = src.replace(".tex", ".pdf")
 
+  cmd = "(/usr/bin/pdflatex $(location %s) > ./%s.LOG)" % (src, name)
   native.genrule(
     name = name,
     outs = [pdf],
     srcs = [src] + data,
-    cmd = "(%s)" % ") && (".join(
-        ["/usr/bin/pdflatex $(location %s)" % src] * runs + [
-        "cp %s $@" % i,
-    ])
+    cmd = "(%s) || (cat ./%s.LOG && false) && cp %s $@" % (
+      " && ".join([cmd] * runs),
+      name,
+      i
+    )
   )
   
