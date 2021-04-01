@@ -1,0 +1,6 @@
+build --cxxopt=-std=c++17
+
+build --copt=-fno-exceptions
+build --copt=-Werror
+
+test --test_output=errors
