@@ -51,7 +51,8 @@ TEST(CcEmbedData, Basic) {
   // Check that all files match.
   std::map<std::string, std::string> idx;
   for (const auto& i : test_ns::EmbedIndex()) {
-    idx.emplace(i.first, i.second);
+    idx.emplace(std::string{i.first},
+                std::string{i.second});
 
     EXPECT_EQ(ReadFile(std::string{i.first}), i.second) << i.first;
   }
