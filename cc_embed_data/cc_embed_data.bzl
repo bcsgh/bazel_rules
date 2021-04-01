@@ -39,7 +39,13 @@ other build artifacts) rather than deal with escaping them into string literals.
 """
 
 def cc_embed_data(name = None, srcs = None, namespace = None):
-    """Generate a library containing the contents of srcs."""
+    """Generate a library containing the contents of srcs.
+
+    Args:
+      name: The target name.
+      srcs: The files to embed.
+      namespace: If given, the C++ namespace to generate in.
+    """
     if not srcs:
         fail("srcs must be provided")
     if not name:

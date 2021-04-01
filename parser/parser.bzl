@@ -28,7 +28,13 @@
 """Bazel/skylark rules for wrapping Flex/Bison builds."""
 
 def genlex(name, src, data = []):
-    """Generate a lexer using flex."""
+    """Generate a lexer using flex.
+
+    Args:
+      name: The target name.
+      arc: The root source file.
+      data: Other files needed.
+    """
     c = "%s.yy.cc" % name
     h = "%s.yy.h" % name
     cmd = "flex --outfile=$(@D)/%s --header-file=$(@D)/%s $(location %s)" % (c, h, src)
@@ -44,7 +50,15 @@ def genlex(name, src, data = []):
     )
 
 def genyacc(name, src, data = [], graph = False, report = False):
-    """Generate a paser using bison."""
+    """Generate a paser using bison.
+
+    Args:
+      name: The target name.
+      arc: The root source file.
+      data: Other files needed.
+      graph: Generate a state machine graph.
+      report: Generate a "report" (`--verbose --report=all`).
+    """
     c = "%s.tab.cc" % name
     h = "%s.tab.h" % name
     cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)

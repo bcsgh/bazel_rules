@@ -31,7 +31,12 @@ This is usefull, for example, with a genrule.
 """
 
 def build_test(name = None, targets = []):
-    """A test that depends on arbitary targets."""
+    """A test that depends on arbitary targets.
+
+    Args:
+      name: The target name.
+      targets: Targets to check.
+    """
     native.sh_test(
         name = name,
         srcs = ["@bazel_rules//build_test:blank.sh"],

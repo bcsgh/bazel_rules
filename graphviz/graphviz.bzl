@@ -28,7 +28,14 @@
 """Bazle/skylark rule(s) to process GraphViz."""
 
 def gen_dot(name = None, src = None, out = None, format = "png"):
-    """Process a .dot file."""
+    """Process a .dot file.
+
+    Args:
+      name: The target name.
+      src: The .dot file.
+      out: The target file name.
+      format: the output file format.
+    """
     if not src:
         fail("src must be provided")
     if not name:

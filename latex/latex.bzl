@@ -28,7 +28,16 @@
 """Bazle/skylark rule(s) to process LaTeX."""
 
 def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = []):
-    """Process a .tex file into a .pdf file."""
+    """Process a .tex file into a .pdf file.
+
+    Args:
+      name: The target name.
+      src: The root source file
+      pdf: The output file name.
+      runs: How many times to run.
+        (Yes, re-running latex mutiple times is still a thing.)
+      data: Other files needed.
+    """
     if not name:
         fail("name must be provided")
     if not src:
