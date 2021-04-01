@@ -25,7 +25,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""Bazle/skylark rule(s) to process GraphViz."""
+
 def gen_dot(name = None, src = None, out = None, format = "png"):
+    """Process a .dot file."""
     if not src:
         fail("src must be provided")
     if not name:

@@ -25,7 +25,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""Bazel/skylark rules for wrapping Flex/Bison builds."""
+
 def genlex(name, src, data = []):
+    """Generate a lexer using flex."""
     c = "%s.yy.cc" % name
     h = "%s.yy.h" % name
     cmd = "flex --outfile=$(@D)/%s --header-file=$(@D)/%s $(location %s)" % (c, h, src)
@@ -41,6 +44,7 @@ def genlex(name, src, data = []):
     )
 
 def genyacc(name, src, data = [], graph=False, report=False):
+    """Generate a paser using bison."""
     c = "%s.tab.cc" % name
     h = "%s.tab.h" % name
     cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)
@@ -56,11 +60,11 @@ def genyacc(name, src, data = [], graph=False, report=False):
     if graph:
         g = "%s.dot" % name
         cmd += " --graph=$(@D)/%s" % g
-        outs += [g]
+        outs.append(g)
     if report:
         r = "%s.output" % name
         cmd += " --verbose --report=all"
-        outs += [r]
+        outs.append(r)
 
     native.genrule(
         name = name + "_gen",

@@ -30,7 +30,16 @@
 # http://www.math.utah.edu/docs/info/ld_2.html
 # https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 
+"""
+A Bazel/skylark rule for embedding files from the build environment into the
+data section of a binary and making them accessible as a library.
+
+This allows placing large test or binary artifacts to come from faw files (or
+other build artifacts) rather than deal with escaping them into string literals.
+"""
+
 def cc_embed_data(name = None, srcs = None, namespace = None):
+    """Generate a library containing the contents of srcs."""
     if not srcs:
         fail("srcs must be provided")
     if not name:

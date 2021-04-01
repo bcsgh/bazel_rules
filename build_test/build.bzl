@@ -25,9 +25,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# A basic test that always passes, as long as everythin in `targets` builds.
-# This is usefull, for example, with a genrule.
+"""
+A basic test that always passes, as long as everythin in `targets` builds.
+This is usefull, for example, with a genrule.
+"""
+
 def build_test(name = None, targets = []):
+    """A test that depends on arbitary targets."""
     native.sh_test(
         name = name,
         srcs = ["@bazel_rules//build_test:blank.sh"],
