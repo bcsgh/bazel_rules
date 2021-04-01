@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def gen_dot(name = None, src = None, out = None):
+def gen_dot(name = None, src = None, out = None, format = "png"):
     if not src:
         fail("src must be provided")
     if not name:
@@ -37,5 +37,5 @@ def gen_dot(name = None, src = None, out = None):
         name = name,
         outs = [out],
         srcs = [src],
-        cmd = "dot -Tpng -o$(location %s) $(location %s) " % (out, src),
+        cmd = "dot -T%s -o$(location %s) $(location %s) " % (format, out, src),
     )
