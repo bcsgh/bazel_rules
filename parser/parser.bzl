@@ -32,7 +32,7 @@ def genlex(name, src, data = []):
 
     Args:
       name: The target name.
-      arc: The root source file.
+      src: The root source file.
       data: Other files needed.
     """
     c = "%s.yy.cc" % name
@@ -54,7 +54,7 @@ def genyacc(name, src, data = [], graph = False, report = False):
 
     Args:
       name: The target name.
-      arc: The root source file.
+      src: The root source file.
       data: Other files needed.
       graph: Generate a state machine graph.
       report: Generate a "report" (`--verbose --report=all`).
