@@ -105,8 +105,8 @@ int main(int argc, char** argv) {
 #include "absl/types/span.h"
 
 )";
-  constexpr char decl[] =
-      R"(absl::Span<std::pair<absl::string_view, absl::string_view>> EmbedIndex())";
+  constexpr char decl[] = R"(EmbeddedIndex EmbedIndex())";
+  constexpr char type[] = "absl::Span<std::pair<absl::string_view, absl::string_view>>";
 
   /////// The header.
   h << header << ns_open;
@@ -115,6 +115,7 @@ int main(int argc, char** argv) {
       << "::absl::string_view " << item.var_name << "();\n\n";
   }
   if (!absl::GetFlag(FLAGS_namespace).empty()) {
+    h << "using EmbeddedIndex = " << type << ";\n";
     h << decl << ";\n\n";
   }
   h << ns_close << "// Done\n\n";
@@ -141,6 +142,7 @@ int main(int argc, char** argv) {
   }
 
   if (!absl::GetFlag(FLAGS_namespace).empty()) {
+    cc << "using EmbeddedIndex = " << type << ";\n";
     cc << decl << R"( {
   static std::pair<absl::string_view, absl::string_view> kRet[] = {
 )";
@@ -148,11 +150,9 @@ int main(int argc, char** argv) {
     for (const auto& item : items) {
       cc << "    {\"" << item.file_name << "\", " << item.var_name << "()},\n";
     }
-    cc << R"(  };
-  return kRet;
-}
-
-)";
+    cc << "  };\n"
+       << "  return EmbeddedIndex{kRet, " << items.size() << "};\n"
+       << "}\n\n";
   }
 
   cc << ns_close << "// Done\n\n";
