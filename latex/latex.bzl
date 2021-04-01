@@ -27,25 +27,25 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-def tex_to_pdf(name=None, src=None, pdf=None, runs=2, data=[]):
+def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = []):
     """Process a .tex file into a .pdf file."""
-  if not name:
-    fail("name must be provided")
-  if not src:
-    fail("src must be provided")
-  if not pdf:
-    fail("pdf must be provided")
+    if not name:
+        fail("name must be provided")
+    if not src:
+        fail("src must be provided")
+    if not pdf:
+        fail("pdf must be provided")
 
-  i = src.replace(".tex", ".pdf")
+    i = src.replace(".tex", ".pdf")
 
-  cmd = "(/usr/bin/pdflatex $(location %s) > ./%s.LOG)" % (src, name)
-  native.genrule(
-    name = name,
-    outs = [pdf],
-    srcs = [src] + data,
-    cmd = "(%s) || (cat ./%s.LOG && false) && cp %s $@" % (
-      " && ".join([cmd] * runs),
-      name,
-      i
+    cmd = "(/usr/bin/pdflatex $(location %s) > ./%s.LOG)" % (src, name)
+    native.genrule(
+        name = name,
+        outs = [pdf],
+        srcs = [src] + data,
+        cmd = "(%s) || (cat ./%s.LOG && false) && cp %s $@" % (
+            " && ".join([cmd] * runs),
+            name,
+            i,
+        ),
     )
-  )

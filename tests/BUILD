@@ -126,5 +126,5 @@ build_test(
     targets = [
         "@com_github_etr_libhttpserver//:libhttpserver",
         "@org_gnu_microhttpd//:microhttpd",
-    ]
+    ],
 )

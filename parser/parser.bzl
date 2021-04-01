@@ -43,7 +43,7 @@ def genlex(name, src, data = []):
         srcs = [c, h],
     )
 
-def genyacc(name, src, data = [], graph=False, report=False):
+def genyacc(name, src, data = [], graph = False, report = False):
     """Generate a paser using bison."""
     c = "%s.tab.cc" % name
     h = "%s.tab.h" % name
