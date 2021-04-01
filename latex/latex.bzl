@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Bazle/skylark rules to process LaTeX."""
+"""Bazle/skylark rule(s) to process LaTeX."""
 
 def tex_to_pdf(name=None, src=None, pdf=None, runs=2, data=[]):
     """Process a .tex file into a .pdf file."""
