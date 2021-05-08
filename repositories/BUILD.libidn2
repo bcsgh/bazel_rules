@@ -15,8 +15,6 @@ filegroup(
 
 configure_make(
     name = "libidn2",
-    lib_source = "@com_gitlab_libidn_libidn2//:all",
-    configure_in_place = True,
     autogen = True,
     autogen_command = "bootstrap",
     autogen_options = [
@@ -25,14 +23,16 @@ configure_make(
         "--skip-po",
         "--no-bootstrap-sync",
     ],
+    configure_env_vars = {
+        "CC_FOR_BUILD": "${CC}",
+        "CFLAGS": "-Wno-error",
+    },
+    configure_in_place = True,
     configure_options = [
         #"--help",
         "--disable-doc",
         "--enable-shared=no",
     ],
-    configure_env_vars = {
-      "CC_FOR_BUILD": "${CC}",
-      "CFLAGS": "-Wno-error",
-    },
+    lib_source = "@com_gitlab_libidn_libidn2//:all",
     visibility = ["//visibility:public"],
 )
