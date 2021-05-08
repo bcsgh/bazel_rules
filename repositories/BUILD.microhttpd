@@ -6,19 +6,21 @@
 # sudo apt-get install libpthread-stubs0-dev
 
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+
 filegroup(
     name = "all",
-    srcs = glob(
-        ["**"],
-        exclude=[
-        ]),
+    srcs = glob(["**"]),
 )
 
 configure_make(
     name = "microhttpd",
     lib_source = "@org_gnu_microhttpd//:all",
-    static_libraries = ["libmicrohttpd.a"],
-    configure_options = ["--disable-doc", "--disable-examples"],
+    out_static_libs = ["libmicrohttpd.a"],
+    configure_options = [
+        "--disable-doc",
+        "--disable-examples",
+        "--disabled-shared",
+    ],
     configure_env_vars = {"CFLAGS": "-Wno-error"},
     visibility = ["//visibility:public"],
 )
