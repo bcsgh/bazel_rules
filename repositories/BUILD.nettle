@@ -1,0 +1,43 @@
+# Building this may need one or more of the following:
+# sudo apt install \
+#   gperf \
+#   autogen \
+#   pkg-config \
+#   autotools-dev \
+#   autoconf \
+#   libtool \
+#   autopoint \
+#   libpthread-stubs0-dev
+
+
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+filegroup(
+    name = "all",
+    srcs = glob(["**"]),
+)
+
+configure_make(
+    name = "nettle",
+    lib_source = "@se_liu_lysator_nettle_nettle//:all",
+    ###
+    configure_in_place = True,
+    autogen = True,
+    autogen_command = ".bootstrap",
+    autogen_options = [
+        #"--no-bootstrap-sync",
+        #"--copy",
+        #"--no-git",
+        #"--gnulib-srcdir=gnulib",
+        #"--skip-po",
+    ],
+    ###
+    #make_commands = [ #"make dist", "make", "make install" ],
+    out_static_libs = ["libnettle.a"],
+    configure_options = [
+        #"--help",
+        "--disable-doc",
+        "--disable-shared",
+    ],
+    configure_env_vars = {"CFLAGS": "-Wno-error"},
+    visibility = ["//visibility:public"],
+)

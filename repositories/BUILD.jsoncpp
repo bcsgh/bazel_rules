@@ -1,0 +1,45 @@
+# https://open-source-parsers.github.io/jsoncpp-docs/doxygen/index.htm
+# https://github.com/open-source-parsers/jsoncppl
+
+py_binary(
+    name = "amalgamate_tool",
+    srcs = ["amalgamate.py"],
+    main = "amalgamate.py",
+)
+
+genrule(
+    name = "amalgamate",
+    srcs = glob([
+        "include/json/*.h",
+        "src/lib_json/*.h",
+        "src/lib_json/*.cpp",
+        "src/lib_json/*.inl",
+    ]) + [
+        "LICENSE",
+    ],
+    outs = [
+        "dist/json/json-forwards.h",
+        "dist/json/json.h",
+        "dist/jsoncpp.cpp",
+    ],
+    cmd = (
+        "$(location :amalgamate_tool)" +
+        " --top-dir=$$(dirname $(location :LICENSE))" +
+        " --source=$(RULEDIR)/dist/jsoncpp.cpp"
+    ),
+    tools = [":amalgamate_tool"],
+)
+
+cc_library(
+    name = "json",
+    visibility=["//visibility:public"],
+    srcs = [
+        "dist/jsoncpp.cpp",
+    ],
+    hdrs = [
+        "dist/json/json.h",
+        "dist/json/json-forwards.h",
+    ],
+    defines = ["JSON_USE_EXCEPTION=0"],
+    includes = ["dist"],
+)

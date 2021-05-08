@@ -5,10 +5,18 @@
 # sudo apt-get install autopoint
 # sudo apt-get install libpthread-stubs0-dev
 
-load("@rules_foreign_cc//tools/build_defs:configure.bzl", "configure_make")
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+filegroup(
+    name = "all",
+    srcs = glob(
+        ["**"],
+        exclude=[
+        ]),
+)
+
 configure_make(
     name = "microhttpd",
-    lib_source = ".",
+    lib_source = "@org_gnu_microhttpd//:all",
     static_libraries = ["libmicrohttpd.a"],
     configure_options = ["--disable-doc", "--disable-examples"],
     configure_env_vars = {"CFLAGS": "-Wno-error"},

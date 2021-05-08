@@ -2,16 +2,16 @@ workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_rules//repositories:repositories.bzl", "jsoncpp", "libcurl", "libev", "libgnutls", "libidn2", "libnettle", "zlib")
 
 git_repository(
     name = "rules_foreign_cc",
-    commit = "d54c78ab86b40770ee19f0949db9d74a831ab9f0",  # current as of 2020/11/28
+    commit = "b136e6c52da63da300b0f588c8a214d97b0d15cd",  # current as of 2021/05/06
+    shallow_since = "1620262045 -0700",
     remote = "git://github.com/bazelbuild/rules_foreign_cc.git",
-    shallow_since = "1603722361 +0100",
 )
 
-load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
-
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 rules_foreign_cc_dependencies([])
 
 #############################################
@@ -33,7 +33,7 @@ git_repository(
 #############################################
 new_git_repository(
     name = "com_github_etr_libhttpserver",
-    build_file = "@bazel_rules//http:BUILD.libhttpserver",
+    build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
     commit = "ec973dc883b0d33f81c7f69b66dd5770ba14e695",  # current as of 2021/02/17
     remote = "git://github.com/etr/libhttpserver.git",
     shallow_since = "1607724471 -0800",
@@ -56,8 +56,16 @@ DOMAINS = [
 
 http_archive(
     name = "org_gnu_microhttpd",
-    build_file = "@bazel_rules//http:BUILD.microhttpd",
+    build_file = "@bazel_rules//repositories:BUILD.microhttpd",
     sha256 = "90d0a3d396f96f9bc41eb0f7e8187796049285fabef82604acd4879590977307",
     strip_prefix = "libmicrohttpd-0.9.70",
     urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz" % domain for domain in DOMAINS],
 )
+
+jsoncpp()
+libcurl()
+libev()
+libgnutls()
+libidn2()
+libnettle()
+zlib()
