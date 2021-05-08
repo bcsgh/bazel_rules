@@ -9,35 +9,28 @@
 #   autopoint \
 #   libpthread-stubs0-dev
 
-
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+
 filegroup(
     name = "all",
     srcs = glob(
         ["**"],
-        exclude=[
-            "devel/libtasn1/tests/**"
-        ]),
+        exclude = [
+            "devel/libtasn1/tests/**",
+        ],
+    ),
 )
 
 LIBS = [
-        "x509/.libs/libgnutls_x509.a",
-        "ext/.libs/libgnutls_ext.a",
-        "auth/.libs/libgnutls_auth.a",
-        "extras/.libs/libgnutls_extras.a",
-        "algorithms/.libs/libgnutls_alg.a",
+    "x509/.libs/libgnutls_x509.a",
+    "ext/.libs/libgnutls_ext.a",
+    "auth/.libs/libgnutls_auth.a",
+    "extras/.libs/libgnutls_extras.a",
+    "algorithms/.libs/libgnutls_alg.a",
 ]
 
 configure_make(
     name = "gnutls",
-    lib_source = "@com_gitlab_gnutls//:all",
-    deps = [
-        "@se_liu_lysator_nettle_nettle//:nettle",
-        "@com_github_enki_libev//:libev",
-    ],
-    visibility = ["//visibility:public"],
-    ###
-    configure_in_place = True,#
     autogen = True,
     autogen_command = "bootstrap",
     autogen_options = [
@@ -47,33 +40,34 @@ configure_make(
         "--gnulib-srcdir=gnulib",
         "--skip-po",
     ],
+    configure_env_vars = {
+        "CFLAGS": " ".join([
+            "-Wno-error",
+        ]),
+    },
     ###
-    postfix_script = "\n".join([
-        "echo $PWD",
-        "find . -name '*.a'",
-        "echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",
-        "mkdir -p $INSTALLDIR/lib",
-    ] + [
-        # Squash all the generatde libraries into one.
-        # This avoids needing to know exactly which libraries are generated.
-        "mkdir ar_merge_tmp",
-        "(cd ar_merge_tmp ; for f in ../lib/*/.libs/*.a ; do ar -x $f ; done )",
-        "ar -csr $INSTALLDIR/lib/gnutls.a ar_merge_tmp/*.o"
-        #"rm -rf ar_merge_tmp",
-    ]),
-    out_static_libs = ["gnutls.a"], #[l.split("/")[-1] for l in LIBS],
+    configure_in_place = True,
     configure_options = [
-        #"--help=recursive",  #
         "--disable-cxx",  # To avoid exceptions
         "--disable-tests",
         "--disable-doc",
         "--with-included-unistring",
         "--enable-shared=no",
     ],
-    configure_env_vars = {
-        "CFLAGS": " ".join([
-          "-Wno-error",
-        ]),
-    },
+    lib_source = "@com_gitlab_gnutls//:all",
+    out_static_libs = ["gnutls.a"],
+    ###
+    postfix_script = "\n".join([
+        # Squash all the generatde libraries into one.
+        # This avoids needing to know exactly which libraries are generated.
+        "mkdir ar_merge_tmp",
+        "(cd ar_merge_tmp ; for f in ../lib/*/.libs/*.a ; do ar -x $f ; done )",
+        "ar -csr $INSTALLDIR/lib/gnutls.a ar_merge_tmp/*.o",
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_enki_libev//:libev",
+        "@se_liu_lysator_nettle_nettle//:nettle",
+    ],
 )
 # """

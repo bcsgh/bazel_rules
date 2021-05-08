@@ -15,23 +15,16 @@ filegroup(
 
 configure_make(
     name = "curl_lib",
-    lib_source = "@com_github_curl_curl//:all",
-    deps = [
-        "@com_gitlab_gnutls//:gnutls",
-    ],
-    configure_in_place = True,
     autogen = True,
     autogen_command = "buildconf",
-    make_commands = ["make", "make install"],
-    out_static_libs = ["libcurl.a"],
+    configure_env_vars = {"CFLAGS": "-Wno-error"},
+    configure_in_place = True,
     configure_options = [
         #"--help",
         "--disable-shared",
         "--disable-doc",
         "--disable-examples",
-
-        "--with-gnutls", #"--with-gnutls=../com_gitlab_gnutls",
-
+        "--with-gnutls",
         "--enable-http",
         "--enable-ftp",
         "--enable-file",
@@ -45,16 +38,24 @@ configure_make(
         "--enable-gopher",
         "--enable-mqtt",
     ],
-    configure_env_vars = {"CFLAGS": "-Wno-error"},
+    lib_source = "@com_github_curl_curl//:all",
+    make_commands = [
+        "make",
+        "make install",
+    ],
+    out_static_libs = ["libcurl.a"],
+    deps = [
+        "@com_gitlab_gnutls//:gnutls",
+    ],
 )
 
 cc_library(
     name = "curl",
+    visibility = ["//visibility:public"],
     deps = [
         ":curl_lib",
-        "@com_gitlab_libidn_libidn2//:libidn2",
         "@com_gitlab_gnutls//:gnutls",
-        "@zlib//:zlib",
+        "@com_gitlab_libidn_libidn2//:libidn2",
+        "@zlib",
     ],
-    visibility = ["//visibility:public"],
 )

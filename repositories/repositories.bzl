@@ -49,14 +49,11 @@ def jsoncpp():
 def libgnutls():
     new_git_repository(
         name = "com_gitlab_gnutls",
-
         remote = "https://gitlab.com/gnutls/gnutls.git",
         commit = "5dd9a55040da54371807471bf3169d7a9a1f527e",
         shallow_since = "1599201540 +0200",
         recursive_init_submodules = True,
-
         build_file = "@bazel_rules//repositories:BUILD.gnutls",
-
         patch_cmds = [
             "rm devel/libtasn1/gtk-doc.make",  # broken symlink in some builds.
         ],
@@ -70,7 +67,6 @@ def libnettle():
         commit = "8247fa21f0f2a7d1b2ff0fbbe61cb058e5edffbe",
         shallow_since = "1618305807 +0200",
         recursive_init_submodules = True,
-
         build_file = "@bazel_rules//repositories:BUILD.nettle",
     )
 
@@ -80,9 +76,7 @@ def libev():
         remote = "git://github.com/enki/libev.git",
         commit = "93823e6ca699df195a6c7b8bfa6006ec40ee0003",
         shallow_since = "1463172876 -0700",
-
         build_file = "@bazel_rules//repositories:BUILD.libev",
-
         patch_cmds = [
             "chmod 755 autogen.sh",
         ],
