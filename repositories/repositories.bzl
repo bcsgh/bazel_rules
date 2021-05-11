@@ -85,3 +85,14 @@ def libev():
             "chmod 755 autogen.sh",
         ],
     )
+
+#############################################
+def openssl():
+    new_git_repository(
+        name = "com_github_openssl_openssl",
+        remote = "https://github.com/openssl/openssl.git",
+        commit = "d29d7a7ff22e8e3be1c8bbdb8edd3ab9c72ed021",
+        shallow_since = "1620617030 +1000",
+        #recursive_init_submodules = True,
+        build_file = "@bazel_rules//repositories:BUILD.openssl",
+    )

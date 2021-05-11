@@ -24,7 +24,7 @@ configure_make(
         "--disable-shared",
         "--disable-doc",
         "--disable-examples",
-        "--with-gnutls",
+        "--with-openssl",
         "--enable-http",
         "--enable-ftp",
         "--enable-file",
@@ -45,7 +45,7 @@ configure_make(
     ],
     out_static_libs = ["libcurl.a"],
     deps = [
-        "@com_gitlab_gnutls//:gnutls",
+        "@com_github_openssl_openssl//:openssl",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":curl_lib",
-        "@com_gitlab_gnutls//:gnutls",
+        "@com_github_openssl_openssl//:openssl",
         "@com_gitlab_libidn_libidn2//:libidn2",
         "@zlib",
     ],
