@@ -20,19 +20,19 @@ filegroup(
 
 configure_make(
     name = "openssl",
+    configure_command = "Configure",
     configure_env_vars = {
         "CFLAGS": " ".join([
             "-ldl",
         ]),
         "LIBS": "-ldl",  # Seem to need this for some reason?
     },
-    configure_command = "Configure",
     configure_options = [
         #"--help",
-        "no-shared"
+        "no-shared",
     ],
     lib_source = "@com_github_openssl_openssl//:all",
-    linkopts= ["-ldl"],
+    linkopts = ["-ldl"],
     postfix_script = "\n".join([
         "echo PWD=$PWD",
         "echo INSTALLDIR=$INSTALLDIR",
