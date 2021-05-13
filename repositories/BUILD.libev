@@ -25,6 +25,7 @@ configure_make(
         "CFLAGS": "-Wno-error",
     },
     configure_options = [
+        #"--help",
         "--enable-shared=no",
     ],
     lib_source = "@com_github_enki_libev//:all",

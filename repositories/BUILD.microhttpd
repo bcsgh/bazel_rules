@@ -18,6 +18,7 @@ configure_make(
     configure_options = [
         "--disable-doc",
         "--disable-examples",
+        #"--enable-messages",  # Helps debugging.
         "--disabled-shared",
     ],
     lib_source = "@org_gnu_microhttpd//:all",

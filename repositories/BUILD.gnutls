@@ -21,14 +21,6 @@ filegroup(
     ),
 )
 
-LIBS = [
-    "x509/.libs/libgnutls_x509.a",
-    "ext/.libs/libgnutls_ext.a",
-    "auth/.libs/libgnutls_auth.a",
-    "extras/.libs/libgnutls_extras.a",
-    "algorithms/.libs/libgnutls_alg.a",
-]
-
 configure_make(
     name = "gnutls",
     autogen = True,
@@ -48,6 +40,7 @@ configure_make(
     ###
     configure_in_place = True,
     configure_options = [
+        #"--help=recursive",
         "--disable-cxx",  # To avoid exceptions
         "--disable-tests",
         "--disable-doc",
@@ -58,7 +51,7 @@ configure_make(
     out_static_libs = ["gnutls.a"],
     ###
     postfix_script = "\n".join([
-        # Squash all the generatde libraries into one.
+        # Squash all the generated libraries into one.
         # This avoids needing to know exactly which libraries are generated.
         "mkdir ar_merge_tmp",
         "(cd ar_merge_tmp ; for f in ../lib/*/.libs/*.a ; do ar -x $f ; done )",
@@ -70,4 +63,3 @@ configure_make(
         "@se_liu_lysator_nettle_nettle//:nettle",
     ],
 )
-# """
