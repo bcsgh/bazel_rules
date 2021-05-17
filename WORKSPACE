@@ -2,7 +2,7 @@ workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_rules//repositories:repositories.bzl", "jsoncpp", "libcurl", "libev", "libgnutls", "libidn2", "libnettle", "openssl", "zlib")
+load("@bazel_rules//repositories:repositories.bzl", "jsoncpp", "libcurl", "libev", "libgnutls", "libidn2", "libnettle", "microhttpd", "openssl", "zlib")
 
 git_repository(
     name = "rules_foreign_cc",
@@ -41,27 +41,6 @@ new_git_repository(
 )
 
 #############################################
-DOMAINS = [
-    # GNU mirrors
-    "ftp.wayne.edu",
-    "mirrors.tripadvisor.com",
-    "mirrors.kernel.org",
-    "mirror.clarkson.edu",
-    "mirrors.syringanetworks.net",
-    "mirror.us-midwest-1.nexcess.net",
-    "mirrors.ocf.berkeley.edu",
-    # primary
-    "ftp.gnu.org",
-]
-
-http_archive(
-    name = "org_gnu_microhttpd",
-    build_file = "@bazel_rules//repositories:BUILD.microhttpd",
-    sha256 = "90d0a3d396f96f9bc41eb0f7e8187796049285fabef82604acd4879590977307",
-    strip_prefix = "libmicrohttpd-0.9.70",
-    urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz" % domain for domain in DOMAINS],
-)
-
 jsoncpp()
 
 libcurl()
@@ -73,6 +52,8 @@ libgnutls()
 libidn2()
 
 libnettle()
+
+microhttpd()
 
 openssl()
 
