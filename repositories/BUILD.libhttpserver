@@ -1,6 +1,28 @@
 cc_library(
     name = "libhttpserver",
-    hdrs = ["src/httpserver.hpp"],
+    hdrs = [
+        "src/gettext.h",
+        "src/httpserver.hpp",
+    ],
+    copts = [
+        "-fexceptions",
+        #"-lpthread",
+        #"-pthread",
+    ],
+    defines = [
+        "HAVE_GNUTLS",
+    ],
+    includes = [
+        "src",
+    ],
+    linkopts = [
+        "-pthread",
+        "-lgnutls",  # apt install libgnutls28-dev
+    ],
+    local_defines = [
+        "HTTPSERVER_COMPILATION",
+        "MHD_NO_DEPRECATION",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":basic_auth_fail_response",
@@ -12,6 +34,7 @@ cc_library(
         ":http_utils",
         ":string_utilities",
         ":webserver",
+        "@org_gnu_microhttpd//:microhttpd",
     ],
 )
 
