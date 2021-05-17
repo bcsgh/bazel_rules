@@ -16,10 +16,12 @@ configure_make(
     name = "microhttpd",
     configure_env_vars = {"CFLAGS": "-Wno-error"},
     configure_options = [
+        #"--help",
         "--disable-doc",
         "--disable-examples",
         #"--enable-messages",  # Helps debugging.
-        "--disabled-shared",
+        "--with-gnutls",
+        "--enable-shared=no",
     ],
     lib_source = "@org_gnu_microhttpd//:all",
     out_static_libs = ["libmicrohttpd.a"],
