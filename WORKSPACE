@@ -2,7 +2,7 @@ workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_rules//repositories:repositories.bzl", "jsoncpp", "libcurl", "libev", "libgnutls", "libidn2", "libnettle", "microhttpd", "openssl", "zlib")
+load("@bazel_rules//repositories:repositories.bzl", "jsoncpp", "libcurl", "libev", "libgnutls", "libhttpserver", "libidn2", "libnettle", "microhttpd", "openssl", "zlib")
 
 git_repository(
     name = "rules_foreign_cc",
@@ -32,15 +32,6 @@ git_repository(
 )
 
 #############################################
-new_git_repository(
-    name = "com_github_etr_libhttpserver",
-    build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
-    commit = "ec973dc883b0d33f81c7f69b66dd5770ba14e695",  # current as of 2021/02/17
-    remote = "git://github.com/etr/libhttpserver.git",
-    shallow_since = "1607724471 -0800",
-)
-
-#############################################
 jsoncpp()
 
 libcurl()
@@ -48,6 +39,8 @@ libcurl()
 libev()
 
 libgnutls()
+
+libhttpserver()
 
 libidn2()
 

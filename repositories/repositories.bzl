@@ -64,6 +64,16 @@ def libgnutls():
     )
 
 #############################################
+def libhttpserver():
+    new_git_repository(
+        name = "com_github_etr_libhttpserver",
+        build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
+        commit = "ec973dc883b0d33f81c7f69b66dd5770ba14e695",  # current as of 2021/02/17
+        remote = "git://github.com/etr/libhttpserver.git",
+        shallow_since = "1607724471 -0800",
+    )
+
+#############################################
 def libnettle():
     new_git_repository(
         name = "se_liu_lysator_nettle_nettle",
@@ -73,7 +83,6 @@ def libnettle():
         recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.nettle",
     )
-
 
 #############################################
 def libev():
@@ -107,9 +116,9 @@ def microhttpd():
     http_archive(
         name = "org_gnu_microhttpd",
         build_file = "@bazel_rules//repositories:BUILD.microhttpd",
-        sha256 = "90d0a3d396f96f9bc41eb0f7e8187796049285fabef82604acd4879590977307",
-        strip_prefix = "libmicrohttpd-0.9.70",
-        urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz" % domain for domain in DOMAINS],
+        sha256 = "e8f445e85faf727b89e9f9590daea4473ae00ead38b237cf1eda55172b89b182",
+        strip_prefix = "libmicrohttpd-0.9.71",
+        urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-0.9.71.tar.gz" % domain for domain in DOMAINS],
     )
 
 #############################################
