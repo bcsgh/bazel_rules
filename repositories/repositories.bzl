@@ -6,6 +6,16 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 #############################################
+def eigen():
+    new_git_repository(
+        name = "eigen",
+        build_file = "@bazel_rules//repositories:BUILD.eigen",
+        commit = "9b51dc7972c9f64727e9c8e8db0c60aaf9aae532",  # current as of 2021/02/17
+        remote = "https://gitlab.com/libeigen/eigen.git",
+        shallow_since = "1613584163 +0000",
+    )
+
+#############################################
 def libcurl():
     new_git_repository(
         name = "com_github_curl_curl",

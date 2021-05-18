@@ -1,0 +1,12 @@
+# A bazel BUILD file for Eigen.
+
+cc_library(
+    name = "eigen",
+    srcs = [
+    ],
+    hdrs = glob([
+        "Eigen/*",
+        "Eigen/**/*.h",
+    ]),
+    visibility = ["//visibility:public"],
+)
