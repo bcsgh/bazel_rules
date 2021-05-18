@@ -1,7 +1,6 @@
 workspace(name = "bazel_rules")
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_rules//repositories:repositories.bzl", "jsoncpp", "libcurl", "libev", "libgnutls", "libhttpserver", "libidn2", "libnettle", "microhttpd", "openssl", "zlib")
 
 git_repository(
