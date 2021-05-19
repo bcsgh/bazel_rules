@@ -9,6 +9,7 @@ tasks:
     - "..."
   ubuntu_default_compiler_manual:
     platform: ubuntu1604
+    soft_fail: true
     build_targets:
     - "//repositories:libcurl_tls_test"
     test_targets:
