@@ -7,6 +7,12 @@ tasks:
     - "..."
     test_targets:
     - "..."
+  ubuntu_default_compiler_manual:
+    platform: ubuntu1604
+    build_targets:
+    - "//repositories:libcurl_tls_test"
+    test_targets:
+    - "//repositories:libcurl_tls_test"
   #ubuntu_clang:
   #  platform: ubuntu1604
   #  environment:
