@@ -31,8 +31,8 @@ def libidn2():
         name = "com_gitlab_libidn_libidn2",
         build_file = "@bazel_rules//repositories:BUILD.libidn2",
         recursive_init_submodules = True,
-        commit = "b8b4a90c04f84971b64bc2a2935c95543937f26a",
-        shallow_since = "1617128657 +0200",
+        commit = "47441cf367ed68bf919dcccc81461b2d3c1f6c0f",
+        shallow_since = "1621339599 +0200",
         remote = "https://gitlab.com/libidn/libidn2.git",
     )
 
