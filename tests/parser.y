@@ -8,7 +8,7 @@
 #include "tests/gen.lexer.h"
 
 %}
-%name-prefix "bazel_test_parser"
+%define api.prefix {bazel_test_parser}
 %param {bazel_test_paser_scan_t scanner}
 
 %token HELLO;
