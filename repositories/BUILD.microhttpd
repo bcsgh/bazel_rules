@@ -23,6 +23,7 @@ configure_make(
         "--with-gnutls",
         "--enable-shared=no",
     ],
+    defines = ["HAVE_GNUTLS"],
     lib_source = "@org_gnu_microhttpd//:all",
     out_static_libs = ["libmicrohttpd.a"],
     visibility = ["//visibility:public"],

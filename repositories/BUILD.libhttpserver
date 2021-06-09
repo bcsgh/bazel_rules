@@ -9,9 +9,6 @@ cc_library(
         #"-lpthread",
         #"-pthread",
     ],
-    defines = [
-        "HAVE_GNUTLS",
-    ],
     includes = [
         "src",
     ],
