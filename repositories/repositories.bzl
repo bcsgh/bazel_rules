@@ -9,10 +9,10 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def eigen():
     new_git_repository(
         name = "eigen",
-        build_file = "@bazel_rules//repositories:BUILD.eigen",
-        commit = "9b51dc7972c9f64727e9c8e8db0c60aaf9aae532",  # current as of 2021/02/17
+        commit = "c8d40a7bf1915015c991b108cf2cd6a32138fdc8",  # current as of 2021/06/10
         remote = "https://gitlab.com/libeigen/eigen.git",
-        shallow_since = "1613584163 +0000",
+        build_file = "@bazel_rules//repositories:BUILD.eigen",
+        shallow_since = "1622232408 +0000",
     )
 
 #############################################
