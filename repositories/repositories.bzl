@@ -9,20 +9,20 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def eigen():
     new_git_repository(
         name = "eigen",
-        commit = "001a57519a7aa909d3bf0cd8c6ec8a9cd19d9c70",  # current as of 2021/06/10
+        commit = "954879183b1e008d7f0fefb97e48a925c4e3fb16",  # current as of 2021/06/15
         remote = "https://gitlab.com/libeigen/eigen.git",
         build_file = "@bazel_rules//repositories:BUILD.eigen",
-        shallow_since = "1623349853 +0000",
+        shallow_since = "1623784629 -0700",
     )
 
 #############################################
 def libcurl():
     new_git_repository(
         name = "com_github_curl_curl",
-        commit = "23eef2394cb810294a669d4bb4862bbdb2f5ced6",  # current as of 2021/06/10
+        commit = "55a13f500e3897c6b640757786c02d989a10f2e2",  # current as of 2021/06/15
         remote = "git://github.com/curl/curl.git",
         build_file = "@bazel_rules//repositories:BUILD.libcurl",
-        shallow_since = "1623334393 +0200",
+        shallow_since = "1623770030 +0200",
     )
 
 #############################################
@@ -63,14 +63,14 @@ def jsoncpp():
 def libgnutls():
     new_git_repository(
         name = "com_gitlab_gnutls",
-        commit = "1b83d881938b4e37d2bb6475ade716b22364b6cb",  # current as of 2021/06/10
+        commit = "70f8edd864b69f05d93c1b31ca4abc5e049078c4",  # current as of 2021/06/15
         remote = "https://gitlab.com/gnutls/gnutls.git",
         recursive_init_submodules = True,
         patch_cmds = [
             "rm devel/libtasn1/gtk-doc.make",  # broken symlink in some builds.
         ],
-        build_file = '@bazel_rules//repositories:BUILD.gnutls',
-        shallow_since = '1622274106 +0000',
+        build_file = "@bazel_rules//repositories:BUILD.gnutls",
+        shallow_since = "1623426704 +0000",
     )
 
 #############################################
@@ -134,9 +134,9 @@ def microhttpd():
 def openssl():
     new_git_repository(
         name = "com_github_openssl_openssl",
-        commit = "7afef721ff93018a66f8e2e6b9e1ce3d48321bdf",  # current as of 2021/06/10
+        commit = "4832560be3b2a709557497cd881f8c390ba7ec34",  # current as of 2021/06/15
         remote = "https://github.com/openssl/openssl.git",
-        shallow_since = "1623340794 +0200",
         #recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.openssl",
+        shallow_since = "1623788074 +0200",
     )
