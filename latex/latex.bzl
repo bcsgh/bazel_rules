@@ -27,7 +27,7 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = []):
+def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs=[]):
     """Process a .tex file into a .pdf file.
 
     Args:
@@ -47,14 +47,17 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = []):
 
     i = src.replace(".tex", ".pdf")
 
+    extra_outs = [src.replace(".tex", ".%s" % o) for o in extra_outs]
+
     cmd = "(/usr/bin/pdflatex $(location %s) > ./%s.LOG)" % (src, name)
+    cp = ["cp %s $(location :%s)" % (t, t) for t in [i] + extra_outs]
     native.genrule(
         name = name,
-        outs = [pdf],
+        outs = [pdf] + extra_outs,
         srcs = [src] + data,
-        cmd = "(%s) || (cat ./%s.LOG && false) && cp %s $@" % (
+        cmd = "(%s) || (cat ./%s.LOG && false) && %s" % (
             " && ".join([cmd] * runs),
             name,
-            i,
+            " && ".join(cp),
         ),
     )
