@@ -9,4 +9,12 @@ cc_library(
         "Eigen/**/*.h",
     ]),
     visibility = ["//visibility:public"],
+    deps = [
+        "@bazel_rules//tests:eigen_static_test",
+    ]
+)
+
+package_group(
+    name = "eigen_visibility",
+    packages = ["//"]
 )
