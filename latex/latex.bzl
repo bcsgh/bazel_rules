@@ -27,7 +27,7 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs=[]):
+def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs = []):
     """Process a .tex file into a .pdf file.
 
     Args:
@@ -37,6 +37,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
       runs: How many times to run.
         (Yes, re-running latex mutiple times is still a thing.)
       data: Other files needed.
+      extra_outs: Aditional outputs from LaTeX to include in the result set.
     """
     if not name:
         fail("name must be provided")
