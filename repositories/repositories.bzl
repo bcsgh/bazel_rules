@@ -9,20 +9,20 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def eigen():
     new_git_repository(
         name = "eigen",
-        commit = "954879183b1e008d7f0fefb97e48a925c4e3fb16",  # current as of 2021/06/15
+        commit = "9312a5bf5cd72f45558f402077b0c95683ee0fea",  # current as of 2021/07/01
         remote = "https://gitlab.com/libeigen/eigen.git",
         build_file = "@bazel_rules//repositories:BUILD.eigen",
-        shallow_since = "1623784629 -0700",
+        shallow_since = "1625182272 +0000",
     )
 
 #############################################
 def libcurl():
     new_git_repository(
         name = "com_github_curl_curl",
-        commit = "55a13f500e3897c6b640757786c02d989a10f2e2",  # current as of 2021/06/15
+        commit = "a37fc62e8bf90bf09d2556003235a4a11b5acf4e",  # current as of 2021/07/01
         remote = "git://github.com/curl/curl.git",
         build_file = "@bazel_rules//repositories:BUILD.libcurl",
-        shallow_since = "1623770030 +0200",
+        shallow_since = "1625142432 +0200",
     )
 
 #############################################
@@ -53,24 +53,24 @@ def zlib():
 def jsoncpp():
     new_git_repository(
         name = "com_github_open_source_parsers_jsoncpp",
-        commit = "375a1119f8bbbf42e5275f31b281b5d87f2e17f2",  # current as of 2021/06/10
+        commit = "65bb1b1c1d8019dc72279c12bb74df92925dfd5e",  # current as of 2021/07/01
         remote = "git://github.com/open-source-parsers/jsoncpp.git",
         build_file = "@bazel_rules//repositories:BUILD.jsoncpp",
-        shallow_since = "1620266582 -0500",
+        shallow_since = "1624471424 -0700",
     )
 
 #############################################
 def libgnutls():
     new_git_repository(
         name = "com_gitlab_gnutls",
-        commit = "70f8edd864b69f05d93c1b31ca4abc5e049078c4",  # current as of 2021/06/15
+        commit = "c70941cea73cb38e0d27395e63aafca12dac9a72",  # current as of 2021/07/01
         remote = "https://gitlab.com/gnutls/gnutls.git",
         recursive_init_submodules = True,
         patch_cmds = [
             "rm devel/libtasn1/gtk-doc.make",  # broken symlink in some builds.
         ],
         build_file = "@bazel_rules//repositories:BUILD.gnutls",
-        shallow_since = "1623426704 +0000",
+        shallow_since = "1624864051 +0000",
     )
 
 #############################################
@@ -87,11 +87,11 @@ def libhttpserver():
 def libnettle():
     new_git_repository(
         name = "se_liu_lysator_nettle_nettle",
-        commit = "a46a17e9f57c64984d5246aa3475e45f8c562ec7",  # current as of 2021/06/10
+        commit = "20fedc0155a8cd08ed81179ac72d5bdc187bf3d0",  # current as of 2021/07/01
         remote = "https://git.lysator.liu.se/nettle/nettle.git",
         recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.nettle",
-        shallow_since = "1621875492 +0200",
+        shallow_since = "1623180848 +0200",
     )
 
 #############################################
@@ -134,9 +134,9 @@ def microhttpd():
 def openssl():
     new_git_repository(
         name = "com_github_openssl_openssl",
-        commit = "4832560be3b2a709557497cd881f8c390ba7ec34",  # current as of 2021/06/15
+        commit = "d60e719c2d158a2998412d45c52df25375e10b74",  # current as of 2021/07/01
         remote = "https://github.com/openssl/openssl.git",
         #recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.openssl",
-        shallow_since = "1623788074 +0200",
+        shallow_since = "1625148253 +0200",
     )
