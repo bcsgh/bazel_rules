@@ -39,9 +39,9 @@ configure_make(
         "--enable-mqtt",
     ],
     lib_source = "@com_github_curl_curl//:all",
-    make_commands = [
-        "make",
-        "make install",
+    targets = [
+        "",
+        "install",
     ],
     out_static_libs = ["libcurl.a"],
     deps = [
