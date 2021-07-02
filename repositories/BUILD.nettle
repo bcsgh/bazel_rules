@@ -20,7 +20,7 @@ configure_make(
     name = "nettle",
     autogen = True,
     autogen_command = ".bootstrap",
-    configure_env_vars = {"CFLAGS": "-Wno-error"},
+    env = {"CFLAGS": "-Wno-error"},
     configure_in_place = True,
     configure_options = [
         #"--help",

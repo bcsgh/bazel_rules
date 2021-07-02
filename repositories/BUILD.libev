@@ -21,7 +21,7 @@ configure_make(
     ###
     #configure_in_place = True,
     autogen = True,
-    configure_env_vars = {
+    env = {
         "CFLAGS": "-Wno-error",
     },
     configure_options = [

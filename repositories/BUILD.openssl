@@ -21,7 +21,7 @@ filegroup(
 configure_make(
     name = "openssl",
     configure_command = "Configure",
-    configure_env_vars = {
+    env = {
         "CFLAGS": " ".join([
             "-ldl",
         ]),

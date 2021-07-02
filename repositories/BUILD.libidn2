@@ -23,7 +23,7 @@ configure_make(
         "--skip-po",
         "--no-bootstrap-sync",
     ],
-    configure_env_vars = {
+    env = {
         "CC_FOR_BUILD": "${CC}",
         "CFLAGS": "-Wno-error",
     },

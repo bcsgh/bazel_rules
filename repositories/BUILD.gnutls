@@ -32,7 +32,7 @@ configure_make(
         "--gnulib-srcdir=gnulib",
         "--skip-po",
     ],
-    configure_env_vars = {
+    env = {
         "CFLAGS": " ".join([
             "-Wno-error",
         ]),
