@@ -14,7 +14,7 @@ filegroup(
 
 configure_make(
     name = "microhttpd",
-    configure_env_vars = {"CFLAGS": "-Wno-error"},
+    env = {"CFLAGS": "-Wno-error"},
     configure_options = [
         #"--help",
         "--disable-doc",
