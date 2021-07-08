@@ -50,13 +50,17 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
 
     extra_outs = [src.replace(".tex", ".%s" % o) for o in extra_outs]
 
+    pull = ["$(location %s)" % s for s in data]
+    pull = "$(location @bazel_rules//latex:pull.sh) %s" % " ".join(pull)
+
     cmd = "(/usr/bin/pdflatex $(location %s) > ./%s.LOG)" % (src, name)
     cp = ["cp %s $(location :%s)" % (t, t) for t in [i] + extra_outs]
     native.genrule(
         name = name,
         outs = [pdf] + extra_outs,
-        srcs = [src] + data,
-        cmd = "(%s) || (cat ./%s.LOG && false) && %s" % (
+        srcs = [src, "@bazel_rules//latex:pull.sh"] + data,
+        cmd = "(%s) && (%s) || (cat ./%s.LOG && false) && %s" % (
+            pull,
             " && ".join([cmd] * runs),
             name,
             " && ".join(cp),
