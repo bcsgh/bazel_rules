@@ -37,9 +37,19 @@ def build_test(name = None, targets = []):
       name: The target name.
       targets: Targets to check.
     """
+
+    # Use a genrule to ensure the targets are built
+    native.genrule(
+        name = name + "_gen",
+        srcs = targets,
+        outs = [name + "_gen.out"],
+        visibility = ["//visibility:private"],
+        cmd = "echo > $@",
+    )
+
     native.sh_test(
         name = name,
         srcs = ["@bazel_rules//build_test:blank.sh"],
-        data = targets,
+        data = [name + "_gen.out"],
         timeout = "short",
     )
