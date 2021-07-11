@@ -24,6 +24,6 @@ MANUAL = [
 
 [build_test(
     name = t.split("/")[0].replace("@", ""),
-    manual = True,
+    tags = ["manual"],
     targets = [t],
 ) for t in MANUAL]

@@ -30,7 +30,7 @@ A basic test that always passes, as long as everythin in `targets` builds.
 This is usefull, for example, with a genrule.
 """
 
-def build_test(name = None, targets = []):
+def build_test(name = None, targets = [], tags = []):
     """A test that depends on arbitary targets.
 
     Args:
@@ -51,5 +51,6 @@ def build_test(name = None, targets = []):
         name = name,
         srcs = ["@bazel_rules//build_test:blank.sh"],
         data = [name + "_gen.out"],
+        tags = tags,
         timeout = "short",
     )
