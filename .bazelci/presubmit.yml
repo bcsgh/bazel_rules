@@ -12,12 +12,14 @@ tasks:
     soft_fail: true
     build_targets:
     - "//repositories:com_github_etr_libhttpserver"
+    - "//repositories:com_gitlab_gnutls"
     - "//repositories:com_gitlab_libidn_libidn2"
     - "//repositories:org_gnu_microhttpd"
     - "//tests:http"
     - "//tests:libcurl_tls_test"
     test_targets:
     - "//repositories:com_github_etr_libhttpserver"
+    - "//repositories:com_gitlab_gnutls"
     - "//repositories:com_gitlab_libidn_libidn2"
     - "//repositories:org_gnu_microhttpd"
     - "//tests:http"
