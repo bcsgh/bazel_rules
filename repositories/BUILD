@@ -11,6 +11,7 @@ ALL = [
     "@se_liu_lysator_nettle_nettle//:nettle",
     "@zlib//:zlib",
 ]
+
 MANUAL = [
     "@com_gitlab_libidn_libidn2//:libidn2",
     "@org_gnu_microhttpd//:microhttpd",
@@ -23,6 +24,6 @@ MANUAL = [
 
 [build_test(
     name = t.split("/")[0].replace("@", ""),
-    targets = [t],
     manual = True,
+    targets = [t],
 ) for t in MANUAL]
