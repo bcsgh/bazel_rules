@@ -18,8 +18,7 @@ filegroup(
 
 configure_make(
     name = "libev",
-    ###
-    #configure_in_place = True,
+    configure_in_place = True,
     autogen = True,
     env = {
         "CFLAGS": "-Wno-error",
@@ -29,10 +28,9 @@ configure_make(
         "--enable-shared=no",
     ],
     lib_source = "@com_github_enki_libev//:all",
-    make_commands = [
-        'sed -ie "s/\\bpod2man.*/\\ttrue/" Makefile',  # This isn't needed and doesn't build.
-        "make",
-        "make install",
+    targets = [
+        "",
+        "install",
     ],
     out_static_libs = ["libev.a"],
     visibility = ["//visibility:public"],

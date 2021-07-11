@@ -104,6 +104,7 @@ def libev():
         build_file = "@bazel_rules//repositories:BUILD.libev",
         patch_cmds = [
             "chmod 755 autogen.sh",
+            'sed -ie "s/\\bpod2man.*/true/" Makefile.*',  # This isn't needed and doesn't build.
         ],
     )
 
