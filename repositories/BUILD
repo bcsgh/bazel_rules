@@ -1,8 +1,6 @@
 load("@bazel_rules//build_test:build.bzl", "build_test")
 
-build_test(
-    name = "everything",
-    targets = [
+ALL = [
         "@com_github_curl_curl//:curl",
         "@com_github_enki_libev//:libev",
         "@com_github_etr_libhttpserver//:libhttpserver",
@@ -14,5 +12,9 @@ build_test(
         "@org_gnu_microhttpd//:microhttpd",
         "@se_liu_lysator_nettle_nettle//:nettle",
         "@zlib//:zlib",
-    ],
-)
+]
+
+[build_test(
+    name = t.split("/")[0].replace("@", ""),
+    targets = [t],
+) for t in ALL]
