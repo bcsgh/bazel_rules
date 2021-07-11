@@ -24,7 +24,6 @@ configure_make(
         "--no-bootstrap-sync",
     ],
     env = {
-        "CC_FOR_BUILD": "${CC}",
         "CFLAGS": "-Wno-error",
     },
     configure_in_place = True,
