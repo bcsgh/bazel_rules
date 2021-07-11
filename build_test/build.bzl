@@ -36,6 +36,7 @@ def build_test(name = None, targets = [], tags = []):
     Args:
       name: The target name.
       targets: Targets to check.
+      tags: tags for the test.
     """
 
     # Use a genrule to ensure the targets are built
