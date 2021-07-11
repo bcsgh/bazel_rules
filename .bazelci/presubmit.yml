@@ -11,8 +11,12 @@ tasks:
     platform: ubuntu1804
     soft_fail: true
     build_targets:
+    - "//repositories:com_gitlab_libidn_libidn2"
+    - "//repositories:org_gnu_microhttpd"
     - "//tests:libcurl_tls_test"
     test_targets:
+    - "//repositories:com_gitlab_libidn_libidn2"
+    - "//repositories:org_gnu_microhttpd"
     - "//tests:libcurl_tls_test"
   #ubuntu_clang:
   #  platform: ubuntu1604
