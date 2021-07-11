@@ -8,7 +8,7 @@ build_test(
         "@com_github_etr_libhttpserver//:libhttpserver",
         "@com_github_open_source_parsers_jsoncpp//:json",
         "@com_github_openssl_openssl//:openssl",
-        #"@com_gitlab_gnutls//:gnutls",
+        "@com_gitlab_gnutls//:gnutls",
         "@com_gitlab_libidn_libidn2//:libidn2",
         "@eigen//:eigen",
         "@org_gnu_microhttpd//:microhttpd",

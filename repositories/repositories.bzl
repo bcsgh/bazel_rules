@@ -66,9 +66,6 @@ def libgnutls():
         commit = "c70941cea73cb38e0d27395e63aafca12dac9a72",  # current as of 2021/07/01
         remote = "https://gitlab.com/gnutls/gnutls.git",
         recursive_init_submodules = True,
-        patch_cmds = [
-            "rm devel/libtasn1/gtk-doc.make",  # broken symlink in some builds.
-        ],
         build_file = "@bazel_rules//repositories:BUILD.gnutls",
         shallow_since = "1624864051 +0000",
     )
