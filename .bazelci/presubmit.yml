@@ -11,6 +11,7 @@ tasks:
     platform: ubuntu1804
     soft_fail: true
     build_targets:
+    - "//repositories:com_github_etr_libhttpserver"
     - "//repositories:com_gitlab_libidn_libidn2"
     - "//repositories:org_gnu_microhttpd"
     - "//tests:libcurl_tls_test"
