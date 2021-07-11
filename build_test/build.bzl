@@ -44,6 +44,7 @@ def build_test(name = None, targets = [], tags = []):
         name = name + "_gen",
         srcs = targets,
         outs = [name + "_gen.out"],
+        tags = tags,
         visibility = ["//visibility:private"],
         cmd = "echo > $@",
     )
