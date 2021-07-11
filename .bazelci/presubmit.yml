@@ -11,9 +11,9 @@ tasks:
     platform: ubuntu1804
     soft_fail: true
     build_targets:
-    - "//repositories:libcurl_tls_test"
+    - "//tests:libcurl_tls_test"
     test_targets:
-    - "//repositories:libcurl_tls_test"
+    - "//tests:libcurl_tls_test"
   #ubuntu_clang:
   #  platform: ubuntu1604
   #  environment:
