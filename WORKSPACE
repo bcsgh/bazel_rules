@@ -5,9 +5,9 @@ load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libcurl
 
 git_repository(
     name = "rules_foreign_cc",
-    commit = "6d1d16d3bb1c09a5154b483de902755ce1f05746",  # current as of 2021/07/01
-    remote = "git://github.com/bazelbuild/rules_foreign_cc.git",
-    shallow_since = "1625108995 -0700",
+    commit = "e97f24e701cc33c0e4aa360d59b83eca0aa46111",  # current as of 2021/11/01
+    remote = "https://github.com/bazelbuild/rules_foreign_cc.git",
+    shallow_since = "1634660901 +0000",
 )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
@@ -17,17 +17,17 @@ rules_foreign_cc_dependencies([])
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "4ec4cd23f486bf70efcc5d2caa40f24368f752e3",  # current as of 2021/07/01
-    remote = "git://github.com/google/googletest.git",
-    shallow_since = "1625074437 -0400",
+    commit = "16f637fbf4ffc3f7a01fa4eceb7906634565242f",  # current as of 2021/11/01
+    remote = "https://github.com/google/googletest.git",
+    shallow_since = "1634142500 -0400",
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "9a7e447c511dae7276ab65fde4d04f6ed52b39c9",  # current as of 2021/07/01
-    remote = "git://github.com/abseil/abseil-cpp.git",
-    shallow_since = "1624810227 -0400",
+    commit = "022527c50e0e2bc937f9fa3c516e3e36cbba0845",  # current as of 2021/11/01
+    remote = "https://github.com/abseil/abseil-cpp.git",
+    shallow_since = "1635537114 -0400",
 )
 
 #############################################
