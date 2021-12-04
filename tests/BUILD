@@ -30,6 +30,8 @@ load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
 load("//graphviz:graphviz.bzl", "gen_dot")
 load("//parser:parser.bzl", "genlex", "genyacc")
 
+test_suite(name = "ci")
+
 ######## build_test
 genrule(
     name = "build_test_target",
@@ -155,3 +157,4 @@ cc_test(
         "@com_google_absl//absl/strings",
     ],
 )
+

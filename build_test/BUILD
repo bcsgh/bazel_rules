@@ -26,3 +26,5 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 exports_files(["blank.sh"])
+
+test_suite(name = "ci")

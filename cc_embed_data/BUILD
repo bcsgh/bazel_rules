@@ -27,6 +27,8 @@
 
 load("@bazel_tools//tools/cpp:cc_flags_supplier.bzl", "cc_flags_supplier")
 
+test_suite(name = "ci")
+
 cc_flags_supplier(
     name = "cc_flags",
     visibility = ["//visibility:public"],

@@ -25,6 +25,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+test_suite(name = "ci")
+
 cc_library(
     name = "parser_support",
     srcs = ["parser_support.cc"],

@@ -1,0 +1,9 @@
+# exit when any command fails
+set -e
+
+# Create a "clean" client.
+NEWR=$(mktemp -d -t hook-XXXXXXXXXX)
+git checkout-index --prefix=${NEWR}/ -a
+cd $NEWR
+
+bazel test //:ci -k
