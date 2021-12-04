@@ -27,7 +27,8 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs = []):
+def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs = [],
+               outs = [], reprocess = []):
     """Process a .tex file into a .pdf file.
 
     Args:
@@ -37,7 +38,9 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
       runs: How many times to run.
         (Yes, re-running latex mutiple times is still a thing.)
       data: Other files needed.
-      extra_outs: Aditional outputs from LaTeX to include in the result set.
+      extra_outs: Aditional filename extention to include in the result set.
+      outs: Arbitrary aditional filenames to include in the result set.
+      reprocess: Extra shell commands to reun between invocation of pdflatex.
     """
     if not name:
         fail("name must be provided")
@@ -45,15 +48,18 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
         fail("src must be provided")
     if not pdf:
         fail("pdf must be provided")
+    if reprocess and runs < 2:
+        fail("reprocessdoes nothing without mutiple runs")
 
     i = src.replace(".tex", ".pdf")
 
-    extra_outs = [src.replace(".tex", ".%s" % o) for o in extra_outs]
+    extra_outs = [src.replace(".tex", ".%s" % o) for o in extra_outs ] + outs
 
     pull = ["$(location %s)" % s for s in data]
     pull = "$(location @bazel_rules//latex:pull.sh) %s" % " ".join(pull)
 
     cmd = "(/usr/bin/pdflatex $(location %s) > ./%s.LOG)" % (src, name)
+    if reprocess: cmd += "".join([" && (%s)" % r for r in reprocess])
     cp = ["cp %s $(location :%s)" % (t, t) for t in [i] + extra_outs]
     native.genrule(
         name = name,
