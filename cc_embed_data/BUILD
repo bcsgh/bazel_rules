@@ -25,6 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+load("@bazel_rules//build_test:build.bzl", "build_test")
 load("@bazel_tools//tools/cpp:cc_flags_supplier.bzl", "cc_flags_supplier")
 
 test_suite(name = "ci")
@@ -43,4 +44,9 @@ cc_binary(
         "@com_google_absl//absl/flags:parse",
         "@com_google_absl//absl/strings",
     ],
+)
+
+build_test(
+    name = "make_emebed_data_test",
+    targets = [":make_emebed_data"],
 )
