@@ -33,6 +33,7 @@ configure_make(
     ],
     lib_source = "@com_github_openssl_openssl//:all",
     linkopts = ["-ldl"],
+    targets = ["", "install_sw", "install_ssldirs"],
     postfix_script = "\n".join([
         "echo PWD=$PWD",
         "echo INSTALLDIR=$INSTALLDIR",
@@ -42,7 +43,7 @@ configure_make(
         # Squash all the generated libraries into one.
         # This avoids needing to know exactly which libraries are generated.
         "mkdir ar_merge_tmp",
-        "(cd ar_merge_tmp ; for f in ../openssl/lib/*.a ; do ar -x $f ; done )",
+        "(cd ar_merge_tmp ; for f in ../openssl/lib*/*.a ; do ar -x $f ; done )",
         "ar -csr $INSTALLDIR/lib/openssl.a ar_merge_tmp/*.o",
         #"mv ./openssl/lib/libssl.a $INSTALLDIR/lib/openssl.a", # rename?
     ]),
