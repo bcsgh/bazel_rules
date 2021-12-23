@@ -33,7 +33,7 @@
 #include "absl/strings/str_join.h"
 #include "curl/curl.h"
 
-// Test that TLS/SSL is supported by this vuild of CURL.
+// Test that TLS/SSL is supported by this build of CURL.
 
 int main(int argc, char **argv) {
   curl_global_init(CURL_GLOBAL_ALL);
