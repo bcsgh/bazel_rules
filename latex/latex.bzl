@@ -55,7 +55,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
 
     extra_outs = [src.replace(".tex", ".%s" % o) for o in extra_outs ] + outs
 
-    pull = ["$(location %s)" % s for s in data]
+    pull = ["$(locations %s)" % s for s in data]
     pull = "$(location @bazel_rules//latex:pull.sh) %s" % " ".join(pull)
 
     cmd = "(max_print_line=1000 /usr/bin/pdflatex $(location %s)  &>./%s.LOG)" % (src, name)
