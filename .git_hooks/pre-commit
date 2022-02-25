@@ -6,4 +6,10 @@ NEWR=$(mktemp -d -t hook-XXXXXXXXXX)
 git checkout-index --prefix=${NEWR}/ -a
 cd $NEWR
 
-bazel test //:ci -k
+if time bazel test //:ci -k;
+then
+  bazel clean --expunge
+else 
+  echo file://$NEWR
+  exit 1
+fi
