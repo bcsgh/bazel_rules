@@ -18,7 +18,6 @@ cc_library(
     ],
     local_defines = [
         "HTTPSERVER_COMPILATION",
-        "MHD_NO_DEPRECATION",
     ],
     visibility = ["//visibility:public"],
     deps = [
