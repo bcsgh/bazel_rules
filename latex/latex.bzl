@@ -28,7 +28,7 @@
 """Bazle/skylark rule(s) to process LaTeX."""
 
 def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs = [],
-               outs = [], reprocess = []):
+               outs = [], reprocess = [], jobname=None):
     """Process a .tex file into a .pdf file.
 
     Args:
@@ -51,16 +51,21 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
     if reprocess and runs < 2:
         fail("reprocessdoes nothing without mutiple runs")
 
-    i = src.replace(".tex", ".pdf")
+    args = []
+    if jobname:
+      args += ["-jobname=%s" % jobname]
+    else:
+      jobname = src.replace(".tex", "")
 
-    extra_outs = [src.replace(".tex", ".%s" % o) for o in extra_outs ] + outs
+    extra_outs = ["%s.%s" % (jobname, o) for o in extra_outs] + outs
 
     pull = ["$(locations %s)" % s for s in data]
     pull = "$(location @bazel_rules//latex:pull.sh) %s" % " ".join(pull)
 
-    cmd = "(max_print_line=1000 /usr/bin/pdflatex $(location %s)  &>./%s.LOG)" % (src, name)
+    cmd = "(max_print_line=1000 /usr/bin/pdflatex %s $(location %s) &>./%s.LOG)" % (" ".join(args), src, name)
     if reprocess: cmd += "".join([" && (%s)" % r for r in reprocess])
-    cp = ["cp %s $(location :%s)" % (t, t) for t in [i] + extra_outs]
+    cp = ["cp %s.pdf $(location :%s)" % (jobname, pdf)]
+    cp += ["cp %s $(location :%s)" % (t, t) for t in extra_outs]
     native.genrule(
         name = name,
         outs = [pdf] + extra_outs,
