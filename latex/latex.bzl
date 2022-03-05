@@ -65,7 +65,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
         name = name,
         outs = [pdf] + extra_outs,
         srcs = [src, "@bazel_rules//latex:pull.sh"] + data,
-        cmd = "(%s) && (%s) || (cat ./%s.LOG && false) && %s" % (
+        cmd = "(%s) && ( %s ) || (cat ./%s.LOG ; false) && %s" % (
             pull,
             " && ".join([cmd] * runs),
             name,
