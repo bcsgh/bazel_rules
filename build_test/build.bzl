@@ -47,6 +47,7 @@ def build_test(name = None, targets = [], tags = []):
         tags = tags,
         visibility = ["//visibility:private"],
         cmd = "echo > $@",
+        testonly = True,
     )
 
     native.sh_test(
