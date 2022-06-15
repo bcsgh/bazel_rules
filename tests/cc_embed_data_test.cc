@@ -31,7 +31,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "tests/cc_embed_data_example_emebed_data.h"
+#include "tests/cc_embed_data_example_embed_data.h"
 
 namespace {
 

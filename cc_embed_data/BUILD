@@ -36,8 +36,8 @@ cc_flags_supplier(
 )
 
 cc_binary(
-    name = "make_emebed_data",
-    srcs = ["make_emebed_data.cc"],
+    name = "make_embed_data",
+    srcs = ["make_embed_data.cc"],
     visibility = ["//visibility:public"],
     deps = [
         "@com_google_absl//absl/flags:flag",
@@ -47,6 +47,6 @@ cc_binary(
 )
 
 build_test(
-    name = "make_emebed_data_test",
-    targets = [":make_emebed_data"],
+    name = "make_embed_data_test",
+    targets = [":make_embed_data"],
 )

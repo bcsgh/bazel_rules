@@ -51,19 +51,19 @@ def cc_embed_data(name = None, srcs = None, namespace = None):
     if not name:
         fail("name must be provided")
 
-    cc = name + "_emebed_data.cc"
-    h = name + "_emebed_data.h"
-    o = name + "_emebed_data.o"
+    cc = name + "_embed_data.cc"
+    h = name + "_embed_data.h"
+    o = name + "_embed_data.o"
 
     PREFIX = "$$(dirname $(rootpath %s) | sed 's|[^0-9A-Za-z]|_|g')_%s" % (cc, name)
 
     native.genrule(
-        name = name + "_make_emebed_src",
+        name = name + "_make_embed_src",
         outs = [cc, h],
         srcs = srcs,
-        tools = ["@bazel_rules//cc_embed_data:make_emebed_data"],
+        tools = ["@bazel_rules//cc_embed_data:make_embed_data"],
         cmd = " ".join([
-            "$(location @bazel_rules//cc_embed_data:make_emebed_data)",
+            "$(location @bazel_rules//cc_embed_data:make_embed_data)",
             "--h=$(location %s)" % (h),
             "--cc=$(location %s)" % (cc),
             "--gendir=$(GENDIR)",

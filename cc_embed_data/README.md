@@ -47,7 +47,7 @@ int main() {
   for (const auto& i : my_namespace::EmbedIndex()) {
     Use(i.first, i.second);
   }
-  
+
   return 0;
 }
 
