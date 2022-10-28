@@ -9,31 +9,31 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def eigen():
     new_git_repository(
         name = "eigen",
-        commit = "d0b4b75fbbe5f99254e031cbfe204c3e2bb7c83f",  # current as of 2021/12/17
+        commit = "c5b896c5a3eb35ed0c08a9be5e6f10cc0a465b81",  # current as of 2022/10/27
         remote = "https://gitlab.com/libeigen/eigen.git",
         build_file = "@bazel_rules//repositories:BUILD.eigen",
-        shallow_since = "1639686047 +0000",
+        shallow_since = "1666902815 +0000",
     )
 
 #############################################
 def libcurl():
     new_git_repository(
         name = "com_github_curl_curl",
-        commit = "ed0bc61e31a90d284b2686df1d48fd697e3ebbc4",  # current as of 2021/12/17
+        commit = "a3063fe0147e00381d149e1d3a3c57c63343e7fc",  # current as of 2022/10/27
         remote = "https://github.com/curl/curl.git",
         build_file = "@bazel_rules//repositories:BUILD.libcurl",
-        shallow_since = "1639729029 +0100",
+        shallow_since = "1666906547 +0200",
     )
 
 #############################################
 def libidn2():
     new_git_repository(
         name = "com_gitlab_libidn_libidn2",
-        commit = "49fe79c77f6013356920b46bd07f95bcb609f541",  # current as of 2021/11/01
+        commit = "9ab0a0d651c692aee964b8d5dbed89a56669742b",  # current as of 2022/10/25
         remote = "https://gitlab.com/libidn/libidn2.git",
         recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.libidn2",
-        shallow_since = "1632651379 +0200",
+        shallow_since = "1666599166 +0200",
     )
 
 #############################################
@@ -53,14 +53,14 @@ def zlib():
 def jsoncpp():
     new_git_repository(
         name = "com_github_open_source_parsers_jsoncpp",
-        commit = "a1f1613bdd81bf28289e8d3fbeb4eb78b82fb203",  # current as of 2021/12/17
+        commit = "8190e061bc2d95da37479a638aa2c9e483e58ec6",  # current as of 2022/10/25
         remote = "https://github.com/open-source-parsers/jsoncpp.git",
         build_file = "@bazel_rules//repositories:BUILD.jsoncpp",
-        shallow_since = "1639533887 -0800",
+        shallow_since = "1657835857 -0400",
     )
 
 #############################################
-def libgnutls():
+def libgnutls():  # WARNING: stuck here. Updateing seems to break too many things.
     new_git_repository(
         name = "com_gitlab_gnutls",
         commit = "18cf560c5518771f3d909a2a32c2c84d8cff1d9a",  # current as of 2021/12/17
@@ -75,20 +75,20 @@ def libhttpserver():
     new_git_repository(
         name = "com_github_etr_libhttpserver",
         build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
-        commit = "bd559af1a2ead64445d04ecdb2e640897ae77b38",  # current as of 2022/02/34
+        commit = "f33553c26bc59c6123383d57c07058cbaa7bc899",  # current as of 2022/10/25
         remote = "https://github.com/etr/libhttpserver.git",
-        shallow_since = "1645730589 -0800",
+        shallow_since = "1664567493 -0700",
     )
 
 #############################################
 def libnettle():
     new_git_repository(
         name = "se_liu_lysator_nettle_nettle",
-        commit = "dd65a63e7453750506144e5caeb6e159165e1bc2",  # current as of 2021/12/17
+        commit = "a19abef9c8cdaece67a418e35a23663925ef6b03",  # current as of 2022/10/25
         remote = "https://git.lysator.liu.se/nettle/nettle.git",
         recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.nettle",
-        shallow_since = "1639081884 +0100",
+        shallow_since = "1666292871 +0000",
     )
 
 #############################################
@@ -132,9 +132,9 @@ def microhttpd():
 def openssl():
     new_git_repository(
         name = "com_github_openssl_openssl",
-        commit = "7ca3bf792a4a085e6f2426ad51a41fca4d0b1b8c",  # current as of 2021/12/17
+        commit = "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2022/10/27
         remote = "https://github.com/openssl/openssl.git",
         #recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.openssl",
-        shallow_since = "1639760376 +0100",
+        shallow_since = "1666888769 +0200",
     )

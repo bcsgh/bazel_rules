@@ -107,7 +107,21 @@ cc_library(
         "src/httpserver",
     ],
     local_defines = ["HTTPSERVER_COMPILATION"],
-    deps = [":http_utils"],
+    deps = [
+        ":http_utils",
+        ":file_info",
+    ],
+)
+
+cc_library(
+    name = "file_info",
+    srcs = ["src/file_info.cpp"],
+    hdrs = ["src/httpserver/file_info.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
 )
 
 cc_library(
