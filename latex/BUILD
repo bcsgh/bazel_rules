@@ -1,1 +1,5 @@
-exports_files(["pull.sh", "role_call.sh"])
+exports_files([
+  "pull.sh",
+  "ref_test.py",
+  "role_call.sh",
+])
