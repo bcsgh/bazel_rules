@@ -16,6 +16,18 @@ rules_foreign_cc_dependencies([])
 
 #############################################
 git_repository(
+    name = "bazel_skylib",
+    commit = "5bfcb1a684550626ce138fe0fe8f5f702b3764c3",
+    remote = "https://github.com/bazelbuild/bazel-skylib.git",
+    shallow_since = "1668623372 +0100",
+)
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
+
+#############################################
+git_repository(
     name = "com_google_googletest",
     commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25
     remote = "https://github.com/google/googletest.git",

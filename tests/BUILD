@@ -28,7 +28,13 @@
 load("//build_test:build.bzl", "build_test")
 load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
 load("//graphviz:graphviz.bzl", "gen_dot")
+load("//latex:latex.bzl", "detex")
+load("//latex:git_stamp.bzl", "git_stamp")
+load("//latex:latex.bzl", "tex_to_pdf")
+load("//latex:ref_test.bzl", "latex_ref_test")
+load("//latex:role_call_test.bzl", "role_call_test")
 load("//parser:parser.bzl", "genlex", "genyacc")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 test_suite(name = "ci")
 
@@ -131,6 +137,58 @@ build_test(
         "@org_gnu_microhttpd//:microhttpd",
     ],
 )
+
+######## latex
+
+git_stamp()
+
+tex_to_pdf(
+    name = "gen_latex_test",
+    src = "gen_latex_test.tex",
+    data = [
+        ":fixed.tex",
+        ":git_stamp.tex",
+    ],
+    extra_outs = ["aux", "log"],
+    # TODO reprocess = [],
+    pdf = "gen_latex_test.pdf",
+    # TODO runs = 3,
+)
+
+build_test(
+    name = "latex_test",
+    targets = [
+        ":gen_latex_test",
+    ],
+)
+
+detex(
+    name = "gen_latex_test_detex",
+    src = "gen_latex_test.tex",
+)
+
+diff_test(
+    name = "detex_gold_test",
+    file1 = ":gen_latex_test_detex",
+    file2 = ":gen_latex_test_detex.gold",
+)
+
+build_test(
+    name = "detex_test",
+    targets = [
+        ":gen_latex_test_detex",
+    ],
+)
+
+
+latex_ref_test(jobname = "gen_latex_test")
+
+role_call_test(
+    root = "gen_latex_test.tex",
+    inputs = [":fixed.tex"],
+    extra = [":git_stamp.tex"],
+)
+
 
 ######## repositories
 
