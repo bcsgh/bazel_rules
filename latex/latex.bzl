@@ -41,6 +41,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
       extra_outs: Aditional filename extention to include in the result set.
       outs: Arbitrary aditional filenames to include in the result set.
       reprocess: Extra shell commands to run between invocation of pdflatex.
+      jobname: The value for \\jobname.
     """
     if not name:
         fail("name must be provided")
@@ -76,4 +77,42 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
             name,
             " && ".join(cp),
         ),
+    )
+
+def detex(name = None, src = None, post_sed = None, visibility = None):
+    """Process a .tex file into a text file that approximates the text from the input.
+
+    This can be usefull as a pre-processing step for tests like spell checking.
+    Note, the input doesn't need to be a complete tex document.
+
+    Args:
+      name: The target name.
+      src: The root source file
+      post_sed: A sed script applied to remove or process custom markup.
+    """
+
+    if not name: fail("name must be provided")
+    if not src: fail("src must be provided")
+
+    sed = "@bazel_rules//latex:detex.sed"
+
+    pipe = ["sed $(location %s) -f $(location %s)" % (src, sed)]
+
+    if post_sed:
+      pipe += ["sed -f $(location %s)" % post_sed]
+      post_seds = [post_sed]
+    else:
+      post_seds = []
+
+    pipe += ["detex -l >$@"]
+
+    native.genrule(
+        name = name,
+        srcs = [
+            src,
+            sed,
+        ] + post_seds,
+        cmd = "set -o pipefail ; " + " | ".join(pipe),
+        outs = [name + ".txt"],
+        visibility = visibility,
     )
