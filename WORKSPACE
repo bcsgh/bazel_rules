@@ -24,6 +24,14 @@ git_repository(
 
 #############################################
 git_repository(
+    name = "com_googlesource_code_re2",
+    commit = "7a65faf439295e941baa6640a717d89c1f13e9cd",  # current as of 2022/10/27
+    remote = "https://github.com/google/re2.git",
+    shallow_since = "1666860568 +0000",
+)
+
+#############################################
+git_repository(
     name = "com_google_absl",
     commit = "827940038258b35a29279d8c65b4b4ca0a676f8d",  # current as of 2022/10/27
     remote = "https://github.com/abseil/abseil-cpp.git",
