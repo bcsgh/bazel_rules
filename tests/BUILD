@@ -147,10 +147,11 @@ tex_to_pdf(
     name = "gen_latex_test",
     src = "gen_latex_test.tex",
     data = [
+        "//latex:spelling.tex",
         ":fixed.tex",
         ":git_stamp.tex",
     ],
-    extra_outs = ["aux", "log"],
+    extra_outs = ["aux", "dict", "log"],
     # TODO reprocess = [],
     pdf = "gen_latex_test.pdf",
     # TODO runs = 3,
@@ -166,6 +167,7 @@ build_test(
 detex(
     name = "gen_latex_test_detex",
     src = "gen_latex_test.tex",
+    post_sed = ":detex_test.sed"
 )
 
 diff_test(
@@ -185,8 +187,17 @@ latex_ref_test(jobname = "gen_latex_test")
 
 role_call_test(
     root = "gen_latex_test.tex",
-    inputs = [":fixed.tex"],
+    inputs = [
+        "//latex:spelling.tex",
+        ":fixed.tex",
+    ],
     extra = [":git_stamp.tex"],
+)
+
+diff_test(
+    name = "dictionary_gold_test",
+    file1 = ":gen_latex_test.dict",
+    file2 = ":spell_test.dict",
 )
 
 ######## spelling
