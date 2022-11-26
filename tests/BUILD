@@ -34,6 +34,7 @@ load("//latex:latex.bzl", "tex_to_pdf")
 load("//latex:ref_test.bzl", "latex_ref_test")
 load("//latex:role_call_test.bzl", "role_call_test")
 load("//parser:parser.bzl", "genlex", "genyacc")
+load("//text:spelling.bzl", "spell_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 test_suite(name = "ci")
@@ -180,7 +181,6 @@ build_test(
     ],
 )
 
-
 latex_ref_test(jobname = "gen_latex_test")
 
 role_call_test(
@@ -189,6 +189,13 @@ role_call_test(
     extra = [":git_stamp.tex"],
 )
 
+######## spelling
+
+spell_test(
+    name = "spell_test_test",
+    file = "spell_test.txt",
+    dict = ["spell_test.dict"],
+)
 
 ######## repositories
 
