@@ -28,7 +28,7 @@
 """Bazle/skylark rule(s) to process LaTeX."""
 
 def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs = [],
-               outs = [], reprocess = [], jobname=None):
+               outs = [], reprocess = [], jobname = None, visibility = None):
     """Process a .tex file into a .pdf file.
 
     Args:
@@ -77,6 +77,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
             name,
             " && ".join(cp),
         ),
+        visibility = visibility,
     )
 
 def detex(name = None, src = None, post_sed = None, visibility = None):

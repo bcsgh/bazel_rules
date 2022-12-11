@@ -27,7 +27,7 @@
 
 """Bazle/skylark rule(s) to process GraphViz."""
 
-def gen_dot(name = None, src = None, out = None, format = "png"):
+def gen_dot(name = None, src = None, out = None, format = "png", visibility = None):
     """Process a .dot file.
 
     Args:
@@ -48,4 +48,5 @@ def gen_dot(name = None, src = None, out = None, format = "png"):
         outs = [out],
         srcs = [src],
         cmd = "dot -T%s -o$(location %s) $(location %s) " % (format, out, src),
+        visibility = visibility,
     )

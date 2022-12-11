@@ -27,7 +27,7 @@
 
 """Bazel/skylark rules for wrapping Flex/Bison builds."""
 
-def genlex(name, src, data = []):
+def genlex(name, src, data = [], visibility = None):
     """Generate a lexer using flex.
 
     Args:
@@ -47,9 +47,10 @@ def genlex(name, src, data = []):
     native.filegroup(
         name = name,
         srcs = [c, h],
+        visibility = visibility,
     )
 
-def genyacc(name, src, data = [], graph = False, report = False):
+def genyacc(name, src, data = [], graph = False, report = False, visibility = None):
     """Generate a paser using bison.
 
     Args:
@@ -89,4 +90,5 @@ def genyacc(name, src, data = [], graph = False, report = False):
     native.filegroup(
         name = name,
         srcs = outs,
+        visibility = visibility,
     )

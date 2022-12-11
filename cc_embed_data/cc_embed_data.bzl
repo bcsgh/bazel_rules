@@ -38,7 +38,7 @@ This allows placing large test or binary artifacts to come from faw files (or
 other build artifacts) rather than deal with escaping them into string literals.
 """
 
-def cc_embed_data(name = None, srcs = None, namespace = None):
+def cc_embed_data(name = None, srcs = None, namespace = None, visibility = None):
     """Generate a library containing the contents of srcs.
 
     Args:
@@ -111,4 +111,5 @@ def cc_embed_data(name = None, srcs = None, namespace = None):
             "@com_google_absl//absl/strings",
             "@com_google_absl//absl/types:span",
         ],
+        visibility = visibility,
     )
