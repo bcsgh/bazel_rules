@@ -27,7 +27,8 @@
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
 
-def latex_ref_test(name = "ref_test", jobname = None, ignore_dups = False):
+def latex_ref_test(name = "ref_test", jobname = None, ignore_dups = False,
+                   externs = []):
     """Test for missing label references.
 
     Args:
@@ -39,6 +40,8 @@ def latex_ref_test(name = "ref_test", jobname = None, ignore_dups = False):
 
     args = []
     if ignore_dups: args += ["--ignore_dups"]
+
+    args += ["--extern=%s" %i for i in externs]
 
 
     native.py_test(

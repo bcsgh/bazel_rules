@@ -34,7 +34,7 @@ miss_ref_re = re.compile("[Rr]eference `(.*)' on page [0-9]+ undefined on input 
 dup_ref_re = re.compile("Label `(.*)' multiply defined.")
 newlable_re = re.compile('newlabel{([^}]*)}')
 
-def BadRefs(ignore_dups, logfile):
+def BadRefs(ignore_dups, logfile, ignore):
   try:
     log = open(logfile, "r")
   except IOError:
@@ -45,7 +45,7 @@ def BadRefs(ignore_dups, logfile):
   dup_ref = set()
   for l in log:
     s = miss_ref_re.search(l)
-    if s:
+    if s and s.group(1) not in ignore:
       print(l.strip())
       missing_ref.add(s.group(1))
     if not ignore_dups:
@@ -75,9 +75,10 @@ def BestMatch(t, labels):
   ]
 
 def main(args):
+  ignore = set(args.extern or [])
   fails = 0
   for f in args.argv:
-    err, missing_ref, dup_refs = BadRefs(args.ignore_dups, f)
+    err, missing_ref, dup_refs = BadRefs(args.ignore_dups, f, ignore)
 
     if not err or not (missing_ref or dup_refs): continue
     fails += 1
@@ -92,10 +93,14 @@ def main(args):
   return fails
 
 if __name__ == "__main__":
+
   parser = argparse.ArgumentParser()
   parser.add_argument("--ignore_dups",
                       default=False, action="store_true",
                       help="Check for cuplicate labels")
+  parser.add_argument("--extern",
+                      action='append',
+                      help="Lables to ignore missing refernces to.")
   parser.add_argument("argv", type=str, help="Logs to check", nargs="+")
   args = parser.parse_args()
   exit(main(args))
