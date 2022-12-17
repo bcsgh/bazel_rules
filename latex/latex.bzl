@@ -50,7 +50,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
     if not pdf:
         fail("pdf must be provided")
     if reprocess and runs < 2:
-        fail("reprocessdoes nothing without mutiple runs")
+        fail("reprocess does nothing without mutiple runs")
 
     args = []
     if jobname:
@@ -64,7 +64,12 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
     pull = "$(location @bazel_rules//latex:pull.sh) %s" % " ".join(pull)
 
     cmd = "(max_print_line=1000 /usr/bin/pdflatex %s $(location %s) &>./%s.LOG)" % (" ".join(args), src, name)
-    if reprocess: cmd += "".join([" && (%s)" % r for r in reprocess])
+
+    if reprocess:
+      mid = " && ".join([""] + ["(%s)" % r for r in reprocess] + [""])
+    else:
+      mid = " && "
+
     cp = ["cp %s.pdf $(location :%s)" % (jobname, pdf)]
     cp += ["cp %s $(location :%s)" % (t, t) for t in extra_outs]
     native.genrule(
@@ -73,7 +78,7 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
         srcs = [src, "@bazel_rules//latex:pull.sh"] + data,
         cmd = "(%s) && ( %s ) || (cat ./%s.LOG ; false) && %s" % (
             pull,
-            " && ".join([cmd] * runs),
+            mid.join([cmd] * runs),
             name,
             " && ".join(cp),
         ),
