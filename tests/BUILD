@@ -36,19 +36,13 @@ load("//latex:role_call_test.bzl", "role_call_test")
 load("//parser:parser.bzl", "genlex", "genyacc")
 load("//text:spelling.bzl", "spell_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load(":build_test_test.bzl", "build_test_suite")
 
 test_suite(name = "ci")
 
 ######## build_test
-genrule(
-    name = "build_test_target",
-    outs = ["build_test_target.txt"],
-    cmd = "touch $@",
-)
-
-build_test(
+build_test_suite(
     name = "build_test_test",
-    targets = [":build_test_target"],
 )
 
 ######## cc_embed_data
@@ -233,4 +227,5 @@ cc_test(
         "@com_google_absl//absl/strings",
     ],
 )
+
 

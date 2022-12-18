@@ -28,32 +28,34 @@
 """
 A basic test that always passes, as long as everythin in `targets` builds.
 This is usefull, for example, with a genrule.
+
+NOTE consider using:
+https://github.com/bazelbuild/bazel-skylib/blob/main/docs/build_test_doc.md
 """
 
-def build_test(name = None, targets = [], tags = []):
-    """A test that depends on arbitary targets.
+def _build_test_impl(ctx):
+    executable = ctx.actions.declare_file(ctx.label.name + ".empty.sh")
+    ctx.actions.write(output=executable, content="")
 
-    Args:
-      name: The target name.
-      targets: Targets to check.
-      tags: tags for the test.
-    """
+    deps = depset([], transitive=[t.files for t in ctx.attr.targets])
 
-    # Use a genrule to ensure the targets are built
-    native.genrule(
-        name = name + "_gen",
-        srcs = targets,
-        outs = [name + "_gen.out"],
-        tags = tags,
-        visibility = ["//visibility:private"],
-        cmd = "echo > $@",
-        testonly = True,
-    )
+    return [DefaultInfo(
+        executable=executable,
+        runfiles=ctx.runfiles(files = deps.to_list()),
+    )]
 
-    native.sh_test(
-        name = name,
-        srcs = ["@bazel_rules//build_test:blank.sh"],
-        data = [name + "_gen.out"],
-        tags = tags,
-        timeout = "short",
-    )
+build_test = rule(
+    doc = "A test that depends on arbitary targets.",
+
+    implementation = _build_test_impl,
+    test = True,
+    attrs = {
+        "targets": attr.label_list(
+            doc="Targets to check.",
+            mandatory=True,
+            cfg="target",
+            allow_empty=False,
+            allow_files=False,
+        ),
+    },
+)
