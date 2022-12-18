@@ -37,6 +37,7 @@ load("//parser:parser.bzl", "genlex", "genyacc")
 load("//text:spelling.bzl", "spell_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
+load(":gen_dot_test.bzl", "gen_dot_suite")
 
 test_suite(
     name = "ci",
@@ -126,17 +127,8 @@ build_test(
 
 ######## gen_dot
 
-gen_dot(
-    name = "gen_dot_png",
-    src = ":gen_dot_test.dot",
-    out = ":gen_dot_test.png",
-)
-
-build_test(
+gen_dot_suite(
     name = "gen_dot_test",
-    targets = [
-        ":gen_dot_png",
-    ],
 )
 
 ######## http

@@ -1,4 +1,4 @@
-# Copyright (c) 2018, Benjamin Shropshire,
+# Copyright (c) 2022, Benjamin Shropshire,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,45 +25,51 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Bazle/skylark rule(s) to process GraphViz."""
+load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("//build_test:build.bzl", "build_test")
+load("//graphviz:graphviz.bzl", "gen_dot")
 
-def _gen_dot_impl(ctx):
-    out = ctx.actions.declare_file(ctx.outputs.out.basename)
+##### SUCCESS case
 
-    args = ctx.actions.args()
-    args.add("-T%s" % ctx.attr.format)
-    args.add("-o%s" % out.path)
-    args.add_all(ctx.files.src)
+def _gen_dot_contents_test_impl(ctx):
+    env = analysistest.begin(ctx)
 
-    ctx.actions.run(
-        inputs=ctx.files.src,
-        outputs=[out],
-        executable="dot",
-        arguments = [args]
+    target_under_test = analysistest.target_under_test(env)
+    asserts.equals(env,
+      ["gen_dot_test.png"],
+      [f.basename for f in target_under_test[DefaultInfo].files.to_list()])
+    return analysistest.end(env)
+
+gen_dot_contents_test = analysistest.make(_gen_dot_contents_test_impl)
+
+##### Go
+
+def gen_dot_suite(name):
+    # Success
+    gen_dot(
+        name = "gen_dot_success",
+        src = ":gen_dot_test.dot",
+        out = ":gen_dot_test.png",
+        tags = ["manual"],
     )
 
-    return [DefaultInfo(
-        files=depset([out]),
-        runfiles=ctx.runfiles(files = ctx.files.src),
-    )]
+    build_test(
+        name = "gen_dot_builds_test",
+        targets = [
+            ":gen_dot_success",
+        ],
+    )
 
-gen_dot = rule(
-    doc = "Process a .dot file.",
+    gen_dot_contents_test(
+        name = "gen_dot_contents_test",
+        target_under_test = ":gen_dot_success",
+    )
 
-    implementation = _gen_dot_impl,
-    attrs = {
-        "src": attr.label(
-            doc="The .dot file.",
-            allow_single_file=[".dot"],
-            mandatory=True,
-        ),
-        "out": attr.output(
-            doc="The target file name.",
-            mandatory=True,
-        ),
-        "format": attr.string(
-            doc="The output file format.",
-            default = "png",
-        ),
-    },
-)
+    # Suit
+    native.test_suite(
+        name = name,
+        tests = [
+            ":gen_dot_builds_test",
+            ":gen_dot_contents_test",
+        ],
+    )
