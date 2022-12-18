@@ -38,7 +38,24 @@ load("//text:spelling.bzl", "spell_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
 
-test_suite(name = "ci")
+test_suite(
+    name = "ci",
+    tests = [
+        ":build_test_test",
+        ":cc_embed_data_build_test",
+        ":cc_embed_data_test",
+        ":detex_gold_test",
+        ":detex_test",
+        ":dictionary_gold_test",
+        ":eigen_test",
+        ":gen_dot_test",
+        ":latex_test",
+        ":parser_test",
+        ":ref_test",
+        ":role_call_test",
+        ":spell_test_test",
+    ],
+)
 
 ######## build_test
 build_test_suite(
@@ -177,9 +194,13 @@ build_test(
     ],
 )
 
-latex_ref_test(jobname = "gen_latex_test")
+latex_ref_test(
+    name = "ref_test",
+    jobname = "gen_latex_test",
+)
 
 role_call_test(
+    name = "role_call_test",
     root = "gen_latex_test.tex",
     inputs = [
         "//latex:spelling.tex",
