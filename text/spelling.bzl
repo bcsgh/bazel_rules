@@ -25,31 +25,82 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def spell_test(name = None, file = None, dict=[]):
-    """Spell check a text file.
+def _spell_test_impl(ctx): #file = None, dict=[]):
+    args = [ctx.file.file.short_path]
+    runs = [ctx.file.file]
+
+    # Must we merge/prep a dictionary?
+    if ctx.attr.dict:
+      # Merge everything with some filtering.
+      udict = ctx.actions.declare_file(ctx.label.name + ".working.dict")
+
+      dict_args = ctx.actions.args()
+      dict_args.add('!/ /{gsub(/[0-9]/,"");print > "%s"}' % udict.path)
+      dict_args.add_all(ctx.files.dict)
+
+      ctx.actions.run(
+          inputs=ctx.files.dict,
+          outputs=[udict],
+          executable="awk",
+          arguments = [dict_args]
+      )
+
+      # Sort it.
+      sdict = ctx.actions.declare_file(ctx.label.name + ".sorted.dict")
+
+      sort_args = ctx.actions.args()
+      sort_args.add(udict.path)
+      sort_args.add("--output=" + sdict.path)
+
+      ctx.actions.run(
+          inputs=[udict],
+          outputs=[sdict],
+          executable="sort",
+          arguments = [sort_args]
+      )
+
+      # Use that generated dictionary.
+      args += ["--dictionary=" + sdict.short_path]
+      runs += [sdict]
+
+    executable = ctx.actions.declare_file(ctx.label.name + ".sh")
+
+    log = ctx.label.name + ".log"
+    ctx.actions.write(
+        output=executable,
+        content="\n".join([
+            "spell %s &> %s" % (" ".join(args), log),
+            "cat >&2 %s" % (log),   # Noop on success
+            "[ ! -s %s ]" % (log),  # Must be last
+        ]),
+    )
+
+    return [DefaultInfo(
+        executable=executable,
+        runfiles=ctx.runfiles(files=runs),
+    )]
+
+spell_test = rule(
+    doc = """Spell check a text file.
 
     NOTE: this requiers that 'spell' be installed on the build system:
 
     sudo apt install spell  # or the equivlent.
+    """,
 
-    Args:
-      name: The target name.
-      file: The file to spell check.
-      dict: A list of supplemental dictionaries to merge and use.
-    """
-    if not name: fail("name is requred")
-    if not file: fail("file is requred")
-
-    native.sh_test(
-        name = name,
-        srcs = ["@bazel_rules//text:test_spell.sh"],
-        data = dict + [
-            file,
-        ],
-        args = [
-            "$(location %s)" % file,
-        ] + [
-          "$(locations %s)" % d
-          for d in dict
-        ],
-    )
+    implementation = _spell_test_impl,
+    test = True,
+    attrs = {
+        "file": attr.label(
+            doc="The file to spell check.",
+            allow_single_file=True,
+            mandatory=True,
+        ),
+        "dict": attr.label_list(
+            doc="A list of supplemental dictionaries to merge and use.",
+            default=[],
+            allow_files=True,
+            mandatory=False,
+        ),
+    },
+)

@@ -25,24 +25,64 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-set -o pipefail
+load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("//text:spelling.bzl", "spell_test")
 
-# sudo apt install spell
+##### SUCCESS case
 
-TEXT=$1
-shift 1
+def _spell_test_contents_test_impl(ctx):
+    env = analysistest.begin(ctx)
 
-cat $TEXT | \
-  spell - --dictionary=<(cat /dev/null $* | grep -ve ' ' | sed 's/[0-9]//g' | sort -u) >output.stdout 2>output.stderr
-SPELL=$?
+    target_under_test = analysistest.target_under_test(env)
+    asserts.equals(env,
+      ["spell_test_pass_test.sh"],
+      [f.basename for f in target_under_test[DefaultInfo].files.to_list()])
+    return analysistest.end(env)
 
-if [ $SPELL -ne 0 ] || [ -s output.stdout ] || [ -s output.stderr ] ;
-then
-  echo "====== STDOUT"
-  sort -u output.stdout
-  echo "====== STDERR"
-  cat output.stderr
-  echo "============="
+spell_test_contents_test = analysistest.make(_spell_test_contents_test_impl)
 
-  exit 1
-fi
+##### Go
+
+def spell_test_suite(name):
+    # Success
+    spell_test(
+        name = "spell_test_pass_test",
+        file = "spell_test.txt",
+        dict = [
+            "spell_test.dict",
+            "second.dict",
+        ],
+    )
+
+    spell_test_contents_test(
+        name = "spell_test_contents_test",
+        target_under_test = ":spell_test_pass_test",
+    )
+
+    # Failure
+    spell_test(
+        name = "spell_test_fail_test",
+        file = "spell_test.txt",
+        dict = [
+        ],
+        tags = ["manual"],
+    )
+
+    # TODO find a better way to do this:
+    # https://stackoverflow.com/questions/74844959
+    native.sh_test(
+        name = "spell_test_failure_test",
+        srcs = [":not.sh"],
+        args = ["$(location :spell_test_fail_test)"],
+        data = [":spell_test_fail_test"],
+    )
+
+    # Suit
+    native.test_suite(
+        name = name,
+        tests = [
+            ":spell_test_contents_test",
+            ":spell_test_failure_test",
+            ":spell_test_pass_test",
+        ],
+    )

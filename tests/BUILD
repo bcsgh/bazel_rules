@@ -34,10 +34,10 @@ load("//latex:latex.bzl", "tex_to_pdf")
 load("//latex:ref_test.bzl", "latex_ref_test")
 load("//latex:role_call_test.bzl", "role_call_test")
 load("//parser:parser.bzl", "genlex", "genyacc")
-load("//text:spelling.bzl", "spell_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
+load(":spell_test_test.bzl", "spell_test_suite")
 
 test_suite(
     name = "ci",
@@ -209,10 +209,8 @@ diff_test(
 
 ######## spelling
 
-spell_test(
+spell_test_suite(
     name = "spell_test_test",
-    file = "spell_test.txt",
-    dict = ["spell_test.dict"],
 )
 
 ######## repositories
