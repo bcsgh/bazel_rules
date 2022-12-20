@@ -85,40 +85,76 @@ def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_o
         visibility = visibility,
     )
 
-def detex(name = None, src = None, post_sed = None, visibility = None):
-    """Process a .tex file into a text file that approximates the text from the input.
+def _detex_impl(ctx):
+    processed_1 = ctx.actions.declare_file(ctx.label.name + ".processed_1")
+
+    sed1_args = ctx.actions.args()
+    sed1_args.add(ctx.attr.src.files.to_list()[0].path)           # input
+    sed1_args.add("-n")                                           # No stdout
+    sed1_args.add("-f%s" % ctx.attr._sed.files.to_list()[0].path) # process
+    sed1_args.add("-ew %s" % processed_1.path)                    # write to output
+
+    ctx.actions.run(
+        inputs=depset(ctx.files.src + ctx.files._sed),
+        outputs=[processed_1],
+        executable="sed",
+        arguments = [sed1_args]
+    )
+
+    if ctx.attr.post_sed:
+      processed_2 = ctx.actions.declare_file(ctx.label.name + ".processed_2")
+      processed = processed_2
+
+      sed2_args = ctx.actions.args()
+      sed2_args.add(processed_1.path)                                   # input
+      sed2_args.add("-n")                                               # No stdout
+      sed2_args.add("-f%s" % ctx.attr.post_sed.files.to_list()[0].path) # process
+      sed2_args.add("-ew %s" % processed_2.path)                        # write to output
+
+      ctx.actions.run(
+          inputs=depset([processed_1], transitive=[ctx.attr.post_sed.files]),
+          outputs=[processed_2],
+          executable="sed",
+          arguments = [sed2_args]
+      )
+    else:
+      processed = processed_1
+
+    result = ctx.actions.declare_file(ctx.label.name + ".txt")
+    ctx.actions.run_shell(
+        inputs=[processed],
+        outputs=[result],
+        command = "/usr/bin/detex -l %s >%s"  % (processed.path, result.path)
+    )
+
+    return [DefaultInfo(
+        files=depset([result]),
+        runfiles=ctx.runfiles(files=(ctx.files.src + ctx.files.post_sed + ctx.files._sed)),
+    )]
+
+detex = rule(
+    doc = """Process a .tex file into a text file that approximates the text from the input.
 
     This can be usefull as a pre-processing step for tests like spell checking.
     Note, the input doesn't need to be a complete tex document.
+    """,
 
-    Args:
-      name: The target name.
-      src: The root source file
-      post_sed: A sed script applied to remove or process custom markup.
-    """
-
-    if not name: fail("name must be provided")
-    if not src: fail("src must be provided")
-
-    sed = "@bazel_rules//latex:detex.sed"
-
-    pipe = ["sed $(location %s) -f $(location %s)" % (src, sed)]
-
-    if post_sed:
-      pipe += ["sed -f $(location %s)" % post_sed]
-      post_seds = [post_sed]
-    else:
-      post_seds = []
-
-    pipe += ["detex -l >$@"]
-
-    native.genrule(
-        name = name,
-        srcs = [
-            src,
-            sed,
-        ] + post_seds,
-        cmd = "set -o pipefail ; " + " | ".join(pipe),
-        outs = [name + ".txt"],
-        visibility = visibility,
-    )
+    implementation = _detex_impl,
+    attrs = {
+        "src": attr.label(
+            doc="The root source file.",
+            allow_single_file=True,
+            mandatory=True,
+        ),
+        "post_sed": attr.label(
+            doc="A sed script applied to remove or process custom markup.",
+            default=None,
+            allow_single_file=True,
+            mandatory=False,
+        ),
+        "_sed": attr.label(
+            default="@bazel_rules//latex:detex.sed",
+            allow_single_file=True,
+        ),
+    },
+)

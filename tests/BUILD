@@ -28,7 +28,6 @@
 load("//build_test:build.bzl", "build_test")
 load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
 load("//graphviz:graphviz.bzl", "gen_dot")
-load("//latex:latex.bzl", "detex")
 load("//latex:git_stamp.bzl", "git_stamp")
 load("//latex:latex.bzl", "tex_to_pdf")
 load("//latex:ref_test.bzl", "latex_ref_test")
@@ -38,6 +37,7 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
+load(":detex_test.bzl", "detex_suite")
 
 test_suite(
     name = "ci",
@@ -167,23 +167,8 @@ build_test(
     ],
 )
 
-detex(
-    name = "gen_latex_test_detex",
-    src = "gen_latex_test.tex",
-    post_sed = ":detex_test.sed"
-)
-
-diff_test(
-    name = "detex_gold_test",
-    file1 = ":gen_latex_test_detex",
-    file2 = ":gen_latex_test_detex.gold",
-)
-
-build_test(
+detex_suite(
     name = "detex_test",
-    targets = [
-        ":gen_latex_test_detex",
-    ],
 )
 
 latex_ref_test(
