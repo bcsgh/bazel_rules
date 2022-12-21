@@ -27,62 +27,182 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-def tex_to_pdf(name = None, src = None, pdf = None, runs = 2, data = [], extra_outs = [],
-               outs = [], reprocess = [], jobname = None, visibility = None):
-    """Process a .tex file into a .pdf file.
+def _tex_to_pdf_impl(ctx):
+    if ctx.attr.runs < 1:
+        fail("At least 1 run requiered.")
+    if ctx.attr.reprocess and ctx.attr.runs < 2:
+        fail("Reprocess does nothing without mutiple runs.")
 
-    Args:
-      name: The target name.
-      src: The root source file
-      pdf: The output file name.
-      runs: How many times to run.
-        (Yes, re-running latex mutiple times is still a thing.)
-      data: Other files needed.
-      extra_outs: Aditional filename extention to include in the result set.
-      outs: Arbitrary aditional filenames to include in the result set.
-      reprocess: Extra shell commands to run between invocation of pdflatex.
-      jobname: The value for \\jobname.
-    """
-    if not name:
-        fail("name must be provided")
-    if not src:
-        fail("src must be provided")
-    if not pdf:
-        fail("pdf must be provided")
-    if reprocess and runs < 2:
-        fail("reprocess does nothing without mutiple runs")
+    steps = []
 
-    args = []
+    ##### Set up pulling everything into where pdflatex expects it.
+    pull = ctx.actions.declare_file(ctx.label.name + ".pull.sh")
+    steps += [pull]
+    ctx.actions.write(output=pull, content="set -e\n%s\n" % " ".join([
+        ctx.file._pull.path,
+    ] + [
+        f.path
+        for f in ctx.files.data
+    ]))
+
+    ##### Set up the pdflatex command.
+    if ctx.attr.jobname:
+        jobname = ctx.attr.jobname
+        extra = "-jobname=%s " % ctx.attr.jobname
+    else:
+        jobname = ctx.file.src.basename.replace(".tex", "")
+        extra = ""
+
+    cmd = "max_print_line=1000 /usr/bin/pdflatex %s%s" % (extra, ctx.file.src.path)
+
+    pdflatex = ctx.actions.declare_file(ctx.label.name + ".pdflatex.sh")
+    steps += [pdflatex]
+    ctx.actions.write(output=pdflatex, content="set -e\n%s\n" % cmd)
+
+    ##### Set up the reprocess commands.
+    rp_steps = []
+    for i, r in enumerate(ctx.attr.reprocess):
+        cmd = ctx.expand_location(r, targets=ctx.attr.reprocess_tools)
+
+        rf = ctx.actions.declare_file(ctx.label.name + ".reprocess_%d.sh" % i)
+        rp_steps += [rf]
+        ctx.actions.write(output=rf, content="set -e\n%s\n" % cmd)
+
+    ##### Setup generation of outputs.
+    pdf = ctx.actions.declare_file(ctx.attr.pdf)
+    outs = [pdf]
+    cp = ["cp %s.pdf %s" % (jobname, pdf.path)]
+
+    ##### Set up pushing everything to where Bazel expects it. (TODO can this use symlinks?)
+    for o in ctx.attr.extra_outs:
+      of = ctx.actions.declare_file("%s.%s" % (jobname, o))
+      outs += [of]
+      cp += ["cp %s.%s %s" % (jobname, o, of.path)]
+
+    for o in ctx.attr.outs:
+      of = ctx.actions.declare_file(o)
+      outs += [of]
+      cp += ["cp %s %s" % (o, of.path)]
+
+    copy = ctx.actions.declare_file(ctx.label.name + ".copy.sh")
+    steps += [copy]
+    ctx.actions.write(output=copy, content="set -e\n%s\n" % "\n".join(cp))
+
+    # Setup the full run.
+    rerun = [r.path for r in rp_steps] + [pdflatex.path]
+    script_body = [pdflatex.path] + (rerun * (ctx.attr.runs - 1))
+
+    script = ctx.actions.declare_file(ctx.label.name + ".full.sh")
+    ctx.actions.expand_template(
+        output=script,
+        template = ctx.file._full_template,
+        substitutions={
+          "{PULL}": pull.path,
+          "{BODY}": "\n".join([
+              "%s &> LOG" % l
+              for l in script_body
+          ]),
+          "{COPY}": copy.path,
+        }
+    )
+
+    #for i,l in enumerate(script_body): print(i,l)
+
+    # Do the full run
+    srcs = (ctx.files.src + ctx.files.data + ctx.files._pull + ctx.files.reprocess_tools)
+    ctx.actions.run(
+        inputs=depset(srcs + steps + rp_steps),
+        outputs=outs,
+        executable=script,
+        arguments = []
+    )
+
+    return [DefaultInfo(runfiles=ctx.runfiles(files=srcs))]
+
+_tex_to_pdf = rule(
+    doc = "Process a .tex file into a .pdf file.",
+
+    implementation = _tex_to_pdf_impl,
+    attrs = {
+      "src": attr.label(
+          doc="The root source file.",
+          allow_single_file=[".tex"],
+          mandatory=True,
+      ),
+      "pdf": attr.string(
+          doc="The output file name.",
+          mandatory=True,
+      ),
+      "runs": attr.int(
+          doc="How many times to run. (Yes, re-running latex mutiple times is still a thing.)",
+          default=2,
+      ),
+      "data": attr.label_list(
+          doc="Other input files needed by pdflatex.",
+          allow_files=True,
+          default=[],
+      ),
+      "reprocess_tools": attr.label_list(
+          doc="Other input files needed by the reprocessing steps.",
+          allow_files=True,
+          default=[],
+      ),
+      "extra_outs": attr.string_list(
+          doc="Aditional filename extention to include in the result set.",
+          default=[],
+      ),
+      "outs": attr.string_list(
+          doc="Arbitrary aditional filenames to include in the result set.",
+          default=[],
+      ),
+      "reprocess": attr.string_list(
+          doc="Extra shell commands to run between invocation of pdflatex.",
+          default=[],
+      ),
+      "jobname": attr.string(
+          doc="The value for \\jobname.",
+          default="",
+      ),
+      "_pull": attr.label(
+          doc="The script that pulls the files into the local dir.",
+          allow_single_file=True,
+          default="@bazel_rules//latex:pull.sh",
+      ),
+      "_full_template": attr.label(
+          doc="A template for the full processing.",
+          allow_single_file=True,
+          default="@bazel_rules//latex:full.sh.tpl",
+      ),
+      "outputs": attr.output_list(),
+    }
+)
+
+def tex_to_pdf(
+        src=None, jobname=None, outs=[], extra_outs=[], pdf=None,
+        outputs=None,
+        *args, **kwargs):
+    if outputs != None: fail("outputs is only for internal use")
+
+    # compute the jobname
     if jobname:
-      args += ["-jobname=%s" % jobname]
+        _jobname = jobname
     else:
-      jobname = src.replace(".tex", "")
+        i = max(0, src.rfind(":"), src.rfind("/"))
+        _jobname = src[i:].replace(".tex", "")
 
-    extra_outs = ["%s.%s" % (jobname, o) for o in extra_outs] + outs
+    # generate the outputs arg
+    outputs = [pdf] + outs + ["%s.%s" % (_jobname, e) for e in extra_outs]
 
-    pull = ["$(locations %s)" % s for s in data]
-    pull = "$(location @bazel_rules//latex:pull.sh) %s" % " ".join(pull)
-
-    cmd = "(max_print_line=1000 /usr/bin/pdflatex %s $(location %s) &>./%s.LOG)" % (" ".join(args), src, name)
-
-    if reprocess:
-      mid = " && ".join([""] + ["(%s)" % r for r in reprocess] + [""])
-    else:
-      mid = " && "
-
-    cp = ["cp %s.pdf $(location :%s)" % (jobname, pdf)]
-    cp += ["cp %s $(location :%s)" % (t, t) for t in extra_outs]
-    native.genrule(
-        name = name,
-        outs = [pdf] + extra_outs,
-        srcs = [src, "@bazel_rules//latex:pull.sh"] + data,
-        cmd = "(%s) && ( %s ) || (cat ./%s.LOG ; false) && %s" % (
-            pull,
-            mid.join([cmd] * runs),
-            name,
-            " && ".join(cp),
-        ),
-        visibility = visibility,
+    # invoke the inner version
+    _tex_to_pdf(
+        src=src,
+        pdf=pdf,
+        jobname=jobname,
+        outs=outs,
+        extra_outs=extra_outs,
+        outputs=outputs,
+        *args,
+        **kwargs
     )
 
 def _detex_impl(ctx):

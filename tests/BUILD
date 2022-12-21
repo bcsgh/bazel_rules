@@ -29,15 +29,15 @@ load("//build_test:build.bzl", "build_test")
 load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
 load("//graphviz:graphviz.bzl", "gen_dot")
 load("//latex:git_stamp.bzl", "git_stamp")
-load("//latex:latex.bzl", "tex_to_pdf")
 load("//latex:ref_test.bzl", "latex_ref_test")
 load("//latex:role_call_test.bzl", "role_call_test")
 load("//parser:parser.bzl", "genlex", "genyacc")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
+load(":detex_test.bzl", "detex_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
-load(":detex_test.bzl", "detex_suite")
+load(":tex_to_pdf_test.bzl", "tex_to_pdf_suite")
 
 test_suite(
     name = "ci",
@@ -50,7 +50,7 @@ test_suite(
         ":dictionary_gold_test",
         ":eigen_test",
         ":gen_dot_test",
-        ":latex_test",
+        ":gen_latex_test",
         ":parser_test",
         ":ref_test",
         ":role_call_test",
@@ -146,25 +146,8 @@ build_test(
 
 git_stamp()
 
-tex_to_pdf(
+tex_to_pdf_suite(
     name = "gen_latex_test",
-    src = "gen_latex_test.tex",
-    data = [
-        "//latex:spelling.tex",
-        ":fixed.tex",
-        ":git_stamp.tex",
-    ],
-    extra_outs = ["aux", "dict", "log"],
-    # TODO reprocess = [],
-    pdf = "gen_latex_test.pdf",
-    # TODO runs = 3,
-)
-
-build_test(
-    name = "latex_test",
-    targets = [
-        ":gen_latex_test",
-    ],
 )
 
 detex_suite(
@@ -173,7 +156,7 @@ detex_suite(
 
 latex_ref_test(
     name = "ref_test",
-    jobname = "gen_latex_test",
+    jobname = "gen_latex",
 )
 
 role_call_test(
@@ -188,7 +171,7 @@ role_call_test(
 
 diff_test(
     name = "dictionary_gold_test",
-    file1 = ":gen_latex_test.dict",
+    file1 = ":gen_latex.dict",
     file2 = ":spell_test.dict",
 )
 
