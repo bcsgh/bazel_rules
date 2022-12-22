@@ -203,10 +203,10 @@ def _detex_impl(ctx):
     processed_1 = ctx.actions.declare_file(ctx.label.name + ".processed_1")
 
     sed1_args = ctx.actions.args()
-    sed1_args.add(ctx.attr.src.files.to_list()[0].path)           # input
-    sed1_args.add("-n")                                           # No stdout
-    sed1_args.add("-f%s" % ctx.attr._sed.files.to_list()[0].path) # process
-    sed1_args.add("-ew %s" % processed_1.path)                    # write to output
+    sed1_args.add(ctx.file.src.path)           # input
+    sed1_args.add("-n")                        # No stdout
+    sed1_args.add("-f%s" % ctx.file._sed.path) # process
+    sed1_args.add("-ew %s" % processed_1.path) # write to output
 
     ctx.actions.run(
         inputs=depset(ctx.files.src + ctx.files._sed),
@@ -215,18 +215,18 @@ def _detex_impl(ctx):
         arguments = [sed1_args]
     )
 
-    if ctx.attr.post_sed:
+    if ctx.file.post_sed:
       processed_2 = ctx.actions.declare_file(ctx.label.name + ".processed_2")
       processed = processed_2
 
       sed2_args = ctx.actions.args()
-      sed2_args.add(processed_1.path)                                   # input
-      sed2_args.add("-n")                                               # No stdout
-      sed2_args.add("-f%s" % ctx.attr.post_sed.files.to_list()[0].path) # process
-      sed2_args.add("-ew %s" % processed_2.path)                        # write to output
+      sed2_args.add(processed_1.path)                # input
+      sed2_args.add("-n")                            # No stdout
+      sed2_args.add("-f%s" % ctx.file.post_sed.path) # process
+      sed2_args.add("-ew %s" % processed_2.path)     # write to output
 
       ctx.actions.run(
-          inputs=depset([processed_1], transitive=[ctx.attr.post_sed.files]),
+          inputs=depset([processed_1, ctx.file.post_sed]),
           outputs=[processed_2],
           executable="sed",
           arguments = [sed2_args]
@@ -236,7 +236,7 @@ def _detex_impl(ctx):
 
     result = ctx.actions.declare_file(ctx.attr.out.name)
     ctx.actions.run_shell(
-        inputs=[processed],
+        inputs=depset([processed]),
         outputs=[result],
         command = "/usr/bin/detex -l %s >%s"  % (processed.path, result.path)
     )
