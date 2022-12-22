@@ -69,7 +69,7 @@ def _tex_to_pdf_impl(ctx):
         ctx.actions.write(output=rf, content="set -e\n%s\n" % cmd)
 
     ##### Setup generation of outputs.
-    pdf = ctx.actions.declare_file(ctx.attr.pdf)
+    pdf = ctx.actions.declare_file(ctx.attr.pdf.name)
     outs = [pdf]
     cp = ["cp %s.pdf %s" % (jobname, pdf.path)]
 
@@ -80,9 +80,9 @@ def _tex_to_pdf_impl(ctx):
       cp += ["cp %s.%s %s" % (jobname, o, of.path)]
 
     for o in ctx.attr.outs:
-      of = ctx.actions.declare_file(o)
+      of = ctx.actions.declare_file(o.name)
       outs += [of]
-      cp += ["cp %s %s" % (o, of.path)]
+      cp += ["cp %s %s" % (o.name, of.path)]
 
     copy = ctx.actions.declare_file(ctx.label.name + ".copy.sh")
     steps += [copy]
@@ -129,7 +129,7 @@ _tex_to_pdf = rule(
           allow_single_file=[".tex"],
           mandatory=True,
       ),
-      "pdf": attr.string(
+      "pdf": attr.output(
           doc="The output file name.",
           mandatory=True,
       ),
@@ -151,9 +151,8 @@ _tex_to_pdf = rule(
           doc="Aditional filename extention to include in the result set.",
           default=[],
       ),
-      "outs": attr.string_list(
+      "outs": attr.output_list(
           doc="Arbitrary aditional filenames to include in the result set.",
-          default=[],
       ),
       "reprocess": attr.string_list(
           doc="Extra shell commands to run between invocation of pdflatex.",
@@ -178,7 +177,7 @@ _tex_to_pdf = rule(
 )
 
 def tex_to_pdf(
-        src=None, jobname=None, outs=[], extra_outs=[], pdf=None,
+        src=None, jobname=None, extra_outs=[],
         outputs=None,
         *args, **kwargs):
     if outputs != None: fail("outputs is only for internal use")
@@ -190,17 +189,12 @@ def tex_to_pdf(
         i = max(0, src.rfind(":"), src.rfind("/"))
         _jobname = src[i:].replace(".tex", "")
 
-    # generate the outputs arg
-    outputs = [pdf] + outs + ["%s.%s" % (_jobname, e) for e in extra_outs]
-
     # invoke the inner version
     _tex_to_pdf(
         src=src,
-        pdf=pdf,
         jobname=jobname,
-        outs=outs,
         extra_outs=extra_outs,
-        outputs=outputs,
+        outputs=["%s.%s" % (_jobname, e) for e in extra_outs],
         *args,
         **kwargs
     )
@@ -240,7 +234,7 @@ def _detex_impl(ctx):
     else:
       processed = processed_1
 
-    result = ctx.actions.declare_file(ctx.label.name + ".txt")
+    result = ctx.actions.declare_file(ctx.attr.out.name)
     ctx.actions.run_shell(
         inputs=[processed],
         outputs=[result],
@@ -248,11 +242,10 @@ def _detex_impl(ctx):
     )
 
     return [DefaultInfo(
-        files=depset([result]),
         runfiles=ctx.runfiles(files=(ctx.files.src + ctx.files.post_sed + ctx.files._sed)),
     )]
 
-detex = rule(
+_detex = rule(
     doc = """Process a .tex file into a text file that approximates the text from the input.
 
     This can be usefull as a pre-processing step for tests like spell checking.
@@ -276,5 +269,14 @@ detex = rule(
             default="@bazel_rules//latex:detex.sed",
             allow_single_file=True,
         ),
+        "out": attr.output(
+            doc="The output file name.",
+            mandatory=True,
+        ),
     },
 )
+
+def detex(name=None, out=None, *args, **kwargs):
+    if out != None: fail("out is only for internal use")
+
+    _detex(name=name, out="%s.txt" % name, *args, **kwargs)

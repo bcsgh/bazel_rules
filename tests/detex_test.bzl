@@ -55,7 +55,7 @@ def detex_suite(name):
 
     diff_test(
         name = "detex_gold_test",
-        file1 = ":gen_detex",
+        file1 = ":gen_detex.txt",
         file2 = ":gen_latex_test_detex.gold",
     )
 

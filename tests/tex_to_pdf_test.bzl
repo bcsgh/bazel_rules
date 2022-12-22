@@ -37,7 +37,7 @@ def _tex_to_pdf_contents_test_impl(ctx):
 
     target_under_test = analysistest.target_under_test(env)
     asserts.equals(env,
-      ["gen_latex." + e for e in sorted(["aux", "dict", "log", "pdf", "test"])],
+      sorted(["gen_latex." + e for e in ["aux", "dict", "log", "pdf"]] + ["out.test"]),
       sorted([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
@@ -71,15 +71,16 @@ def tex_to_pdf_suite(name):
             ":fixed.tex",
             ":git_stamp.tex",
         ],
-        extra_outs = ["aux", "dict", "log", "test"],
-        reprocess = ["echo foo >> gen_latex.test"],
+        extra_outs = ["aux", "dict", "log"],
+        outs = ["out.test"],
+        reprocess = ["echo foo >> out.test"],
         pdf = "gen_latex.pdf",
         runs = 3,
     )
 
     diff_test(
         name = "latex_gold_test",
-        file1 = ":gen_latex.test",
+        file1 = ":out.test",
         file2 = ":gen_latex.gold",
     )
 

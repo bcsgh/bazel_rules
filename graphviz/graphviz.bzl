@@ -43,7 +43,6 @@ def _gen_dot_impl(ctx):
     )
 
     return [DefaultInfo(
-        files=depset([out]),
         runfiles=ctx.runfiles(files = ctx.files.src),
     )]
 
