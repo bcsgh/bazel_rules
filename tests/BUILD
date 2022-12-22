@@ -26,16 +26,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("//build_test:build.bzl", "build_test")
-load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
 load("//graphviz:graphviz.bzl", "gen_dot")
 load("//latex:git_stamp.bzl", "git_stamp")
 load("//latex:ref_test.bzl", "latex_ref_test")
 load("//latex:role_call_test.bzl", "role_call_test")
-load("//parser:parser.bzl", "genlex", "genyacc")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
+load(":cc_embed_data_test.bzl", "cc_embed_data_suite")
 load(":detex_test.bzl", "detex_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
+load(":parser_test.bzl", "parser_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
 load(":tex_to_pdf_test.bzl", "tex_to_pdf_suite")
 
@@ -43,9 +43,7 @@ test_suite(
     name = "ci",
     tests = [
         ":build_test_test",
-        ":cc_embed_data_build_test",
         ":cc_embed_data_test",
-        ":detex_gold_test",
         ":detex_test",
         ":dictionary_gold_test",
         ":eigen_test",
@@ -65,64 +63,13 @@ build_test_suite(
 
 ######## cc_embed_data
 
-SRCS = glob(["*"])
-
-cc_embed_data(
-    name = "cc_embed_data_example",
-    srcs = SRCS,
-    namespace = "test_ns",
-)
-
-build_test(
-    name = "cc_embed_data_build_test",
-    targets = [":cc_embed_data_example"],
-)
-
-cc_test(
+cc_embed_data_suite(
     name = "cc_embed_data_test",
-    srcs = ["cc_embed_data_test.cc"],
-    data = SRCS,
-    deps = [
-        ":cc_embed_data_example",
-        "@com_google_googletest//:gtest_main",
-    ],
 )
-
 ######## genlex/genyacc
 
-genyacc(
-    name = "parser",
-    src = "parser.y",
-)
-
-genlex(
-    name = "lexer",
-    src = "lexer.l",
-)
-
-cc_library(
-    name = "parser_build",
-    srcs = [
-        ":lexer",
-        ":parser",
-    ],
-    hdrs = [
-        "gen.lexer.h",
-        ":lexer",
-        ":parser",
-    ],
-    copts = [
-        # because bison
-        "-fexceptions",
-        "-Wno-sign-compare",
-    ],
-)
-
-build_test(
-    name = "parser_test",
-    targets = [
-        ":parser_build",
-    ],
+parser_suite(
+    name = "parser_test"
 )
 
 ######## gen_dot
