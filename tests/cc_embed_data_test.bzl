@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//build_test:build.bzl", "build_test")
 load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
 
@@ -81,12 +82,39 @@ def cc_embed_data_suite(name):
         target_under_test = ":cc_embed_data_example",
     )
 
+    cc_embed_data(
+        name = "cc_embed_data_short",
+        srcs = [
+            "cc_embed_data_test.bzl",  # local static
+            ":gen_detex.txt",          # local generated
+            # TODO "@bazel_skylib//:LICENSE"  # extern static
+            # TODO ... extern generated
+        ],
+        namespace = "test_ns",
+    )
+
+    EXT = ["cc", "h"]
+    gt = [diff_test(
+        name = "diff_%s_test" % e,
+        file1 = "cc_embed_data_short_emebed_data." + e,
+        file2 = "cc_embed_data_short_emebed_data.gold." + e,
+    ) for e in EXT]
+
+    build_test(
+        name = "cc_embed_data_build_short_test",
+        targets = [":cc_embed_data_short"],
+    )
+
     # Suit
     native.test_suite(
         name = name,
         tests = [
             ":cc_embed_data_build_test",
+            ":cc_embed_data_build_short_test",
             ":cc_embed_data_contents_test",
             ":cc_embed_data_live_test",
+        ] + [
+            ":diff_%s_test" % e
+            for e in EXT
         ],
     )
