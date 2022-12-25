@@ -63,13 +63,13 @@ def cc_embed_data_suite(name):
     )
 
     build_test(
-        name = "cc_embed_data_build_test",
+        name = "cc_embed_data_example_build_test",
         targets = [":cc_embed_data_example"],
     )
 
     native.cc_test(
-        name = "cc_embed_data_live_test",
-        srcs = ["cc_embed_data_test.cc"],
+        name = "cc_embed_data_example_live_test",
+        srcs = ["cc_embed_data_example_test.cc"],
         data = SRCS,
         deps = [
             ":cc_embed_data_example",
@@ -82,14 +82,16 @@ def cc_embed_data_suite(name):
         target_under_test = ":cc_embed_data_example",
     )
 
+    SHORT_SRC = [
+        "cc_embed_data_test.bzl",  # local static
+        ":gen_detex.txt",          # local generated
+        # TODO "@bazel_skylib//:LICENSE"  # extern static
+        # TODO ... extern generated
+    ]
+
     cc_embed_data(
         name = "cc_embed_data_short",
-        srcs = [
-            "cc_embed_data_test.bzl",  # local static
-            ":gen_detex.txt",          # local generated
-            # TODO "@bazel_skylib//:LICENSE"  # extern static
-            # TODO ... extern generated
-        ],
+        srcs = SHORT_SRC,
         namespace = "test_ns",
     )
 
@@ -101,18 +103,29 @@ def cc_embed_data_suite(name):
     ) for e in EXT]
 
     build_test(
-        name = "cc_embed_data_build_short_test",
+        name = "cc_embed_data_short_build_test",
         targets = [":cc_embed_data_short"],
+    )
+
+    native.cc_test(
+        name = "cc_embed_data_short_live_test",
+        srcs = ["cc_embed_data_short_test.cc"],
+        data = SHORT_SRC,
+        deps = [
+            ":cc_embed_data_short",
+            "@com_google_googletest//:gtest_main",
+        ],
     )
 
     # Suit
     native.test_suite(
         name = name,
         tests = [
-            ":cc_embed_data_build_test",
-            ":cc_embed_data_build_short_test",
+            ":cc_embed_data_example_build_test",
+            ":cc_embed_data_example_live_test",
+            ":cc_embed_data_short_build_test",
+            ":cc_embed_data_short_live_test",
             ":cc_embed_data_contents_test",
-            ":cc_embed_data_live_test",
         ] + [
             ":diff_%s_test" % e
             for e in EXT

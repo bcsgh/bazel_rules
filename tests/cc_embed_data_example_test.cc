@@ -49,10 +49,9 @@ std::string ReadFile(const std::string& path) {
 
 TEST(CcEmbedData, Basic) {
   // Check that all files match.
-  std::map<std::string, std::string> idx;
+  std::set<std::string> idx;
   for (const auto& i : test_ns::EmbedIndex()) {
-    idx.emplace(std::string{i.first},
-                std::string{i.second});
+    idx.emplace(std::string{i.first});
 
     EXPECT_EQ(ReadFile(std::string{i.first}), i.second) << i.first;
   }
@@ -61,12 +60,12 @@ TEST(CcEmbedData, Basic) {
   using ::testing::Contains;
   using ::testing::Key;
 
-  EXPECT_THAT(idx, Contains(Key("tests/BUILD")));
-  EXPECT_THAT(idx, Contains(Key("tests/cc_embed_data_test.cc")));
-  EXPECT_THAT(idx, Contains(Key("tests/gen.lexer.h")));
-  EXPECT_THAT(idx, Contains(Key("tests/gen_dot_test.dot")));
-  EXPECT_THAT(idx, Contains(Key("tests/lexer.l")));
-  EXPECT_THAT(idx, Contains(Key("tests/parser.y")));
+  EXPECT_THAT(idx, Contains("tests/BUILD"));
+  EXPECT_THAT(idx, Contains("tests/cc_embed_data_example_test.cc"));
+  EXPECT_THAT(idx, Contains("tests/gen.lexer.h"));
+  EXPECT_THAT(idx, Contains("tests/gen_dot_test.dot"));
+  EXPECT_THAT(idx, Contains("tests/lexer.l"));
+  EXPECT_THAT(idx, Contains("tests/parser.y"));
 }
 
 }  // namespace
