@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//build_test:build.bzl", "build_test")
 
 ##### SUCCESS case
@@ -34,9 +35,9 @@ def _build_test_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      ["build_success_test.empty.sh"],
-      [f.basename for f in target_under_test[DefaultInfo].files.to_list()])
+    asserts.set_equals(env,
+      sets.make(["build_success_test.empty.sh"]),
+      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
 build_test_contents_test = analysistest.make(_build_test_contents_test_impl)

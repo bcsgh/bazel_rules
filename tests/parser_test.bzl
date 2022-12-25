@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//build_test:build.bzl", "build_test")
 load("//parser:parser.bzl", "genlex", "genyacc")
 
@@ -35,18 +36,18 @@ def _genyacc_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      [
+    asserts.set_equals(env,
+      sets.make([
           "parser.tab.cc",
           "parser.tab.h",
           "stack.hh",
           "position.hh",
           "location.hh",
-      ],
-      [
+      ]),
+      sets.make([
           f.basename
           for f in target_under_test[DefaultInfo].files.to_list()
-      ])
+      ]))
     return analysistest.end(env)
 
 genyacc_contents_test = analysistest.make(_genyacc_contents_test_impl)
@@ -55,15 +56,15 @@ def _genlex_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      [
+    asserts.set_equals(env,
+      sets.make([
           "lexer.yy.cc",
           "lexer.yy.h",
-      ],
-      [
+      ]),
+      sets.make([
           f.basename
           for f in target_under_test[DefaultInfo].files.to_list()
-      ])
+      ]))
     return analysistest.end(env)
 
 genlex_contents_test = analysistest.make(_genlex_contents_test_impl)

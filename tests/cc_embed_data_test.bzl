@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//build_test:build.bzl", "build_test")
 load("//cc_embed_data:cc_embed_data.bzl", "cc_embed_data")
@@ -36,15 +37,15 @@ def _cc_embed_data_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      [
+    asserts.set_equals(env,
+      sets.make([
           "libcc_embed_data_example.a",
           "libcc_embed_data_example.so",
-      ],
-      [
+      ]),
+      sets.make([
           f.basename
           for f in target_under_test[DefaultInfo].files.to_list()
-      ])
+      ]))
     return analysistest.end(env)
 
 cc_embed_data_contents_test = analysistest.make(_cc_embed_data_contents_test_impl)

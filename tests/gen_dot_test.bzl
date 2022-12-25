@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//build_test:build.bzl", "build_test")
 load("//graphviz:graphviz.bzl", "gen_dot")
 
@@ -35,9 +36,9 @@ def _gen_dot_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      ["gen_dot_test.png"],
-      [f.basename for f in target_under_test[DefaultInfo].files.to_list()])
+    asserts.set_equals(env,
+      sets.make(["gen_dot_test.png"]),
+      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
 gen_dot_contents_test = analysistest.make(_gen_dot_contents_test_impl)

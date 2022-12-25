@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//build_test:build.bzl", "build_test")
 load("//latex:latex.bzl", "detex")
@@ -36,9 +37,9 @@ def _detex_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      ["gen_detex.txt"],
-      [f.basename for f in target_under_test[DefaultInfo].files.to_list()])
+    asserts.set_equals(env,
+      sets.make(["gen_detex.txt"]),
+      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
 detex_contents_test = analysistest.make(_detex_contents_test_impl)

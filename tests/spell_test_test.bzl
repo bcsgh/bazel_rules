@@ -26,6 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//text:spelling.bzl", "spell_test")
 
 ##### SUCCESS case
@@ -34,9 +35,9 @@ def _spell_test_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.equals(env,
-      ["spell_test_pass_test.sh"],
-      [f.basename for f in target_under_test[DefaultInfo].files.to_list()])
+    asserts.set_equals(env,
+      sets.make(["spell_test_pass_test.sh"]),
+      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
 spell_test_contents_test = analysistest.make(_spell_test_contents_test_impl)
