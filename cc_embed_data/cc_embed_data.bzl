@@ -122,6 +122,7 @@ _cc_embed_data = rule(
         "srcs": attr.label_list(
             doc="The files to embed.",
             allow_files=True,
+            allow_empty=False,
         ),
         "_make_emebed_data": attr.label(
             doc="The C++ file generater.",
@@ -143,11 +144,6 @@ def cc_embed_data(name = None, srcs = None, namespace = None, visibility = None)
       srcs: The files to embed.
       namespace: If given, the C++ namespace to generate in.
     """
-    if not srcs:
-        fail("srcs must be provided")
-    if not name:
-        fail("name must be provided")
-
     cc = name + "_emebed_data.cc"
     h = name + "_emebed_data.h"
     o = name + "_emebed_data.o"
