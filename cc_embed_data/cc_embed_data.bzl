@@ -38,6 +38,103 @@ This allows placing large test or binary artifacts to come from faw files (or
 other build artifacts) rather than deal with escaping them into string literals.
 """
 
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain", "use_cpp_toolchain")
+
+_ALLOWED = ("0123456789" +
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz")
+
+def _Clean(p):
+    return "".join([
+        p[c] if p[c] in _ALLOWED else "_"
+        for c in range(len(p))
+    ])
+
+def _cc_embed_data_impl(ctx):
+    cc = ctx.actions.declare_file(ctx.outputs.cc.basename)
+    h = ctx.actions.declare_file(ctx.outputs.h.basename)
+
+    prefix = "%s_%s" % (_Clean(ctx.label.package), _Clean(ctx.attr.lib_name))
+
+    args = ctx.actions.args()
+    args.add("--h=%s" % h.path)
+    args.add("--cc=%s" % cc.path)
+    args.add("--gendir=%s" % ctx.genfiles_dir.path)
+    args.add("--workspace=%s" % ctx.workspace_name) ##(native.repository_name().lstrip("@"))
+    if ctx.attr.namespace: args.add("--namespace=%s" % ctx.attr.namespace)
+    args.add("--symbol_prefix=%s" % prefix)
+    args.add_all(ctx.files.srcs)
+
+    ctx.actions.run(
+        inputs=ctx.files.srcs,
+        outputs=[cc, h],
+        executable=ctx.file._make_emebed_data,
+        arguments=[args]
+    )
+
+    o = ctx.actions.declare_file(ctx.outputs.o.basename)
+
+    args = ctx.actions.args()
+    args.add("-o%s" % o.path)   # Output file name
+    args.add("-r")              # Make relocatable output (don't resolve stuff).
+    args.add("--format=binary") # Just read in the files.
+
+    links = []
+    for i, f in enumerate(ctx.files.srcs):
+        links += [f]
+        args.add(f.path)
+
+    ctx.actions.run(
+        inputs=depset(links),
+        outputs=[o],
+        executable=find_cpp_toolchain(ctx).ld_executable,
+        arguments=[args]
+    )
+
+    return [DefaultInfo(
+        runfiles=ctx.runfiles(files = ctx.files.srcs + ctx.files._make_emebed_data),
+    )]
+
+_cc_embed_data = rule(
+    doc = "Generate (bits of) a library containing the contents of srcs.",
+
+    implementation = _cc_embed_data_impl,
+    attrs = {
+        "lib_name": attr.string(
+            doc="The bazel name of the generated C++ library rule.",
+            mandatory=True,
+        ),
+        "namespace": attr.string(
+            doc="If given, the C++ namespace to generate in.",
+        ),
+        "cc": attr.output(
+            doc="The generated C++ source file.",
+            mandatory=True,
+        ),
+        "h": attr.output(
+            doc="The generated C++ header file.",
+            mandatory=True,
+        ),
+        "o": attr.output(
+            doc="The generated object file.",
+            mandatory=True,
+        ),
+        "srcs": attr.label_list(
+            doc="The files to embed.",
+            allow_files=True,
+        ),
+        "_make_emebed_data": attr.label(
+            doc="The C++ file generater.",
+            allow_single_file=True,
+            default="@bazel_rules//cc_embed_data:make_emebed_data",
+        ),
+        "_cc_toolchain": attr.label(  # used by find_cpp_toolchain()
+            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+        ),
+    },
+    toolchains = use_cpp_toolchain(),
+)
+
 def cc_embed_data(name = None, srcs = None, namespace = None, visibility = None):
     """Generate a library containing the contents of srcs.
 
@@ -55,52 +152,14 @@ def cc_embed_data(name = None, srcs = None, namespace = None, visibility = None)
     h = name + "_emebed_data.h"
     o = name + "_emebed_data.o"
 
-    PREFIX = "$$(dirname $(rootpath %s) | sed 's|[^0-9A-Za-z]|_|g')_%s" % (cc, name)
-
-    native.genrule(
+    _cc_embed_data(
         name = name + "_make_emebed_src",
-        outs = [cc, h],
+        cc = cc,
+        h = h,
+        o = o,
         srcs = srcs,
-        tools = ["@bazel_rules//cc_embed_data:make_emebed_data"],
-        cmd = " ".join([
-            "$(location @bazel_rules//cc_embed_data:make_emebed_data)",
-            "--h=$(location %s)" % (h),
-            "--cc=$(location %s)" % (cc),
-            "--gendir=$(GENDIR)",
-            "--workspace=%s" % (native.repository_name().lstrip("@")),
-            "--namespace=%s" % (namespace or ""),
-            "--symbol_prefix=%s" % PREFIX,
-            "$(SRCS)",
-        ]),
-    )
-
-    native.genrule(
-        name = name + "_make_embed_obj",
-        outs = [o],
-        srcs = srcs + [cc],  # include `cc` just to ask about its path.
-        cmd = " ; ".join([
-            "PREFIX=%s" % PREFIX,
-        ] + [
-            # Copy the inputs to fixed locations
-            "cp $(location %s) $${PREFIX}_%d" % (srcs[i], i)
-            for i in range(len(srcs))
-        ]) + " ; " + " ".join([
-            "$(CC) $(CC_FLAGS)",  # Compiler and default flags.
-            "-nostdlib",  # This is just data, no libs needed.
-            "-o $(location %s)" % (o),  # Output file name
-            "-no-pie",  # Avoid position independent executable.
-            "-Wl,-r",  # Make relocatable output (don't resolve stuff).
-            "-Wl,--format=binary",  # Just read in the files.
-        ] + [
-            # The files need to be passed via `-Wl,...` so that the
-            # compiler won't try to handle file of know type itself.
-            "-Wl,$${PREFIX}_%d" % i
-            for i in range(len(srcs))
-        ]),
-        toolchains = [
-            "@bazel_tools//tools/cpp:current_cc_toolchain",
-            "@bazel_rules//cc_embed_data:cc_flags",
-        ],
+        lib_name = name,
+        namespace = namespace,
     )
 
     native.cc_library(

@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
   // Generate the names:
   for (int i = 1, size = args.size(); i < size; i++) {
     // Things needed to turn a path into a symbol name.
-    const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
+    static const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
         {"/", "_"}, {".", "_"}, {"-", "_"}  //
     };
 
@@ -85,8 +85,7 @@ int main(int argc, char** argv) {
     items.emplace_back(Item{
         file_name,
         absl::StrReplaceAll(file_name, rep),
-        absl::StrCat("_binary_", absl::GetFlag(FLAGS_symbol_prefix), "_",
-                     (i - 1), "_"),
+        absl::StrCat("_binary_", absl::StrReplaceAll(args[i], rep), "_"),
     });
   }
 
