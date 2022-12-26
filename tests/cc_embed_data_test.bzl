@@ -39,8 +39,9 @@ def _cc_embed_data_contents_test_impl(ctx):
     target_under_test = analysistest.target_under_test(env)
     asserts.set_equals(env,
       sets.make([
+          "cc_embed_data_example_emebed_data.cc",
+          "cc_embed_data_example_emebed_data.h",
           "libcc_embed_data_example.a",
-          "libcc_embed_data_example.so",
       ]),
       sets.make([
           f.basename
