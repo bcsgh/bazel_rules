@@ -54,7 +54,7 @@ tex_to_pdf_failure_test = analysistest.make(
     expect_failure = True,
     attrs = {
         "error_msg": attr.string(
-          doc="The output file name.",
+          doc="The expected error messge fragement.",
           mandatory=True,
       ),
     }
@@ -97,6 +97,7 @@ def tex_to_pdf_suite(name):
         target_under_test = ":gen_tex_to_pdf",
     )
 
+    # FAILURE
     tex_to_pdf(
         name = "tex_to_pdf_failure1",
 

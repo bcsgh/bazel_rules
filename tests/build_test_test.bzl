@@ -1,4 +1,4 @@
-# Copyright (c) 2018, Benjamin Shropshire,
+# Copyright (c) 2022, Benjamin Shropshire,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -107,6 +107,7 @@ def build_test_suite(name):
     native.test_suite(
         name = name,
         tests = [
+            ":build_success_test",
             ":build_test_contents_test",
             #":build_test_failure_test",
         ],

@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def _spell_test_impl(ctx): #file = None, dict=[]):
+def _spell_test_impl(ctx):
     args = [ctx.file.file.short_path]
     runs = [ctx.file.file]
 

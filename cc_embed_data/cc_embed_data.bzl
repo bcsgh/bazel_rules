@@ -69,7 +69,7 @@ def _cc_embed_data_impl(ctx):
         inputs=ctx.files.srcs,
         outputs=[cc, h],
         executable=ctx.file._make_emebed_data,
-        arguments=[args]
+        arguments=[args],
     )
 
     o = ctx.actions.declare_file(ctx.outputs.o.basename)
@@ -88,7 +88,7 @@ def _cc_embed_data_impl(ctx):
         inputs=depset(links),
         outputs=[o],
         executable=find_cpp_toolchain(ctx).ld_executable,
-        arguments=[args]
+        arguments=[args],
     )
 
     return [DefaultInfo(
@@ -130,7 +130,7 @@ _cc_embed_data = rule(
             default="@bazel_rules//cc_embed_data:make_emebed_data",
         ),
         "_cc_toolchain": attr.label(  # used by find_cpp_toolchain()
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
         ),
     },
     toolchains = use_cpp_toolchain(),
