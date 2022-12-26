@@ -33,12 +33,6 @@ def _tex_to_pdf_impl(ctx):
     if ctx.attr.reprocess and ctx.attr.runs < 2:
         fail("Reprocess does nothing without mutiple runs.")
 
-    if ctx.attr.extra_outs:
-        print("WARNING",
-              "%s: Use of tex_to_pdf.extra_outs is depricated." % ctx.label,
-              "Add outs = ",
-              ["%s.%s" % (jobname, o) for o in ctx.attr.extra_outs])
-
     steps = []
 
     ##### Set up pulling everything into where pdflatex expects it.
@@ -75,6 +69,12 @@ def _tex_to_pdf_impl(ctx):
         ctx.actions.write(output=rf, content="set -e\n%s\n" % cmd)
 
     ##### Setup generation of outputs.
+    if ctx.attr.extra_outs:
+        print("WARNING",
+              "%s: Use of tex_to_pdf.extra_outs is depricated." % ctx.label,
+              "Add outs = ",
+              ["%s.%s" % (jobname, o) for o in ctx.attr.extra_outs])
+
     pdf = ctx.actions.declare_file(ctx.attr.pdf.name)
     outs = [pdf]
     cp = ["cp %s.pdf %s" % (jobname, pdf.path)]
