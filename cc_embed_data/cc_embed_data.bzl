@@ -55,22 +55,17 @@ DISABLED_FEATURES = [
     "module_maps",  ## WHY?
 ]
 
-def _Fallback(label, name, out, alt):
+def _Fallback(out, alt):
     if out:
         return out.basename
     else:
-        print("WARNING",
-              "%s: Use of cc_embed_data() without `%s` depricated." % (label, name),
-              'Add %s = "%s".' % (name, alt))
         return alt
 
 def _cc_embed_data_impl(ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
 
-    cc = ctx.actions.declare_file(_Fallback(
-        ctx.label, "cc", ctx.outputs.cc, ctx.label.name + "_emebed_data.cc"))
-    h = ctx.actions.declare_file(_Fallback(
-        ctx.label, "h", ctx.outputs.h, ctx.label.name + "_emebed_data.h"))
+    cc = ctx.actions.declare_file(_Fallback(ctx.outputs.cc, ctx.label.name + "_emebed_data.cc"))
+    h = ctx.actions.declare_file(_Fallback(ctx.outputs.h, ctx.label.name + "_emebed_data.h"))
 
     prefix = "%s_%s" % (_Clean(ctx.label.package), _Clean(ctx.label.name))
 
@@ -167,8 +162,7 @@ def _cc_embed_data_impl(ctx):
     # https://bazel.build/configure/integrate-cpp#implement-starlark-rules
     # https://github.com/bazelbuild/rules_cc/blob/main/examples/my_c_archive/my_c_archive.bzl
 
-    output_lib = ctx.actions.declare_file(_Fallback(
-        ctx.label, "a", ctx.outputs.a, "lib%s.a" % ctx.label.name))
+    output_lib = ctx.actions.declare_file(_Fallback(ctx.outputs.a, "lib%s.a" % ctx.label.name))
 
     linker_input = cc_common.create_linker_input(
         owner = ctx.label,
@@ -246,16 +240,13 @@ cc_embed_data = rule(
             doc="If given, the C++ namespace to generate in.",
         ),
         "cc": attr.output(
-            doc="The generated C++ source file.",
-            # TODO mandatory=True,
+            doc="The generated C++ source file. (This must be set for other rules to depend on individual output files.)",
         ),
         "h": attr.output(
-            doc="The generated C++ header file.",
-            # TODO mandatory=True,
+            doc="The generated C++ header file. (This must be set for other rules to depend on individual output files.)",
         ),
         "a": attr.output(
-            doc="The generated cc_library archive.",
-            # TODO mandatory=True,
+            doc="The generated cc_library archive. (This must be set for other rules to depend on individual output files.)",
         ),
         "srcs": attr.label_list(
             doc="The files to embed.",
