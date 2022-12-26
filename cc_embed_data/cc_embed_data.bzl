@@ -55,13 +55,24 @@ DISABLED_FEATURES = [
     "module_maps",  ## WHY?
 ]
 
+def _Fallback(label, name, out, alt):
+    if out:
+        return out.basename
+    else:
+        print("WARNING",
+              "%s: Use of cc_embed_data() without `%s` depricated." % (label, name),
+              'Add %s = "%s".' % (name, alt))
+        return alt
+
 def _cc_embed_data_impl(ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
 
-    cc = ctx.actions.declare_file(ctx.outputs.cc.basename)
-    h = ctx.actions.declare_file(ctx.outputs.h.basename)
+    cc = ctx.actions.declare_file(_Fallback(
+        ctx.label, "cc", ctx.outputs.cc, ctx.label.name + "_emebed_data.cc"))
+    h = ctx.actions.declare_file(_Fallback(
+        ctx.label, "h", ctx.outputs.h, ctx.label.name + "_emebed_data.h"))
 
-    prefix = "%s_%s" % (_Clean(ctx.label.package), _Clean(ctx.attr.lib_name))
+    prefix = "%s_%s" % (_Clean(ctx.label.package), _Clean(ctx.label.name))
 
     gen_src_args = ctx.actions.args()
     gen_src_args.add("--h=%s" % h.path)
@@ -156,7 +167,8 @@ def _cc_embed_data_impl(ctx):
     # https://bazel.build/configure/integrate-cpp#implement-starlark-rules
     # https://github.com/bazelbuild/rules_cc/blob/main/examples/my_c_archive/my_c_archive.bzl
 
-    output_file = ctx.actions.declare_file(ctx.outputs.a.basename)
+    output_lib = ctx.actions.declare_file(_Fallback(
+        ctx.label, "a", ctx.outputs.a, "lib%s.a" % ctx.label.name))
 
     linker_input = cc_common.create_linker_input(
         owner = ctx.label,
@@ -165,7 +177,7 @@ def _cc_embed_data_impl(ctx):
                 actions = ctx.actions,
                 feature_configuration = feature_configuration,
                 cc_toolchain = cc_toolchain,
-                static_library = output_file,
+                static_library = output_lib,
             ),
         ]),
     )
@@ -177,7 +189,7 @@ def _cc_embed_data_impl(ctx):
     archiver_variables = cc_common.create_link_variables(
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
-        output_file = output_file.path,
+        output_file = output_lib.path,
         is_using_linker = False,
     )
     command_line = cc_common.get_memory_inefficient_command_line(
@@ -206,7 +218,7 @@ def _cc_embed_data_impl(ctx):
                 cc_toolchain.all_files,
             ],
         ),
-        outputs = [output_file],
+        outputs = [output_lib],
     )
 
     lib_info = CcInfo(
@@ -225,29 +237,25 @@ def _cc_embed_data_impl(ctx):
         cc_infos = [lib_info] + [dep[CcInfo] for dep in ctx.attr._cc_deps],
     )]
 
-_cc_embed_data = rule(
-    doc = "Generate (bits of) a library containing the contents of srcs.",
+cc_embed_data = rule(
+    doc = "Generate a library containing the contents of srcs.",
 
     implementation = _cc_embed_data_impl,
     attrs = {
-        "lib_name": attr.string(
-            doc="The bazel name of the generated C++ library rule.",
-            mandatory=True,
-        ),
         "namespace": attr.string(
             doc="If given, the C++ namespace to generate in.",
         ),
         "cc": attr.output(
             doc="The generated C++ source file.",
-            mandatory=True,
+            # TODO mandatory=True,
         ),
         "h": attr.output(
             doc="The generated C++ header file.",
-            mandatory=True,
+            # TODO mandatory=True,
         ),
         "a": attr.output(
             doc="The generated cc_library archive.",
-            mandatory=True,
+            # TODO mandatory=True,
         ),
         "srcs": attr.label_list(
             doc="The files to embed.",
@@ -273,26 +281,3 @@ _cc_embed_data = rule(
     fragments = ["cpp"],
     toolchains = use_cpp_toolchain(),
 )
-
-def cc_embed_data(name = None, srcs = None, *argv, **argd):
-    """Generate a library containing the contents of srcs.
-
-    Args:
-      name: The target name.
-      srcs: The files to embed.
-      namespace: If given, the C++ namespace to generate in.
-    """
-    cc = name + "_emebed_data.cc"
-    h = name + "_emebed_data.h"
-    a = "lib%s.a" % name
-
-    _cc_embed_data(
-        name = name,
-        cc = cc,
-        h = h,
-        a = a,
-        srcs = srcs,
-        lib_name = name,
-        *argv,
-        **argd,
-    )

@@ -62,6 +62,9 @@ def cc_embed_data_suite(name):
         name = "cc_embed_data_example",
         srcs = SRCS,
         namespace = "test_ns",
+        cc = "cc_embed_data_example_emebed_data.cc",
+        h = "cc_embed_data_example_emebed_data.h",
+        a = "libcc_embed_data_example.a",
     )
 
     build_test(
@@ -95,6 +98,9 @@ def cc_embed_data_suite(name):
         name = "cc_embed_data_short",
         srcs = SHORT_SRC,
         namespace = "test_ns",
+        cc = "cc_embed_data_short_emebed_data.cc",
+        h = "cc_embed_data_short_emebed_data.h",
+        a = "libcc_embed_data_short.a",
     )
 
     EXT = ["cc", "h"]

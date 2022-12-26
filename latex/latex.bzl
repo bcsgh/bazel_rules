@@ -33,6 +33,12 @@ def _tex_to_pdf_impl(ctx):
     if ctx.attr.reprocess and ctx.attr.runs < 2:
         fail("Reprocess does nothing without mutiple runs.")
 
+    if ctx.attr.extra_outs:
+        print("WARNING",
+              "%s: Use of tex_to_pdf.extra_outs is depricated." % ctx.label,
+              "Add outs = ",
+              ["%s.%s" % (jobname, o) for o in ctx.attr.extra_outs])
+
     steps = []
 
     ##### Set up pulling everything into where pdflatex expects it.
@@ -119,7 +125,7 @@ def _tex_to_pdf_impl(ctx):
 
     return [DefaultInfo(runfiles=ctx.runfiles(files=srcs))]
 
-_tex_to_pdf = rule(
+tex_to_pdf = rule(
     doc = "Process a .tex file into a .pdf file.",
 
     implementation = _tex_to_pdf_impl,
@@ -147,8 +153,8 @@ _tex_to_pdf = rule(
           allow_files=True,
           default=[],
       ),
-      "extra_outs": attr.string_list(
-          doc="Aditional filename extention to include in the result set.",
+      "extra_outs": attr.string_list( # TODO remove
+          doc="DEPRECATED: Aditional filename extention to include in the result set.",
           default=[],
       ),
       "outs": attr.output_list(
@@ -172,32 +178,8 @@ _tex_to_pdf = rule(
           allow_single_file=True,
           default="@bazel_rules//latex:full.sh.tpl",
       ),
-      "outputs": attr.output_list(),
     }
 )
-
-def tex_to_pdf(
-        src=None, jobname=None, extra_outs=[],
-        outputs=None,
-        *args, **kwargs):
-    if outputs != None: fail("outputs is only for internal use")
-
-    # compute the jobname
-    if jobname:
-        _jobname = jobname
-    else:
-        i = max(0, src.rfind(":"), src.rfind("/"))
-        _jobname = src[i:].replace(".tex", "")
-
-    # invoke the inner version
-    _tex_to_pdf(
-        src=src,
-        jobname=jobname,
-        extra_outs=extra_outs,
-        outputs=["%s.%s" % (_jobname, e) for e in extra_outs],
-        *args,
-        **kwargs
-    )
 
 def _detex_impl(ctx):
     processed_1 = ctx.actions.declare_file(ctx.label.name + ".processed_1")
@@ -234,7 +216,14 @@ def _detex_impl(ctx):
     else:
       processed = processed_1
 
-    result = ctx.actions.declare_file(ctx.attr.out.name)
+    if ctx.attr.out:
+      result = ctx.actions.declare_file(ctx.attr.out.name)
+    else:
+      result = ctx.actions.declare_file("%s.txt" % ctx.label.name)
+      print("WARNING",
+            "%s: Use of detex() without `out` depricated." % ctx.label,
+            'Add out = "%s".' % result.basename)
+
     ctx.actions.run_shell(
         inputs=depset([processed]),
         outputs=[result],
@@ -245,7 +234,7 @@ def _detex_impl(ctx):
         runfiles=ctx.runfiles(files=(ctx.files.src + ctx.files.post_sed + ctx.files._sed)),
     )]
 
-_detex = rule(
+detex = rule(
     doc = """Process a .tex file into a text file that approximates the text from the input.
 
     This can be usefull as a pre-processing step for tests like spell checking.
@@ -271,12 +260,7 @@ _detex = rule(
         ),
         "out": attr.output(
             doc="The output file name.",
-            mandatory=True,
+            # TODO mandatory=True,
         ),
     },
 )
-
-def detex(name=None, out=None, *args, **kwargs):
-    if out != None: fail("out is only for internal use")
-
-    _detex(name=name, out="%s.txt" % name, *args, **kwargs)

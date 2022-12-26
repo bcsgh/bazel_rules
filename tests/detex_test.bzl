@@ -51,6 +51,7 @@ def detex_suite(name):
     detex(
         name = "gen_detex",
         src = "gen_latex_test.tex",
+        out = "gen_detex.txt",
         post_sed = ":detex_test.sed"
     )
 
