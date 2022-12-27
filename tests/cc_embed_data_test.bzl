@@ -90,8 +90,11 @@ def cc_embed_data_suite(name):
     SHORT_SRC = [
         "cc_embed_data_test.bzl",  # local static
         ":gen_detex.txt",          # local generated
-        # TODO "@bazel_skylib//:LICENSE"  # extern static
-        # TODO ... extern generated
+
+        # extern static
+        "@bazel_skylib//:LICENSE",
+        "@bazel_tools//tools/genrule:genrule-setup.sh",
+        # extern generated (TODO)
     ]
 
     cc_embed_data(
@@ -101,6 +104,7 @@ def cc_embed_data_suite(name):
         cc = "cc_embed_data_short_emebed_data.cc",
         h = "cc_embed_data_short_emebed_data.h",
         a = "libcc_embed_data_short.a",
+        json = "cc_embed_data_short_emebed_data.json",  # export for debugging
     )
 
     EXT = ["cc", "h"]

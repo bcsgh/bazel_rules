@@ -64,22 +64,38 @@ def _Fallback(out, alt):
 def _cc_embed_data_impl(ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
 
+    # Construct a manifest to generate from.
+    # This allows passing structured data from the ctx to the generator.
+    def Munge(s):
+      is_output = not [f.is_source for f in s.files.to_list() if f.is_source]
+      name = "/".join([x for x in [s.label.package, s.label.name] if x])
+      path = ctx.expand_location("$(location %s)" % s.label, [s])
+      return struct(
+            name = name,
+            path = path,
+            src = name if is_output else path,
+            is_output = is_output,
+        )
+
+    _json = ctx.actions.declare_file(_Fallback(ctx.outputs.json, ctx.label.name + "_emebed_data.json"))
+    ctx.actions.write(output=_json, content=json.encode([Munge(s) for s in ctx.attr.srcs]))
+
     cc = ctx.actions.declare_file(_Fallback(ctx.outputs.cc, ctx.label.name + "_emebed_data.cc"))
     h = ctx.actions.declare_file(_Fallback(ctx.outputs.h, ctx.label.name + "_emebed_data.h"))
 
     prefix = "%s_%s" % (_Clean(ctx.label.package), _Clean(ctx.label.name))
 
     gen_src_args = ctx.actions.args()
+    gen_src_args.add("--json_manifest=%s" % _json.path)
     gen_src_args.add("--h=%s" % h.path)
     gen_src_args.add("--cc=%s" % cc.path)
     gen_src_args.add("--gendir=%s" % ctx.genfiles_dir.path)
     gen_src_args.add("--workspace=%s" % ctx.workspace_name)
     if ctx.attr.namespace: gen_src_args.add("--namespace=%s" % ctx.attr.namespace)
     gen_src_args.add("--symbol_prefix=%s" % prefix)
-    gen_src_args.add_all(ctx.files.srcs)
 
     ctx.actions.run(
-        inputs=ctx.files.srcs,
+        inputs=[_json],
         outputs=[cc, h],
         executable=ctx.file._make_emebed_data,
         arguments=[gen_src_args],
@@ -253,6 +269,7 @@ cc_embed_data = rule(
             allow_files=True,
             allow_empty=False,
         ),
+        "json": attr.output(),
         "_make_emebed_data": attr.label(
             doc="The C++ file generater.",
             allow_single_file=True,

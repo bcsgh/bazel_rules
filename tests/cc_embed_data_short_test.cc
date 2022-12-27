@@ -25,6 +25,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -36,8 +37,16 @@
 namespace {
 
 std::string ReadFile(const std::string& path) {
-  std::ifstream ifs{path.c_str(),
+  const static auto ms = test_ns::OriginMap();
+  const static std::map<std::string, std::string> m{ms.begin(), ms.end()};
+
+  auto mapped_path = m.find(path);
+  std::ifstream ifs{mapped_path->second,
                     std::ios::in | std::ios::binary | std::ios::ate};
+  if (ifs.fail() || !ifs.is_open()) {
+    std::cerr << "Failed to open [" << mapped_path->second << "]\n";
+    return "@@@ FAILED TO OPEN @@@";
+  }
 
   std::string::size_type size = ifs.tellg();
   ifs.seekg(0, std::ios::beg);

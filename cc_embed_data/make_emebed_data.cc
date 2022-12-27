@@ -33,6 +33,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/strip.h"
+#include "json/json.h"
 
 ABSL_FLAG(std::string, cc, "", "The generated source");
 ABSL_FLAG(std::string, h, "", "The generated header");
@@ -42,6 +43,87 @@ ABSL_FLAG(std::string, workspace, "", "The named of the WORKSPACE in use");
 ABSL_FLAG(std::string, namespace, "", "The C++ namespace to put the API in.");
 ABSL_FLAG(std::string, symbol_prefix, "",
           "The prefix of the linker generated globals.");
+ABSL_FLAG(std::string, json_manifest, "", "The set of files to generate for.");
+
+struct Item {
+  std::string file_name;
+  std::string file_path;
+  std::string file_src;
+  std::string var_name;
+  std::string symbol_name;
+};
+
+std::optional<std::vector<Item>> Load() {
+  std::vector<Item> items;
+
+  Json::Value json_manifest;
+  // OPEN
+  std::ifstream json;
+  json.open(absl::GetFlag(FLAGS_json_manifest), std::ios::in);
+  if (!json.is_open()) {
+    std::cerr << "failed to read json_manifest: " << absl::GetFlag(FLAGS_json_manifest) << "\n";
+    return std::nullopt;
+  }
+
+  // READ
+  Json::CharReaderBuilder rbuilder;
+  rbuilder["collectComments"] = false;
+  std::string errs;
+  if (!Json::parseFromStream(rbuilder, json, &json_manifest, &errs)) {
+    std::cerr << "ERROR parsing  " << absl::GetFlag(FLAGS_json_manifest) << "\n" << errs;
+    return std::nullopt;
+  }
+
+  // CONSUME
+  for (const auto &i : json_manifest) {
+    // VALIDATE
+    if (!i.isMember("name")) {
+      std::cerr << "Missing `name` on json_manifest node.\n";
+      return std::nullopt;
+    }
+    if (!i["name"].isString()) {
+      std::cerr << "Expect string for `name` on json_manifest node.\n";
+      return std::nullopt;
+    }
+    std::string name = i["name"].asString();
+
+    if (!i.isMember("path")) {
+      std::cerr << "Missing `paths` on json_manifest node.\n";
+      return std::nullopt;
+    }
+    if (!i["path"].isString()) {
+      std::cerr << "Expect string for `path` on json_manifest node.\n";
+      return std::nullopt;
+    }
+    std::string path = i["path"].asString();
+
+    if (!i.isMember("src")) {
+      std::cerr << "Missing `paths` on json_manifest node.\n";
+      return std::nullopt;
+    }
+    if (!i["src"].isString()) {
+      std::cerr << "Expect string for `src` on json_manifest node.\n";
+      return std::nullopt;
+    }
+    std::string src = i["src"].asString();
+
+    // Things needed to turn a path into a symbol name.
+    static const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
+        {"/", "_"}, {".", "_"}, {"-", "_"}  //
+    };
+
+    items.emplace_back(Item{
+        name,
+        path,
+        src,
+        absl::StrReplaceAll(name, rep),
+        absl::StrCat("_binary_", absl::StrReplaceAll(path, rep), "_"),
+    });
+
+  }
+  return std::move(items);
+}
+
 
 int main(int argc, char** argv) {
   auto args = absl::ParseCommandLine(argc, argv);
@@ -59,35 +141,9 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  struct Item {
-    absl::string_view file_name;
-    std::string var_name;
-    std::string symbol_name;
-  };
-  std::vector<Item> items;
-
-  // Generate the names:
-  for (int i = 1, size = args.size(); i < size; i++) {
-    // Things needed to turn a path into a symbol name.
-    static const std::vector<std::pair<absl::string_view, absl::string_view>> rep = {
-        {"/", "_"}, {".", "_"}, {"-", "_"}  //
-    };
-
-    // Do a bunch of magic to get the workspace relative path.
-    // This is complicated by generated file being in a different places
-    // and by the paths changing for the tools vs. result builds.
-    absl::string_view file_name = args[i];
-    absl::ConsumePrefix(&file_name, absl::GetFlag(FLAGS_gendir));
-    absl::ConsumePrefix(&file_name, "/");
-    auto ws = absl::StrCat("external/", absl::GetFlag(FLAGS_workspace), "/");
-    absl::ConsumePrefix(&file_name, ws);
-
-    items.emplace_back(Item{
-        file_name,
-        absl::StrReplaceAll(file_name, rep),
-        absl::StrCat("_binary_", absl::StrReplaceAll(args[i], rep), "_"),
-    });
-  }
+  auto items_or = Load();
+  if (!items_or) return 1;
+  auto items = std::move(*items_or);
 
   // Set up using a namespace is requested.
   std::string ns_open, ns_close;
@@ -105,24 +161,28 @@ int main(int argc, char** argv) {
 
 )";
   constexpr char decl[] = R"(EmbeddedIndex EmbedIndex())";
-  constexpr char type[] = "absl::Span<std::pair<absl::string_view, absl::string_view>>";
+  constexpr char type[] = "using EmbeddedIndex = absl::Span<std::pair<absl::string_view, absl::string_view>>";
+  constexpr char map_decl[] = R"(EmbeddedIndex OriginMap())";
 
   /////// The header.
   h << header << ns_open;
   for (const auto& item : items) {
-    h << "// " << item.file_name << "\n"
+    h << "// " << item.file_path << "\n"
       << "::absl::string_view " << item.var_name << "();\n\n";
   }
   if (!absl::GetFlag(FLAGS_namespace).empty()) {
-    h << "using EmbeddedIndex = " << type << ";\n";
-    h << decl << ";\n\n";
+    h << type << ";\n\n";
+    h << "// Map from file names to their contents.\n"
+      << decl << ";\n";
+    h << "// Map from file names to their 'original' paths.\n"
+      << map_decl << ";\n\n";
   }
   h << ns_close << "// Done\n\n";
 
   /////// The implementation.
   cc << header << "/////// linker provided globals\n\n";
   for (const auto& item : items) {
-    cc << "// " << item.file_name << "\n"
+    cc << "// " << item.file_path << "\n"
        << "extern const char " << item.symbol_name << "start;\n"
        << "extern const char " << item.symbol_name << "end;\n";
   }
@@ -130,7 +190,7 @@ int main(int argc, char** argv) {
   cc << "\n/////// Getter functions.\n" << ns_open << "\n";
 
   for (const auto& item : items) {
-    cc << "// " << item.file_name << "\n"
+    cc << "// " << item.file_path << "\n"
        << "::absl::string_view " << item.var_name << "() {\n"
        << "  static ::absl::string_view ret{&" << item.symbol_name << "start,\n"
        << "    ::absl::string_view::size_type(\n"
@@ -141,13 +201,23 @@ int main(int argc, char** argv) {
   }
 
   if (!absl::GetFlag(FLAGS_namespace).empty()) {
-    cc << "using EmbeddedIndex = " << type << ";\n";
+    cc << type << ";\n";
     cc << decl << R"( {
   static std::pair<absl::string_view, absl::string_view> kRet[] = {
 )";
 
     for (const auto& item : items) {
       cc << "    {\"" << item.file_name << "\", " << item.var_name << "()},\n";
+    }
+    cc << "  };\n"
+       << "  return EmbeddedIndex{kRet, " << items.size() << "};\n"
+       << "}\n\n";
+
+    cc << map_decl << R"( {
+  static std::pair<absl::string_view, absl::string_view> kRet[] = {
+)";
+    for (const auto& item : items) {
+      cc << "    {\"" << item.file_name << "\", \"" << item.file_src << "\"},\n";
     }
     cc << "  };\n"
        << "  return EmbeddedIndex{kRet, " << items.size() << "};\n"
