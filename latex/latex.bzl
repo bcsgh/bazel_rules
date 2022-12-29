@@ -36,13 +36,19 @@ def _tex_to_pdf_impl(ctx):
     steps = []
 
     ##### Set up pulling everything into where pdflatex expects it.
+    def Munge(f):
+        # construct the expected path based on the type of the target, etc.
+        path = f.path if f.is_source else f.short_path
+        if f.owner.workspace_root: path = path[len(f.owner.workspace_root) + 1:]
+        return path
+
+    paths = [(f.path, Munge(f)) for f in ctx.files.data]
+    paths = [(f, t) for f, t in paths if f != t]
+
     pull = ctx.actions.declare_file(ctx.label.name + ".pull.sh")
     steps += [pull]
-    ctx.actions.write(output=pull, content="set -e\n%s\n" % " ".join([
-        ctx.file._pull.path,
-    ] + [
-        f.path
-        for f in ctx.files.data
+    ctx.actions.write(output=pull, content="set -e\n%s\n" % "\n".join([
+        "mkdir -p $(dirname %s)\ncp %s %s" % (t, f, t) for f, t in paths
     ]))
 
     ##### Set up the pdflatex command.
@@ -115,7 +121,7 @@ def _tex_to_pdf_impl(ctx):
     #for i,l in enumerate(script_body): print(i,l)
 
     # Do the full run
-    srcs = (ctx.files.src + ctx.files.data + ctx.files._pull + ctx.files.reprocess_tools)
+    srcs = (ctx.files.src + ctx.files.data + ctx.files.reprocess_tools)
     ctx.actions.run(
         inputs=depset(srcs + steps + rp_steps),
         outputs=outs,
@@ -167,11 +173,6 @@ tex_to_pdf = rule(
       "jobname": attr.string(
           doc="The value for \\jobname.",
           default="",
-      ),
-      "_pull": attr.label(
-          doc="The script that pulls the files into the local dir.",
-          allow_single_file=True,
-          default="@bazel_rules//latex:pull.sh",
       ),
       "_full_template": attr.label(
           doc="A template for the full processing.",
