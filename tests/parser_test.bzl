@@ -40,8 +40,8 @@ def _genyacc_contents_test_impl(ctx):
       sets.make([
           "parser.tab.cc",
           "parser.tab.h",
-          "stack.hh",
-          "position.hh",
+          "parser.output",
+          "parser.dot",
           "location.hh",
       ]),
       sets.make([
@@ -76,11 +76,18 @@ def parser_suite(name):
     genyacc(
         name = "parser",
         src = "parser.y",
+        cc = "parser.tab.cc",
+        h = "parser.tab.h",
+        loc = "location.hh",
+        graph_file = "parser.dot",
+        report_file = "parser.output",
     )
 
     genlex(
         name = "lexer",
         src = "lexer.l",
+        cc = "lexer.yy.cc",
+        h = "lexer.yy.h",
     )
 
     native.cc_library(

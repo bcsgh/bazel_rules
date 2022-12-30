@@ -27,68 +27,147 @@
 
 """Bazel/skylark rules for wrapping Flex/Bison builds."""
 
-def genlex(name, src, data = [], visibility = None):
-    """Generate a lexer using flex.
+def _genlex_impl(ctx):
+    cc = ctx.actions.declare_file(ctx.attr.cc.name)
+    h  = ctx.actions.declare_file(ctx.attr.h.name)
 
-    Args:
-      name: The target name.
-      src: The root source file.
-      data: Other files needed.
-    """
-    c = "%s.yy.cc" % name
-    h = "%s.yy.h" % name
-    cmd = "flex --outfile=$(@D)/%s --header-file=$(@D)/%s $(location %s)" % (c, h, src)
-    native.genrule(
-        name = name + "_gen",
-        outs = [c, h],
-        srcs = [src] + data,
-        cmd = cmd,
-    )
-    native.filegroup(
-        name = name,
-        srcs = [c, h],
-        visibility = visibility,
+    args = ctx.actions.args()
+    args.add("--outfile=%s" % cc.path)
+    args.add("--header-file=%s" % h.path)
+    args.add_all(ctx.files.src)
+
+    ctx.actions.run(
+        inputs=depset(ctx.files.src + ctx.files.data),
+        outputs=[cc, h],
+        executable="/usr/bin/flex",
+        arguments = [args],
     )
 
-def genyacc(name, src, data = [], graph = False, report = False, visibility = None):
-    """Generate a paser using bison.
+    return [DefaultInfo(
+        runfiles=ctx.runfiles(files=ctx.files.src + ctx.files.data),
+    )]
 
-    Args:
-      name: The target name.
-      src: The root source file.
-      data: Other files needed.
-      graph: Generate a state machine graph.
-      report: Generate a "report" (`--verbose --report=all`).
-    """
-    c = "%s.tab.cc" % name
-    h = "%s.tab.h" % name
-    cmd = "bison --output=$(@D)/%s --defines=$(@D)/%s $(location %s)" % (c, h, src)
-    outs = [
-        c,
-        h,
-        # TODO: figure out how to not generate these for every invocation.
-        "stack.hh",
-        "position.hh",
-        "location.hh",
-    ]
+genlex = rule(
+    doc = "Generate a lexer using flex.",
 
-    if graph:
-        g = "%s.dot" % name
-        cmd += " --graph=$(@D)/%s" % g
-        outs.append(g)
-    if report:
-        r = "%s.output" % name
-        cmd += " --verbose --report=all"
-        outs.append(r)
+    implementation = _genlex_impl,
+    attrs = {
+        "src": attr.label(
+            doc="The root source file.",
+            allow_single_file=[".l"],
+            mandatory=True,
+        ),
+        "data": attr.label_list(
+            doc="Other files needed.",
+            allow_files=True,
+            default=[],
+        ),
 
-    native.genrule(
-        name = name + "_gen",
-        outs = outs,
-        srcs = [src] + data,
-        cmd = cmd,
+        "cc": attr.output(
+            doc="The generated C++ source file.",
+            mandatory=True,
+        ),
+        "h": attr.output(
+            doc="The generated C++ header file.",
+            mandatory=True,
+        ),
+    }
+)
+
+def _genyacc_impl(ctx):
+    if ctx.attr.graph:
+        print("genyacc.graph is deprecated. " +
+              'Use genyacc.graph_file = "%s.dot"' % ctx.label.name)
+    if ctx.attr.report:
+        print("genyacc.report is deprecated. " +
+              'Use genyacc.report_file = "%s.output"' % ctx.label.name)
+
+    # Default setup.
+    cc = ctx.actions.declare_file(ctx.attr.cc.name)
+    h = ctx.actions.declare_file(ctx.attr.h.name)
+    outs = [cc, h]
+
+    if ctx.attr.loc:
+        loc = ctx.actions.declare_file(ctx.attr.loc.name)
+        outs += [loc]
+
+    args = ctx.actions.args()
+    args.add("--output=%s" % cc.path)
+    args.add("--defines=%s" % h.path)
+    args.add_all(ctx.files.src)
+
+    # Optional features.
+    if ctx.attr.graph or ctx.attr.graph_file:
+        gf = ctx.actions.declare_file(ctx.attr.graph_file.name
+                                      if ctx.attr.graph_file
+                                      else "%s.dot" % ctx.label.name)
+        outs += [gf]
+        args.add("--graph=%s" % gf.path)
+
+    if ctx.attr.report or ctx.attr.report_file:
+        rf = ctx.actions.declare_file(ctx.attr.report_file.name
+                                      if ctx.attr.report_file
+                                      else "%s.output" % ctx.label.name)
+        outs += [rf]
+        args.add("--verbose")
+        args.add("--report=all")
+        args.add("--report-file=%s" % rf.path)
+
+    # Do it.
+    ctx.actions.run(
+        inputs=depset(ctx.files.src + ctx.files.data),
+        outputs=outs,
+        executable="/usr/bin/bison",
+        arguments = [args],
     )
-    native.filegroup(
-        name = name,
-        srcs = outs,
-        visibility = visibility,
-    )
+
+    return [DefaultInfo(
+        runfiles=ctx.runfiles(files=ctx.files.src + ctx.files.data),
+    )]
+
+genyacc = rule(
+    doc = "Generate a paser using bison.",
+
+    implementation = _genyacc_impl,
+    attrs = {
+        "src": attr.label(
+            doc="The root source file.",
+            allow_single_file=[".y"],
+            mandatory=True,
+        ),
+        "data": attr.label_list(
+            doc="Other files needed.",
+            allow_files=True,
+            default=[],
+        ),
+
+        "cc": attr.output(
+            doc="The generated C++ source file.",
+            mandatory=True,
+        ),
+        "h": attr.output(
+            doc="The generated C++ header file.",
+            mandatory=True,
+        ),
+        "loc": attr.output(
+            doc="""The generated location header (if used).
+              This can be manipulated in the .y file via `%define api.location.file`.""",
+        ),
+
+        "graph": attr.bool(
+            doc="Generate a state machine graph. (Depricated, use graph_file.)",
+            default=False,
+        ),
+        "report": attr.bool(
+            doc='Generate a "report" (`--verbose --report=all`). (Depricated, use report_file.)',
+            default=False,
+        ),
+
+        "graph_file": attr.output(
+            doc="Generate a state machine graph.",
+        ),
+        "report_file": attr.output(
+            doc='Generate a "report" (`--verbose --report=all`).',
+        ),
+    }
+)
