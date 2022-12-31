@@ -25,66 +25,47 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
-load("@bazel_skylib//lib:sets.bzl", "sets")
-load("//text:spelling.bzl", "spell_test")
-load(":fail_test.bzl", "fail_test")
+import argparse
+import json
 
-##### SUCCESS case
+def main(args):
+  try:
+    with open(args.log, "r") as logfile:
+      log = logfile.read()
+  except IOError:
+    print("File not found:", args.log)
+    return 1
 
-def _spell_test_contents_test_impl(ctx):
-    env = analysistest.begin(ctx)
+  try:
+    with open(args.json, "r") as jsonfile:
+      JSON = json.load(jsonfile)
+  except IOError:
+    print("File not found:", args.log)
+    return 1
 
-    target_under_test = analysistest.target_under_test(env)
-    asserts.set_equals(env,
-        sets.make(["spell_test_pass_test.sh"]),
-        sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
-    return analysistest.end(env)
+  missing = [
+    msg for msg in JSON["msgs"]
+    if msg not in log
+  ]
 
-spell_test_contents_test = analysistest.make(_spell_test_contents_test_impl)
+  if not missing: return 0
 
-##### Go
+  print("""Log is missing %d expected messages.
+LOG:
+-------
+%s
+-------
+Missing messages:""" % (len(missing), log.rstrip()))
 
-def spell_test_suite(name):
-    # Success
-    spell_test(
-        name = "spell_test_pass_test",
-        file = "spell_test.txt",
-        dict = [
-            "spell_test.dict",
-            "second.dict",
-        ],
-    )
+  for m in missing: print("> %s" % m)
 
-    spell_test_contents_test(
-        name = "spell_test_contents_test",
-        target_under_test = ":spell_test_pass_test",
-    )
+  return 1
 
-    # Failure
-    spell_test(
-        name = "spell_test_fail_test",
-        file = "spell_test.txt",
-        dict = [
-        ],
-        tags = ["manual"],
-    )
 
-    fail_test(
-        name = "spell_test_failure_test",
-        msgs = [
-            "flimmflam",
-            "sparkly",
-        ],
-        test = ":spell_test_fail_test",
-    )
+if __name__ == "__main__":
 
-    # Suit
-    native.test_suite(
-        name = name,
-        tests = [
-            ":spell_test_contents_test",
-            ":spell_test_failure_test",
-            ":spell_test_pass_test",
-        ],
-    )
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--json", type=str, help="A JSON file with the test case data.")
+  parser.add_argument("--log", type=str, help="The .log file from a test run.")
+  args = parser.parse_args()
+  exit(main(args))

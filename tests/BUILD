@@ -39,6 +39,10 @@ load(":parser_test.bzl", "parser_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
 load(":tex_to_pdf_test.bzl", "tex_to_pdf_suite")
 
+exports_files([
+    "fail_test.py",
+])
+
 test_suite(
     name = "ci",
     tests = [
@@ -50,7 +54,7 @@ test_suite(
         ":gen_dot_test",
         ":gen_latex_test",
         ":parser_test",
-        ":ref_test",#
+        ":ref_test",
         ":role_call_test",
         ":spell_test_test",
     ],

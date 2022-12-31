@@ -29,6 +29,7 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//latex:latex.bzl", "tex_to_pdf")
 load("//latex:ref_test.bzl", "latex_ref_test")
+load(":fail_test.bzl", "fail_test")
 
 ##### SUCCESS case
 
@@ -75,13 +76,13 @@ def latex_ref_test_suite(name, job):
         tags = ["manual"],
     )
 
-    # TODO find a better way to do this:
-    # https://stackoverflow.com/questions/74844959
-    native.sh_test(
+    fail_test(
         name = "ref_test_failure_test",
-        srcs = [":not.sh"],
-        args = ["$(location :ref_test_fail_test)"],
-        data = [":ref_test_fail_test"],
+        msgs = [
+          "Missing -?> Hissing",
+          "LaTeX Warning",
+        ],
+        test = ":ref_test_fail_test",
     )
 
     # Suit
