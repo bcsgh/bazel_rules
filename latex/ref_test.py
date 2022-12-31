@@ -35,6 +35,7 @@ dup_ref_re = re.compile("Label `(.*)' multiply defined.")
 newlable_re = re.compile('newlabel{([^}]*)}')
 
 def BadRefs(ignore_dups, logfile, ignore):
+  """Search a LaTeX log fille for instereing messages."""
   try:
     log = open(logfile, "r")
   except IOError:
@@ -44,16 +45,22 @@ def BadRefs(ignore_dups, logfile, ignore):
   missing_ref = set()
   dup_ref = set()
   for l in log:
+
+    # Check for and collect reports of missing lables.
     s = miss_ref_re.search(l)
     if s and s.group(1) not in ignore:
       print(l.strip())
       missing_ref.add(s.group(1))
+
+    # If not suppressed, check for and collect reports of duplicate lables.
     if not ignore_dups:
       s = dup_ref_re.search(l)
       if s: dup_ref.add(s.group(1))
+
   return (True, missing_ref, dup_ref)
 
 def FindLabels(auxfile):
+  """Search a LaTeX aux file for know lables."""
   try:
     aux = open(auxfile, "r")
   except IOError:
@@ -68,6 +75,7 @@ def FindLabels(auxfile):
   return labels
 
 def BestMatch(t, labels):
+  """Find the best matches for t from labels."""
   return [
     x
     for _,x in
@@ -97,7 +105,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--ignore_dups",
                       default=False, action="store_true",
-                      help="Check for cuplicate labels")
+                      help="Suppress check for duplicate labels.")
   parser.add_argument("--extern",
                       action='append',
                       help="Lables to ignore missing refernces to.")

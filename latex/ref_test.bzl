@@ -34,7 +34,8 @@ def latex_ref_test(name = "ref_test", jobname = None, ignore_dups = False,
     Args:
       name: The target name.
       jobname: The assumed basename for the .log and .aux files to read in.
-      ignore_dups:
+      ignore_dups: Suppress check for duplicate labels.
+      externs: Lables to ignore missing refernces to.
     """
     if not jobname: fail("jobname is requred")
 
