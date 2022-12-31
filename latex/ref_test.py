@@ -84,21 +84,19 @@ def BestMatch(t, labels):
 
 def main(args):
   ignore = set(args.extern or [])
-  fails = 0
-  for f in args.argv:
-    err, missing_ref, dup_refs = BadRefs(args.ignore_dups, f, ignore)
 
-    if not err or not (missing_ref or dup_refs): continue
-    fails += 1
+  err, missing_ref, dup_refs = BadRefs(args.ignore_dups, args.log, ignore)
 
-    labels = FindLabels(f[:-3] + "aux")
+  if not err or not (missing_ref or dup_refs): return 0
 
-    for t in missing_ref:
-      print(t, "-?>", " ".join(BestMatch(t, labels)[:8]), "...")
+  labels = FindLabels(args.aux)
 
-    for t in dup_refs: print("Duplicate label:", t)
+  for t in missing_ref:
+    print(t, "-?>", " ".join(BestMatch(t, labels)[:8]), "...")
 
-  return fails
+  for t in dup_refs: print("Duplicate label:", t)
+
+  return 1
 
 if __name__ == "__main__":
 
@@ -109,6 +107,7 @@ if __name__ == "__main__":
   parser.add_argument("--extern",
                       action='append',
                       help="Lables to ignore missing refernces to.")
-  parser.add_argument("argv", type=str, help="Logs to check", nargs="+")
+  parser.add_argument("--aux", type=str, help="The .aux file from a TeX/LaTeX build.")
+  parser.add_argument("--log", type=str, help="The .aux file from a TeX/LaTeX build.")
   args = parser.parse_args()
   exit(main(args))

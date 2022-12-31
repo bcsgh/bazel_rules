@@ -28,13 +28,13 @@
 load("//build_test:build.bzl", "build_test")
 load("//graphviz:graphviz.bzl", "gen_dot")
 load("//latex:git_stamp.bzl", "git_stamp")
-load("//latex:ref_test.bzl", "latex_ref_test")
 load("//latex:role_call_test.bzl", "role_call_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
 load(":cc_embed_data_test.bzl", "cc_embed_data_suite")
 load(":detex_test.bzl", "detex_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
+load(":latex_ref_test_test.bzl", "latex_ref_test_suite")
 load(":parser_test.bzl", "parser_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
 load(":tex_to_pdf_test.bzl", "tex_to_pdf_suite")
@@ -50,7 +50,7 @@ test_suite(
         ":gen_dot_test",
         ":gen_latex_test",
         ":parser_test",
-        ":ref_test",
+        ":ref_test",#
         ":role_call_test",
         ":spell_test_test",
     ],
@@ -101,9 +101,9 @@ detex_suite(
     name = "detex_test",
 )
 
-latex_ref_test(
+latex_ref_test_suite(
     name = "ref_test",
-    jobname = "gen_latex",
+    job = ":gen_tex_to_pdf",
 )
 
 role_call_test(

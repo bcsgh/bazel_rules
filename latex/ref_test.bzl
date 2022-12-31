@@ -27,31 +27,71 @@
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
 
-def latex_ref_test(name = "ref_test", jobname = None, ignore_dups = False,
-                   externs = []):
-    """Test for missing label references.
+def _latex_ref_test_impl(ctx):
+    args = ["/usr/bin/python3", ctx.file._tool.path]
+    runs = [ctx.file._tool]
 
-    Args:
-      name: The target name.
-      jobname: The assumed basename for the .log and .aux files to read in.
-      ignore_dups: Suppress check for duplicate labels.
-      externs: Lables to ignore missing refernces to.
-    """
-    if not jobname: fail("jobname is requred")
+    # Try to find what we need.
+    bits = [
+        (f.extension, f)
+        for f in ctx.attr.src[DefaultInfo].files.to_list()
+        if f.extension in ["aux", "log"]
+    ]
 
-    args = []
-    if ignore_dups: args += ["--ignore_dups"]
+    # Check to see if we got what we need.
+    fmt = "Expected %s to have exactly one each of .aux and .log outputs. Found %s"
+    if len(bits) != 2: fail(fmt % (ctx.attr.src.label, [f.short_path for e,f in bits]))
+    bits = dict(bits)
+    if len(bits) != 2: fail(fmt % (ctx.attr.src.label, [f.short_path for f in bits.values()]))
 
-    args += ["--extern=%s" %i for i in externs]
+    # Yield it
+    aux = bits["aux"]
+    log = bits["log"]
 
+    args += ["--aux=%s" % aux.short_path,"--log=%s" % log.short_path]
+    runs += [aux, log]
 
-    native.py_test(
-        name = name,
-        srcs = ["@bazel_rules//latex:ref_test.py"],
-        main = "@bazel_rules//latex:ref_test.py",
-        args = args + ["$(location :%s.log)" % jobname],
-        data = [
-            ":%s.aux" % jobname,
-            ":%s.log" % jobname,
-        ],
+    # Tack on some options.
+    if ctx.attr.ignore_dups: args += ["--ignore_dups"]
+
+    args += ["--extern=%s" %i for i in ctx.attr.externs]
+
+    executable = ctx.actions.declare_file(ctx.label.name + ".sh")
+    ctx.actions.write(
+        output=executable,
+        content="\n".join([
+            " ".join(args),
+            "",
+        ]),
     )
+
+    return [DefaultInfo(
+        executable=executable,
+        runfiles=ctx.runfiles(files=runs),
+    )]
+
+latex_ref_test = rule(
+    doc = "Test for missing label references.",
+
+    implementation = _latex_ref_test_impl,
+    test = True,
+    attrs = {
+        "src": attr.label(
+            doc="The tex_to_pdf to get the .log and .aux files from.",
+            mandatory=True,
+        ),
+        "ignore_dups": attr.bool(
+            doc="Suppress check for duplicate labels.",
+            default=False,
+        ),
+        "externs": attr.string_list(
+            doc="Lables to ignore missing refernces to.",
+            default=[],
+        ),
+        "_tool": attr.label(
+            doc="The test script.",
+            allow_single_file=True,
+            default="@bazel_rules//latex:ref_test.py",
+        ),
+    },
+)
