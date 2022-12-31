@@ -26,9 +26,26 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
-import editdistance  # pip install editdistance
 import re
 import sys
+
+def EditDistance(a, b):
+  if len(a) > len(b): return EditDistance(b, a)
+
+  d = list(range(0, len(a)+1))
+
+  for i,c in enumerate(b):
+    D = [i+1] * (len(d))
+
+    for j in range(1, len(d)):
+      rem = D[j-1] + 1
+      add = d[j  ] + 1
+      rep = d[j-1] + (0 if a[j-1] == b[i] else 1)
+      D[j] = min(rem, add, rep)
+
+    d = D
+
+  return d[-1]
 
 miss_ref_re = re.compile("[Rr]eference `(.*)' on page [0-9]+ undefined on input line")
 dup_ref_re = re.compile("Label `(.*)' multiply defined.")
@@ -79,7 +96,7 @@ def BestMatch(t, labels):
   return [
     x
     for _,x in
-    sorted((editdistance.eval(t, o), o) for o in labels)
+    sorted((EditDistance(t, o), o) for o in labels)
   ]
 
 def main(args):
@@ -97,6 +114,7 @@ def main(args):
   for t in dup_refs: print("Duplicate label:", t)
 
   return 1
+
 
 if __name__ == "__main__":
 
