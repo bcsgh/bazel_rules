@@ -16,6 +16,23 @@ rules_foreign_cc_dependencies([])
 
 #############################################
 git_repository(
+    name = "rules_python",
+    commit = "17a1573ecb960f0ed839fc8581cb015737b6241d",  # current as of 2022/12/31
+    remote = "https://github.com/bazelbuild/rules_python.git",
+    shallow_since = "1669672701 -0800",
+)
+
+load("@rules_python//python:repositories.bzl", "python_register_multi_toolchains")
+load("@rules_python//python:versions.bzl", "MINOR_MAPPING")
+
+python_register_multi_toolchains(
+    name = "python",
+    default_version = MINOR_MAPPING.values()[-1],
+    python_versions = MINOR_MAPPING.values(),
+)
+
+#############################################
+git_repository(
     name = "bazel_skylib",
     commit = "5bfcb1a684550626ce138fe0fe8f5f702b3764c3",
     remote = "https://github.com/bazelbuild/bazel-skylib.git",

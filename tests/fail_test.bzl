@@ -40,6 +40,9 @@ def _fail_test_impl(ctx):
         )),
     )
 
+    _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    runfiles += [_PYTHON.interpreter] + _PYTHON.files.to_list()
+
     log = ctx.label.name + ".log"
     executable = ctx.actions.declare_file(ctx.label.name + ".sh")
     runfiles += [ctx.file._tool]
@@ -51,7 +54,8 @@ def _fail_test_impl(ctx):
             "! (%s &> %s) || (cat %s ; exit 2)" % (exe.short_path, log, log),
 
             # Inspect the log.
-            "/usr/bin/python3 %s --log=%s --json=%s" % (
+            "%s %s --log=%s --json=%s" % (
+                _PYTHON.interpreter.path,
                 ctx.file._tool.path,
                 log,
                 json_data.short_path,
@@ -85,4 +89,5 @@ fail_test = rule(
             default="@bazel_rules//tests:fail_test.py",
         ),
     },
+    toolchains = ["@bazel_tools//tools/python:toolchain_type"],
 )

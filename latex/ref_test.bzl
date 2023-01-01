@@ -28,8 +28,10 @@
 """Bazle/skylark rule(s) to test LaTeX builds."""
 
 def _latex_ref_test_impl(ctx):
-    args = ["/usr/bin/python3", ctx.file._tool.path]
-    runs = [ctx.file._tool]
+    _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+
+    args = [_PYTHON.interpreter.path, ctx.file._tool.path]
+    runs = [ctx.file._tool, _PYTHON.interpreter] + _PYTHON.files.to_list()
 
     # Try to find what we need.
     bits = [
@@ -94,4 +96,5 @@ latex_ref_test = rule(
             default="@bazel_rules//latex:ref_test.py",
         ),
     },
+    toolchains = ["@bazel_tools//tools/python:toolchain_type"],
 )
