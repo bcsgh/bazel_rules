@@ -27,12 +27,12 @@
 
 load("//build_test:build.bzl", "build_test")
 load("//graphviz:graphviz.bzl", "gen_dot")
-load("//latex:git_stamp.bzl", "git_stamp")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
 load(":cc_embed_data_test.bzl", "cc_embed_data_suite")
 load(":detex_test.bzl", "detex_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
+load(":git_stamp_test.bzl", "git_stamp_suite")
 load(":latex_ref_test_test.bzl", "latex_ref_test_suite")
 load(":parser_test.bzl", "parser_suite")
 load(":role_call_test_test.bzl", "role_call_test_suite")
@@ -95,7 +95,9 @@ build_test(
 
 ######## latex
 
-git_stamp()
+git_stamp_suite(
+    name = "git_stamp_test",
+)
 
 tex_to_pdf_suite(
     name = "gen_latex_test",
