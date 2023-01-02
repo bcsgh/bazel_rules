@@ -29,8 +29,9 @@
 
 def _role_call_test_impl(ctx):
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
 
-    args = [_PYTHON.interpreter.path, ctx.file._tool.path]
+    args = [interpreter, ctx.file._tool.path]
     runs = _PYTHON.files.to_list() + [
         _PYTHON.interpreter,
         ctx.file._tool,

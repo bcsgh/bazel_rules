@@ -29,9 +29,13 @@
 
 def _latex_ref_test_impl(ctx):
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
 
-    args = [_PYTHON.interpreter.path, ctx.file._tool.path]
-    runs = [ctx.file._tool, _PYTHON.interpreter] + _PYTHON.files.to_list()
+    args = [interpreter, ctx.file._tool.path]
+    runs = _PYTHON.files.to_list() + [
+        _PYTHON.interpreter,
+        ctx.file._tool,
+    ]
 
     # Try to find what we need.
     bits = [

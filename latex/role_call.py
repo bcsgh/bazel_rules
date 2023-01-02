@@ -30,6 +30,12 @@ import json
 import re
 
 def main(args):
+  def removesuffix(f, s):
+    if f[-len(s):] != s:
+        return f
+    else:
+        return f[:-len(s)]
+
   try:
     with open(args.json, "r") as jsonfile:
       JSON = json.load(jsonfile)
@@ -37,7 +43,7 @@ def main(args):
     print("File not found:", args.json)
     return 1
 
-  extra = set(JSON["extra"] + [f.removesuffix(".tex") for f in JSON["extra"]])
+  extra = set(JSON["extra"] + [removesuffix(f, ".tex") for f in JSON["extra"]])
 
   mapping = {}
 
@@ -70,12 +76,12 @@ def main(args):
         if f.group(1) not in extra
       )
 
-    assert f.removesuffix(".tex") not in mapping
-    mapping[f.removesuffix(".tex")] = new
+    assert removesuffix(f, ".tex") not in mapping
+    mapping[removesuffix(f, ".tex")] = new
 
   ##### Check that all files input are expected, and the same the other way:
   found = set(x for y in mapping.values() for x in y)
-  expected = set(x.removesuffix(".tex") for x in JSON["inputs"])
+  expected = set(removesuffix(x, ".tex") for x in JSON["inputs"])
 
   missing = set()
   if found != expected:
@@ -85,7 +91,7 @@ def main(args):
     for x in found.difference(expected): print("Missing file %s.tex" % x)
 
   ##### Check that all expected files are reachable from root:
-  todo = [JSON["root"].removesuffix(".tex")]
+  todo = [removesuffix(JSON["root"], ".tex")]
   seen = set()
 
   expected.update(todo)

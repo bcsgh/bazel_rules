@@ -41,7 +41,10 @@ def _fail_test_impl(ctx):
     )
 
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
-    runfiles += [_PYTHON.interpreter] + _PYTHON.files.to_list()
+    interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
+    runfiles += _PYTHON.files.to_list() + [
+        _PYTHON.interpreter,
+    ]
 
     log = ctx.label.name + ".log"
     executable = ctx.actions.declare_file(ctx.label.name + ".sh")
@@ -55,7 +58,7 @@ def _fail_test_impl(ctx):
 
             # Inspect the log.
             "%s %s --log=%s --json=%s" % (
-                _PYTHON.interpreter.path,
+                interpreter,
                 ctx.file._tool.path,
                 log,
                 json_data.short_path,
@@ -77,7 +80,7 @@ fail_test = rule(
     attrs = {
         "test": attr.label(
             doc="The test target being checked.",
-            allow_single_file=True,
+            allow_files=True,
             mandatory=True,
         ),
         "msgs": attr.string_list(
