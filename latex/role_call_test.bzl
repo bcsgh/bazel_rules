@@ -26,6 +26,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
+load("@bazel_rules//repositories:repositories.bzl", "load_skylib")
+
+def get_deps():
+    "A WORKSPACE macro to set up the external dependencies of role_call_test()."
+    load_skylib()
 
 def _role_call_test_impl(ctx):
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime

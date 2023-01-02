@@ -2,8 +2,9 @@
 Misc. imported libs.
 """
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 #############################################
 def eigen():
@@ -137,4 +138,24 @@ def openssl():
         #recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.openssl",
         shallow_since = "1666888769 +0200",
+    )
+
+#############################################
+def load_skylib():
+    maybe(
+        git_repository,
+        name = "bazel_skylib",
+        commit = "5bfcb1a684550626ce138fe0fe8f5f702b3764c3",  # current as of 2023/01/02
+        remote = "https://github.com/bazelbuild/bazel-skylib.git",
+        shallow_since = "1668623372 +0100",
+    )
+
+#############################################
+def load_absl():
+    maybe(
+        git_repository,
+        name = "com_google_absl",
+        commit = "827940038258b35a29279d8c65b4b4ca0a676f8d",  # current as of 2022/10/27
+        remote = "https://github.com/abseil/abseil-cpp.git",
+        shallow_since = "1666903548 -0700",
     )

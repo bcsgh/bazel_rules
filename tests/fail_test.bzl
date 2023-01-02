@@ -25,6 +25,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+load("@bazel_rules//repositories:repositories.bzl", "load_skylib")
+
+def get_deps():
+    "A WORKSPACE macro to set up the external dependencies of fail_test()."
+    load_skylib()
+
 def _fail_test_impl(ctx):
     runfiles = ctx.attr.test[DefaultInfo].default_runfiles.files.to_list()
     exe = ctx.attr.test[DefaultInfo].files_to_run.executable
