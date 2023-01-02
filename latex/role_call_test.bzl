@@ -27,7 +27,7 @@
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
 
-def _role_call_test_impl(ctx): #name="role_call_test", root=None, inputs=None, extra=[]):
+def _role_call_test_impl(ctx):
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
 
     args = [_PYTHON.interpreter.path, ctx.file._tool.path]
@@ -48,10 +48,6 @@ def _role_call_test_impl(ctx): #name="role_call_test", root=None, inputs=None, e
         root=Squash(ctx.file.root),
         inputs=[Squash(f) for f in ctx.files.inputs],
         extra=[Squash(f) for f in ctx.files.extra],
-        #paths = [
-        #  struct(p=f.path, s=f.short_path)
-        #  for f in [ctx.file.root] + ctx.files.inputs
-        #],
     )
 
     # Check that each file only shows up once.
@@ -71,8 +67,6 @@ def _role_call_test_impl(ctx): #name="role_call_test", root=None, inputs=None, e
     ctx.actions.write(
         output=executable,
         content="\n".join([
-            #"find -not -type d | grep -ve python_3_10_6_x86_64-unknown-linux-gnu",
-            #"jq . %s" % _json.short_path,
             " ".join(args),
             "",
         ]),

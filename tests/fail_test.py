@@ -40,7 +40,7 @@ def main(args):
     with open(args.json, "r") as jsonfile:
       JSON = json.load(jsonfile)
   except IOError:
-    print("File not found:", args.log)
+    print("File not found:", args.json)
     return 1
 
   missing = [
