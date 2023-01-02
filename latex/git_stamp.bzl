@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def git_stamp(name = "git_stamp"):
+def git_stamp(name = None):
   """Generate a .tex file defining the command \\GitCommit to give the current git commit hash.
 
   Note: for this to work the build must be built using the equivlent of the flag:
@@ -34,8 +34,13 @@ def git_stamp(name = "git_stamp"):
   - Copy .git_hooks/bazel_stamp.sh from this repo into your workspace
   - copy the --workspace_status_command= line from this repo's .bazelrc into yours.
   """
+  if not name:
+      print("git_stamp.name should be explicitly set;\n" +
+            '    name = "git_stamp",\n'+
+            "This will be reqiered at some point.")
+
   native.genrule(
-      name = name,
+      name = name or "git_stamp",
       srcs = ["@bazel_rules//latex:git_stamp.tpl"],
       outs = ["%s.tex" % name],
       cmd = " ; ".join([
