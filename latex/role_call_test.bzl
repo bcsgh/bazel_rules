@@ -27,27 +27,86 @@
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
 
-def role_call_test(name="role_call_test", root=None, inputs=None, extra=[]):
-    """Test that the expected inputs exist and are used.
+def _role_call_test_impl(ctx): #name="role_call_test", root=None, inputs=None, extra=[]):
+    _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
 
-    Args:
-      name: The target name.
-      root: The root file that the inputs should be reachable from.
-      inputs: The files that should be reachable and can be used.
-      extra: Files that might be read but aren't tested for.
-    """
-    if not root: fail("root is requred")
-    if type(inputs) != type([]): fail("inputs must be a list, found %s" % type(inputs))
-    if type(extra) != type([]): fail("extra must be a list, found %s" % type(extra))
+    args = [_PYTHON.interpreter.path, ctx.file._tool.path]
+    runs = _PYTHON.files.to_list() + [
+        _PYTHON.interpreter,
+        ctx.file._tool,
+        ctx.file.root,
+    ] + ctx.files.inputs
 
-    native.sh_test(
-      name = name,
-      srcs = ["@bazel_rules//latex:role_call.sh"],
-      args = [
-          "$(location :%s)" % root,
-      ] + [
-          "$(locations %s)" % f
-          for f in inputs
-      ],
-      data = [root] + extra + inputs,
+    def Squash(f):
+        path = f.short_path.split("/")
+        backs = reversed([i for i,x in enumerate(path) if x == ".."])
+        for a in backs: path = path[:a] + path[a+2:]
+        return "/".join(path)
+
+    _json = ctx.actions.declare_file(ctx.label.name + ".json")
+    JSON = struct(
+        root=Squash(ctx.file.root),
+        inputs=[Squash(f) for f in ctx.files.inputs],
+        extra=[Squash(f) for f in ctx.files.extra],
+        #paths = [
+        #  struct(p=f.path, s=f.short_path)
+        #  for f in [ctx.file.root] + ctx.files.inputs
+        #],
     )
+
+    # Check that each file only shows up once.
+    all = JSON.inputs + JSON.extra + [JSON.root]
+    if len(all) != len(dict([(k,0) for k in all])):
+        fail("Found duplicate inputs.")
+
+    ctx.actions.write(
+        output=_json,
+        content=json.encode(JSON) + "\n",
+    )
+
+    runs += [_json]
+    args += ["--json=%s" % _json.short_path]
+
+    executable = ctx.actions.declare_file(ctx.label.name + ".sh")
+    ctx.actions.write(
+        output=executable,
+        content="\n".join([
+            #"find -not -type d | grep -ve python_3_10_6_x86_64-unknown-linux-gnu",
+            #"jq . %s" % _json.short_path,
+            " ".join(args),
+            "",
+        ]),
+    )
+
+    return [DefaultInfo(
+        executable=executable,
+        runfiles=ctx.runfiles(files=runs),
+    )]
+
+role_call_test = rule(
+    doc = "Test that the expected inputs exist and are used.",
+
+    implementation = _role_call_test_impl,
+    test = True,
+    attrs = {
+        "root": attr.label(
+            doc="The root file that the inputs should be reachable from.",
+            allow_single_file=True,
+            mandatory=True,
+        ),
+        "inputs": attr.label_list(
+            doc="The files that should be reachable and can be used.",
+            allow_files=True,
+        ),
+        "extra": attr.label_list(
+            doc="Files that might be read but aren't tested for.",
+            allow_files=True,
+        ),
+        "_tool": attr.label(
+            doc="The test script.",
+            allow_single_file=True,
+            default="@bazel_rules//latex:role_call.py",
+        ),
+    },
+    toolchains = ["@bazel_tools//tools/python:toolchain_type"],
+)

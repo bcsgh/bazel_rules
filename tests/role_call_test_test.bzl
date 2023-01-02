@@ -28,6 +28,7 @@
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//latex:role_call_test.bzl", "role_call_test")
+load(":fail_test.bzl", "fail_test")
 
 ##### SUCCESS case
 
@@ -46,9 +47,8 @@ role_call_test_contents_test = analysistest.make(_role_call_test_contents_test_i
 
 def role_call_test_suite(name):
     # Success
-
     role_call_test(
-        name = "role_call_pass_test",
+        name = "role_call_test_pass_test",
         root = "gen_latex_test.tex",
         inputs = [
             "//latex:spelling.tex",
@@ -62,10 +62,36 @@ def role_call_test_suite(name):
         target_under_test = ":role_call_test_pass_test",
     )
 
+    # Failure
+    role_call_test(
+        name = "role_call_test_fail_test",
+        root = "gen_latex_test.tex",
+        inputs = [
+            ":ref_error.tex",
+            "loop.tex",
+        ],
+        tags = ["manual"],
+    )
+
+    fail_test(
+        name = "role_call_test_failure_test",
+        msgs = [
+            "Missing \\input{tests/ref_error}",
+            "Missing file latex/spelling.tex",
+            "Missing file tests/git_stamp.tex",
+            "Missing file tests/fixed.tex",
+            "tests/loop unreachable from root (tests/gen_latex_test.tex)",
+            "Found cycle(s) in \\input{}s.\nFiles include:\ntests/loop.tex",
+        ],
+        test = ":role_call_test_fail_test",
+    )
+
     # Suit
     native.test_suite(
         name = name,
         tests = [
-            ":role_call_pass_test",
+            ":role_call_test_contents_test",
+            ":role_call_test_failure_test",
+            ":role_call_test_pass_test",
         ],
     )

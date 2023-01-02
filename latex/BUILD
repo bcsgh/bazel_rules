@@ -4,6 +4,6 @@ exports_files([
   "git_stamp.tpl",
   "pull.sh",
   "ref_test.py",
-  "role_call.sh",
+  "role_call.py",
   "spelling.tex",
 ])
