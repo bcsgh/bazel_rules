@@ -26,43 +26,34 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 def _spell_test_impl(ctx):
+    _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+
     args = [ctx.file.file.short_path]
     runs = [ctx.file.file]
 
     # Must we merge/prep a dictionary?
     if ctx.attr.dict:
-      # Merge everything with some filtering.
-      udict = ctx.actions.declare_file(ctx.label.name + ".working.dict")
+      # Merge everything with some filtering and sort.
+      gen_dict = ctx.actions.declare_file(ctx.label.name + ".generated.dict")
 
       dict_args = ctx.actions.args()
-      dict_args.add("-vpath=%s" % udict.path)
-      dict_args.add('BEGIN{print ""> path}!/ /{gsub(/[0-9]/,"");print > path}')
+      dict_args.add(ctx.file._tool.path)
+      dict_args.add("--output=" + gen_dict.path)
       dict_args.add_all(ctx.files.dict)
 
       ctx.actions.run(
-          inputs=ctx.files.dict,
-          outputs=[udict],
-          executable="awk",
+          inputs=_PYTHON.files.to_list() + ctx.files.dict + [
+              _PYTHON.interpreter,
+              ctx.file._tool,
+          ],
+          outputs=[gen_dict],
+          executable=_PYTHON.interpreter.path,
           arguments = [dict_args]
       )
 
-      # Sort it.
-      sdict = ctx.actions.declare_file(ctx.label.name + ".sorted.dict")
-
-      sort_args = ctx.actions.args()
-      sort_args.add(udict.path)
-      sort_args.add("--output=" + sdict.path)
-
-      ctx.actions.run(
-          inputs=[udict],
-          outputs=[sdict],
-          executable="sort",
-          arguments = [sort_args]
-      )
-
       # Use that generated dictionary.
-      args += ["--dictionary=" + sdict.short_path]
-      runs += [sdict]
+      args += ["--dictionary=" + gen_dict.short_path]
+      runs += [gen_dict]
 
     executable = ctx.actions.declare_file(ctx.label.name + ".sh")
 
@@ -103,5 +94,11 @@ spell_test = rule(
             allow_files=True,
             mandatory=False,
         ),
+        "_tool": attr.label(
+            doc="The test script.",
+            allow_single_file=True,
+            default="@bazel_rules//text:prep_dict.py",
+        ),
     },
+    toolchains = ["@bazel_tools//tools/python:toolchain_type"],
 )
