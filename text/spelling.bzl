@@ -35,7 +35,8 @@ def _spell_test_impl(ctx):
       udict = ctx.actions.declare_file(ctx.label.name + ".working.dict")
 
       dict_args = ctx.actions.args()
-      dict_args.add('!/ /{gsub(/[0-9]/,"");print > "%s"}' % udict.path)
+      dict_args.add("-vpath=%s" % udict.path)
+      dict_args.add('BEGIN{print ""> path}!/ /{gsub(/[0-9]/,"");print > path}')
       dict_args.add_all(ctx.files.dict)
 
       ctx.actions.run(
