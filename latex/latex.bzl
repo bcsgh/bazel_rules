@@ -27,7 +27,28 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
+BarcInfo = provider(
+    doc = "Information about how to invoke LaTeX tools.",
+
+    fields = [
+        "pdflatex",
+        "detex",
+    ],
+)
+
+# If nothing else is found, blindly use these hard coded values.
+# (They at least work on my machine.)
+_last_chance_toolchain = struct(
+    latex_toolchain = BarcInfo(
+        pdflatex = "/usr/bin/pdflatex",
+        detex = "/usr/bin/detex",
+    )
+)
+
 def _tex_to_pdf_impl(ctx):
+    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"] or _last_chance_toolchain
+    _LATEX = _LATEX.latex_toolchain
+
     if ctx.attr.runs < 1:
         fail("At least 1 run requiered.")
     if ctx.attr.reprocess and ctx.attr.runs < 2:
@@ -59,7 +80,7 @@ def _tex_to_pdf_impl(ctx):
         jobname = ctx.file.src.basename.replace(".tex", "")
         extra = ""
 
-    cmd = "max_print_line=1000 /usr/bin/pdflatex %s%s" % (extra, ctx.file.src.path)
+    cmd = "max_print_line=1000 %s %s%s" % (_LATEX.pdflatex, extra, ctx.file.src.path)
 
     pdflatex = ctx.actions.declare_file(ctx.label.name + ".pdflatex.sh")
     steps += [pdflatex]
@@ -117,8 +138,6 @@ def _tex_to_pdf_impl(ctx):
           "{COPY}": copy.path,
         }
     )
-
-    #for i,l in enumerate(script_body): print(i,l)
 
     # Do the full run
     srcs = (ctx.files.src + ctx.files.data + ctx.files.reprocess_tools)
@@ -179,10 +198,19 @@ tex_to_pdf = rule(
           allow_single_file=True,
           default="@bazel_rules//latex:full.sh.tpl",
       ),
-    }
+    },
+    toolchains = [
+        config_common.toolchain_type(
+            "@bazel_rules//latex:toolchain_type",
+            mandatory = False,
+        ),
+    ],
 )
 
 def _detex_impl(ctx):
+    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"] or _last_chance_toolchain
+    _LATEX = _LATEX.latex_toolchain
+
     processed_1 = ctx.actions.declare_file(ctx.label.name + ".processed_1")
 
     sed1_args = ctx.actions.args()
@@ -228,7 +256,7 @@ def _detex_impl(ctx):
     ctx.actions.run_shell(
         inputs=depset([processed]),
         outputs=[result],
-        command = "/usr/bin/detex -l %s >%s"  % (processed.path, result.path)
+        command = "%s -l %s >%s"  % (_LATEX.detex, processed.path, result.path)
     )
 
     return [DefaultInfo(
@@ -264,4 +292,9 @@ detex = rule(
             # TODO mandatory=True,
         ),
     },
+    toolchains = [config_common.toolchain_type(
+            "@bazel_rules//latex:toolchain_type",
+            mandatory = False,
+        ),
+    ],
 )

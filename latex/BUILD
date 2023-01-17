@@ -7,3 +7,5 @@ exports_files([
   "role_call.py",
   "spelling.tex",
 ])
+
+toolchain_type(name = "toolchain_type")
