@@ -27,7 +27,7 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-BarcInfo = provider(
+LaTeXInfo = provider(
     doc = "Information about how to invoke LaTeX tools.",
 
     fields = [
@@ -39,7 +39,7 @@ BarcInfo = provider(
 # If nothing else is found, blindly use these hard coded values.
 # (They at least work on my machine.)
 _last_chance_toolchain = struct(
-    latex_toolchain = BarcInfo(
+    latex_toolchain = LaTeXInfo(
         pdflatex = "/usr/bin/pdflatex",
         detex = "/usr/bin/detex",
     )
