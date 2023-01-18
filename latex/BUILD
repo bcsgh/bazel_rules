@@ -1,7 +1,7 @@
 exports_files([
   "detex.sed",
-  "full.sh.tpl",
   "git_stamp.tpl",
+  "latex.py",
   "pull.sh",
   "ref_test.py",
   "role_call.py",

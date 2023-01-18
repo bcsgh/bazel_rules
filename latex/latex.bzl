@@ -49,12 +49,13 @@ def _tex_to_pdf_impl(ctx):
     _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"] or _last_chance_toolchain
     _LATEX = _LATEX.latex_toolchain
 
+    _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
+
     if ctx.attr.runs < 1:
         fail("At least 1 run requiered.")
     if ctx.attr.reprocess and ctx.attr.runs < 2:
         fail("Reprocess does nothing without mutiple runs.")
-
-    steps = []
 
     ##### Set up pulling everything into where pdflatex expects it.
     def Munge(f):
@@ -66,12 +67,6 @@ def _tex_to_pdf_impl(ctx):
     paths = [(f.path, Munge(f)) for f in ctx.files.data]
     paths = [(f, t) for f, t in paths if f != t]
 
-    pull = ctx.actions.declare_file(ctx.label.name + ".pull.sh")
-    steps += [pull]
-    ctx.actions.write(output=pull, content="set -e\n%s\n" % "\n".join([
-        "mkdir -p $(dirname %s)\ncp %s %s" % (t, f, t) for f, t in paths
-    ]))
-
     ##### Set up the pdflatex command.
     if ctx.attr.jobname:
         jobname = ctx.attr.jobname
@@ -81,19 +76,6 @@ def _tex_to_pdf_impl(ctx):
         extra = ""
 
     cmd = "max_print_line=1000 %s %s%s" % (_LATEX.pdflatex, extra, ctx.file.src.path)
-
-    pdflatex = ctx.actions.declare_file(ctx.label.name + ".pdflatex.sh")
-    steps += [pdflatex]
-    ctx.actions.write(output=pdflatex, content="set -e\n%s\n" % cmd)
-
-    ##### Set up the reprocess commands.
-    rp_steps = []
-    for i, r in enumerate(ctx.attr.reprocess):
-        reprocess = ctx.expand_location(r, targets=ctx.attr.reprocess_tools)
-
-        rf = ctx.actions.declare_file(ctx.label.name + ".reprocess_%d.sh" % i)
-        rp_steps += [rf]
-        ctx.actions.write(output=rf, content="set -e\n%s\n" % reprocess)
 
     ##### Setup generation of outputs.
     if ctx.attr.extra_outs:
@@ -112,37 +94,39 @@ def _tex_to_pdf_impl(ctx):
         for o in ctx.attr.outs
     ]
 
-    ##### Set up pushing everything to where Bazel expects it. (TODO can this use symlinks?)
-    copy = ctx.actions.declare_file(ctx.label.name + ".copy.sh")
-    steps += [copy]
-    cp = ["cp %s %s" % (f.basename, f.path) for f in outs]
-    ctx.actions.write(output=copy, content="set -e\n%s\n" % "\n".join(cp))
-
-    # Setup the full run.
-    rerun = [r.path for r in rp_steps] + [pdflatex.path]
-    script_body = [pdflatex.path] + (rerun * (ctx.attr.runs - 1))
-
-    script = ctx.actions.declare_file(ctx.label.name + ".full.sh")
-    ctx.actions.expand_template(
-        output=script,
-        template = ctx.file._full_template,
-        substitutions={
-          "{PULL}": pull.path,
-          "{BODY}": "\n".join([
-              "%s &> LOG" % l
-              for l in script_body
-          ]),
-          "{COPY}": copy.path,
-        }
-    )
+    json_meta = ctx.actions.declare_file(ctx.label.name + ".json")
+    ctx.actions.write(output=json_meta, content=json.encode({
+        "runs": ctx.attr.runs,
+        "pdflatex": cmd,
+        "reprocess": [
+            ctx.expand_location(r, targets=ctx.attr.reprocess_tools)
+            for r in ctx.attr.reprocess
+        ],
+        "pull": dict([
+            (t,f)
+            for f,t in paths
+        ]),
+        "push": dict([
+            (f.basename, f.path)
+            for f in outs
+        ]),
+    }))
 
     # Do the full run
-    srcs = (ctx.files.src + ctx.files.data + ctx.files.reprocess_tools)
+    args = ctx.actions.args()
+    args.add(ctx.file._tool.path)
+    args.add("--json=" + json_meta.path)
+
+    srcs = ()
     ctx.actions.run(
-        inputs=depset(srcs + steps + rp_steps),
+        inputs=ctx.files.src + ctx.files.data + ctx.files.reprocess_tools + [
+            _PYTHON.interpreter,
+            ctx.file._tool,
+            json_meta,
+        ] + _PYTHON.files.to_list(),
         outputs=outs,
-        executable=script,
-        arguments = []
+        executable=_PYTHON.interpreter.path,
+        arguments=[args]
     )
 
     return [DefaultInfo(runfiles=ctx.runfiles(files=srcs))]
@@ -190,10 +174,10 @@ tex_to_pdf = rule(
           doc="The value for \\jobname.",
           default="",
       ),
-      "_full_template": attr.label(
+      "_tool": attr.label(
           doc="A template for the full processing.",
           allow_single_file=True,
-          default="@bazel_rules//latex:full.sh.tpl",
+          default="@bazel_rules//latex:latex.py",
       ),
     },
     toolchains = [
@@ -201,6 +185,7 @@ tex_to_pdf = rule(
             "@bazel_rules//latex:toolchain_type",
             mandatory = False,
         ),
+        "@bazel_tools//tools/python:toolchain_type",
     ],
 )
 
