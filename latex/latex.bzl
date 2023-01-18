@@ -89,11 +89,11 @@ def _tex_to_pdf_impl(ctx):
     ##### Set up the reprocess commands.
     rp_steps = []
     for i, r in enumerate(ctx.attr.reprocess):
-        cmd = ctx.expand_location(r, targets=ctx.attr.reprocess_tools)
+        reprocess = ctx.expand_location(r, targets=ctx.attr.reprocess_tools)
 
         rf = ctx.actions.declare_file(ctx.label.name + ".reprocess_%d.sh" % i)
         rp_steps += [rf]
-        ctx.actions.write(output=rf, content="set -e\n%s\n" % cmd)
+        ctx.actions.write(output=rf, content="set -e\n%s\n" % reprocess)
 
     ##### Setup generation of outputs.
     if ctx.attr.extra_outs:
@@ -103,22 +103,19 @@ def _tex_to_pdf_impl(ctx):
               ["%s.%s" % (jobname, o) for o in ctx.attr.extra_outs])
 
     pdf = ctx.actions.declare_file(ctx.attr.pdf.name)
-    outs = [pdf]
-    cp = ["cp %s.pdf %s" % (jobname, pdf.path)]
+
+    outs = [pdf] + [
+        ctx.actions.declare_file("%s.%s" % (jobname, o))
+        for o in ctx.attr.extra_outs
+    ] + [
+        ctx.actions.declare_file(o.name)
+        for o in ctx.attr.outs
+    ]
 
     ##### Set up pushing everything to where Bazel expects it. (TODO can this use symlinks?)
-    for o in ctx.attr.extra_outs:
-      of = ctx.actions.declare_file("%s.%s" % (jobname, o))
-      outs += [of]
-      cp += ["cp %s.%s %s" % (jobname, o, of.path)]
-
-    for o in ctx.attr.outs:
-      of = ctx.actions.declare_file(o.name)
-      outs += [of]
-      cp += ["cp %s %s" % (o.name, of.path)]
-
     copy = ctx.actions.declare_file(ctx.label.name + ".copy.sh")
     steps += [copy]
+    cp = ["cp %s %s" % (f.basename, f.path) for f in outs]
     ctx.actions.write(output=copy, content="set -e\n%s\n" % "\n".join(cp))
 
     # Setup the full run.
