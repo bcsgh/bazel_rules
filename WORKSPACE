@@ -29,6 +29,9 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
 
 #############################################
+register_toolchains("@bazel_rules//latex:linux_texlive")
+
+#############################################
 git_repository(
     name = "com_google_googletest",
     commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25

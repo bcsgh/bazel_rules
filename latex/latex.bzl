@@ -27,27 +27,8 @@
 
 """Bazle/skylark rule(s) to process LaTeX."""
 
-LaTeXInfo = provider(
-    doc = "Information about how to invoke LaTeX tools.",
-
-    fields = [
-        "pdflatex",
-        "detex",
-    ],
-)
-
-# If nothing else is found, blindly use these hard coded values.
-# (They at least work on my machine.)
-_last_chance_toolchain = struct(
-    latex_toolchain = LaTeXInfo(
-        pdflatex = "/usr/bin/pdflatex",
-        detex = "/usr/bin/detex",
-    )
-)
-
 def _tex_to_pdf_impl(ctx):
-    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"] or _last_chance_toolchain
-    _LATEX = _LATEX.latex_toolchain
+    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"].latexinfo
 
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
     interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
@@ -181,17 +162,13 @@ tex_to_pdf = rule(
       ),
     },
     toolchains = [
-        config_common.toolchain_type(
-            "@bazel_rules//latex:toolchain_type",
-            mandatory = False,
-        ),
+        "@bazel_rules//latex:toolchain_type",
         "@bazel_tools//tools/python:toolchain_type",
     ],
 )
 
 def _detex_impl(ctx):
-    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"] or _last_chance_toolchain
-    _LATEX = _LATEX.latex_toolchain
+    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"].latexinfo
 
     processed_1 = ctx.actions.declare_file(ctx.label.name + ".processed_1")
 
@@ -274,9 +251,33 @@ detex = rule(
             # TODO mandatory=True,
         ),
     },
-    toolchains = [config_common.toolchain_type(
-            "@bazel_rules//latex:toolchain_type",
-            mandatory = False,
-        ),
+    toolchains = [
+        "@bazel_rules//latex:toolchain_type",
     ],
+)
+
+## LaTeX Toolchain
+LaTeXInfo = provider(
+    doc = "Information about how to invoke LaTeX tools.",
+
+    fields = [
+        "pdflatex",
+        "detex",
+    ],
+)
+
+def _latex_toolchain_impl(ctx):
+    return [platform_common.ToolchainInfo(
+        latexinfo = LaTeXInfo(
+            pdflatex = ctx.attr.pdflatex,
+            detex = ctx.attr.detex,
+        ),
+    )]
+
+latex_toolchain = rule(
+    implementation = _latex_toolchain_impl,
+    attrs = {
+        "pdflatex": attr.string(mandatory=True),
+        "detex": attr.string(mandatory=True),
+    },
 )
