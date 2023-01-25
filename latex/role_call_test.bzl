@@ -54,6 +54,7 @@ def _role_call_test_impl(ctx):
         root=Squash(ctx.file.root),
         inputs=[Squash(f) for f in ctx.files.inputs],
         extra=[Squash(f) for f in ctx.files.extra],
+        ignore_re=ctx.attr.ignore_re,
     )
 
     # Check that each file only shows up once.
@@ -101,6 +102,9 @@ role_call_test = rule(
         "extra": attr.label_list(
             doc="Files that might be read but aren't tested for.",
             allow_files=True,
+        ),
+        "ignore_re": attr.string_list(
+            doc="Patterns to ignore as input arguments. (Uses python regex syntax.)",
         ),
         "_tool": attr.label(
             doc="The test script.",

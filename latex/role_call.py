@@ -45,6 +45,8 @@ def main(args):
 
   extra = set(JSON["extra"] + [removesuffix(f, ".tex") for f in JSON["extra"]])
 
+  ignore = [re.compile(r) for r in JSON["ignore_re"]]
+
   mapping = {}
 
   ESCAPED_BACKSLASH = re.compile("\\\\\\\\")
@@ -74,6 +76,7 @@ def main(args):
         f.group(1)
         for f in INPUTS.finditer(l)
         if f.group(1) not in extra
+          and not [1 for r in ignore if r.fullmatch(f.group(1))]
       )
 
     assert removesuffix(f, ".tex") not in mapping
