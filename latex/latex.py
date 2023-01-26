@@ -31,14 +31,17 @@ import os
 import os.path
 import shutil
 import subprocess
+import sys
 
 def Pull(pull):
+  print("PULL: <-\n  " + "\n  ".join(str(x) for x in pull.items()), file=debug)
   for d,s in pull.items():
     os.makedirs(os.path.dirname(d), exist_ok=True)
     shutil.copy(s, d)
 
 def Run(runs, pdflatex, reprocess):
   def Try(cmd, tag):
+    print("RUN:", tag, [cmd], file=debug)
     task = subprocess.run(
         cmd,
         shell=True,
@@ -60,6 +63,7 @@ def Run(runs, pdflatex, reprocess):
     Try(pdflatex, "pdflatex %d" % i)
 
 def Push(push):
+  print("PUSH: ->\n  " + "\n  ".join(str(x) for x in push.items()), file=debug)
   for s,d in push.items(): shutil.copy(s, d)
 
 def main(args):
@@ -88,8 +92,16 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser()
   parser.add_argument("--json", type=str, help="The JSON config blob.")
+  parser.add_argument("--debug",
+      default=False, action='store_true',
+      help="Output more about ehat's going on.")
   args = parser.parse_args()
   try:
+    if args.debug:
+      debug = sys.stdout
+    else:
+      debug = open(os.devnull, "w")
+
     exit(main(args))
   except Exception as err:
     raise SystemExit(err)

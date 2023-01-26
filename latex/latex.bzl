@@ -98,6 +98,8 @@ def _tex_to_pdf_impl(ctx):
     args.add(ctx.file._tool.path)
     args.add("--json=" + json_meta.path)
 
+    if ctx.attr.debug_internals: args.add("--debug")
+
     srcs = ()
     ctx.actions.run(
         inputs=ctx.files.src + ctx.files.data + ctx.files.reprocess_tools + [
@@ -154,6 +156,13 @@ tex_to_pdf = rule(
       "jobname": attr.string(
           doc="The value for \\jobname.",
           default="",
+      ),
+      "debug_internals": attr.bool(
+          doc="""Dump more of what's going on.
+              This will make the rule always generate output even on success.
+              NOT recomended as a regular thing.
+          """,
+          default=False,
       ),
       "_tool": attr.label(
           doc="A template for the full processing.",
