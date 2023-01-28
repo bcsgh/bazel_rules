@@ -39,12 +39,18 @@ def Pull(pull):
     os.makedirs(os.path.dirname(d), exist_ok=True)
     shutil.copy(s, d)
 
-def Run(runs, pdflatex, reprocess):
-  def Try(cmd, tag):
+def Run(runs, pdflatex, reprocess, env={}):
+  if env:
+    e = dict(os.environ)
+    e.update(env)
+    env = e
+
+  def Try(cmd, tag, env):
     print("RUN:", tag, [cmd], file=debug)
     task = subprocess.run(
         cmd,
         shell=True,
+        env=env,
         stdin=subprocess.DEVNULL,
         stderr=subprocess.STDOUT,
         stdout=subprocess.PIPE,
@@ -55,12 +61,12 @@ def Run(runs, pdflatex, reprocess):
       raise Exception("%s: %s\n----\n%s\n----" % (
           tag, cmd, task.stdout.decode('utf-8')))
 
-  Try(pdflatex, "pdflatex 1")
+  Try(pdflatex, "pdflatex 1", env)
 
   for i in range(2, runs+1):
     for r in reprocess:
-      Try(r, "reprocess %d" % i)
-    Try(pdflatex, "pdflatex %d" % i)
+      Try(r, "reprocess %d" % i, None)
+    Try(pdflatex, "pdflatex %d" % i, env)
 
 def Push(push):
   print("PUSH: ->\n  " + "\n  ".join(str(x) for x in push.items()), file=debug)
@@ -81,7 +87,7 @@ def main(args):
 
   Pull(JSON["pull"])
 
-  Run(JSON["runs"], JSON["pdflatex"], JSON["reprocess"])
+  Run(JSON["runs"], JSON["pdflatex"], JSON["reprocess"], JSON["env"])
 
   Push(JSON["push"])
 

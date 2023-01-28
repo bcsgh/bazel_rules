@@ -51,12 +51,10 @@ def _tex_to_pdf_impl(ctx):
     ##### Set up the pdflatex command.
     if ctx.attr.jobname:
         jobname = ctx.attr.jobname
-        extra = "-jobname=%s " % ctx.attr.jobname
+        cmd = "%s -jobname=%s %s" % (_LATEX.pdflatex, ctx.attr.jobname, ctx.file.src.path)
     else:
         jobname = ctx.file.src.basename.replace(".tex", "")
-        extra = ""
-
-    cmd = "max_print_line=1000 %s %s%s" % (_LATEX.pdflatex, extra, ctx.file.src.path)
+        cmd = "%s %s" % (_LATEX.pdflatex, ctx.file.src.path)
 
     ##### Setup generation of outputs.
     if ctx.attr.extra_outs:
@@ -79,6 +77,7 @@ def _tex_to_pdf_impl(ctx):
     ctx.actions.write(output=json_meta, content=json.encode({
         "runs": ctx.attr.runs,
         "pdflatex": cmd,
+        "env": {"max_print_line": str(ctx.attr.wrap_width or 10000)},
         "reprocess": [
             ctx.expand_location(r, targets=ctx.attr.reprocess_tools)
             for r in ctx.attr.reprocess
@@ -156,6 +155,10 @@ tex_to_pdf = rule(
       "jobname": attr.string(
           doc="The value for \\jobname.",
           default="",
+      ),
+      "wrap_width": attr.int(
+          doc="Wrap log output lines width. 0 'disables' wrapping.",
+          default=0,
       ),
       "debug_internals": attr.bool(
           doc="""Dump more of what's going on.
