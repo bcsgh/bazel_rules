@@ -182,22 +182,30 @@ tex_to_pdf = rule(
 def _detex_impl(ctx):
     _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"].latexinfo
 
+    _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
+
     processed_1 = ctx.actions.declare_file(ctx.label.name + ".processed_1")
 
     sed1_args = ctx.actions.args()
-    sed1_args.add(ctx.file.src.path)           # input
-    sed1_args.add("-n")                        # No stdout
-    sed1_args.add("-f%s" % ctx.file._sed.path) # process
-    sed1_args.add("-ew %s" % processed_1.path) # write to output
+    sed1_args.add(ctx.file._tool.path)
+    sed1_args.add("--input=%s" % ctx.file.src.path) # input
+    sed1_args.add(ctx.file._json.path)              # default processing
+    sed1_args.add_all(ctx.files.process)            # custom processing
+    sed1_args.add("--output=%s" % processed_1.path) # write to output
 
     ctx.actions.run(
-        inputs=depset(ctx.files.src + ctx.files._sed),
+        inputs=ctx.files.src + ctx.files.process + [
+            _PYTHON.interpreter,
+            ctx.file._tool,
+            ctx.file._json,
+        ] + _PYTHON.files.to_list(),
         outputs=[processed_1],
-        executable="sed",
+        executable=_PYTHON.interpreter.path,
         arguments = [sed1_args]
     )
 
-    if ctx.file.post_sed:
+    if ctx.file.post_sed:  # Depricated.
       processed_2 = ctx.actions.declare_file(ctx.label.name + ".processed_2")
       processed = processed_2
 
@@ -231,7 +239,7 @@ def _detex_impl(ctx):
     )
 
     return [DefaultInfo(
-        runfiles=ctx.runfiles(files=(ctx.files.src + ctx.files.post_sed + ctx.files._sed)),
+        runfiles=ctx.runfiles(files=(ctx.files.src + ctx.files.post_sed + ctx.files.process + ctx.files._tool)),
     )]
 
 detex = rule(
@@ -248,14 +256,23 @@ detex = rule(
             allow_single_file=True,
             mandatory=True,
         ),
+        "process": attr.label_list(
+            doc="A JSON file of rule to apply to the .tex file before passing to detex.\n" +
+            """The expected format is: [{"re":"...","sub":"..."},...] """,
+            allow_files=True,
+        ),
         "post_sed": attr.label(
-            doc="A sed script applied to remove or process custom markup.",
+            doc="Depricated, prefer process. A sed script applied to remove or process custom markup.",
             default=None,
             allow_single_file=True,
             mandatory=False,
         ),
-        "_sed": attr.label(
-            default="@bazel_rules//latex:detex.sed",
+        "_tool": attr.label(
+            default="@bazel_rules//latex:detex.py",
+            allow_single_file=True,
+        ),
+        "_json": attr.label(
+            default="@bazel_rules//latex:detex.json",
             allow_single_file=True,
         ),
         "out": attr.output(
@@ -265,6 +282,7 @@ detex = rule(
     },
     toolchains = [
         "@bazel_rules//latex:toolchain_type",
+        "@bazel_tools//tools/python:toolchain_type",
     ],
 )
 

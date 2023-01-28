@@ -1,7 +1,8 @@
 load(":latex.bzl", "latex_toolchain")
 
 exports_files([
-  "detex.sed",
+  "detex.json",
+  "detex.py",
   "git_stamp.tpl",
   "latex.py",
   "pull.sh",
