@@ -28,6 +28,8 @@
 """Bazel/skylark rules for wrapping Flex/Bison builds."""
 
 def _genlex_impl(ctx):
+    _PARSER = ctx.toolchains["@bazel_rules//parser:toolchain_type"].parser_gen_info
+
     cc = ctx.actions.declare_file(ctx.attr.cc.name)
     h  = ctx.actions.declare_file(ctx.attr.h.name)
 
@@ -39,7 +41,7 @@ def _genlex_impl(ctx):
     ctx.actions.run(
         inputs=depset(ctx.files.src + ctx.files.data),
         outputs=[cc, h],
-        executable="/usr/bin/flex",
+        executable=_PARSER.lex_gen,
         arguments = [args],
     )
 
@@ -71,10 +73,13 @@ genlex = rule(
             doc="The generated C++ header file.",
             mandatory=True,
         ),
-    }
+    },
+    toolchains = ["@bazel_rules//parser:toolchain_type"],
 )
 
 def _genyacc_impl(ctx):
+    _PARSER = ctx.toolchains["@bazel_rules//parser:toolchain_type"].parser_gen_info
+
     if ctx.attr.graph:
         print("genyacc.graph is deprecated. " +
               'Use genyacc.graph_file = "%s.dot"' % ctx.label.name)
@@ -117,7 +122,7 @@ def _genyacc_impl(ctx):
     ctx.actions.run(
         inputs=depset(ctx.files.src + ctx.files.data),
         outputs=outs,
-        executable="/usr/bin/bison",
+        executable=_PARSER.parse_gen,
         arguments = [args],
     )
 
@@ -169,5 +174,32 @@ genyacc = rule(
         "report_file": attr.output(
             doc='Generate a "report" (`--verbose --report=all`).',
         ),
-    }
+    },
+    toolchains = ["@bazel_rules//parser:toolchain_type"],
+)
+
+## Parser generator Toolchain
+ParserGenInfo = provider(
+    doc = "Information about how to invoke lexer and parser generators tools.",
+
+    fields = [
+        "lex_gen",
+        "parse_gen",
+    ],
+)
+
+def _parser_toolchain_impl(ctx):
+    return [platform_common.ToolchainInfo(
+        parser_gen_info = ParserGenInfo(
+            lex_gen = ctx.attr.lex_gen,
+            parse_gen = ctx.attr.parse_gen,
+        ),
+    )]
+
+parser_toolchain = rule(
+    implementation = _parser_toolchain_impl,
+    attrs = {
+        "lex_gen": attr.string(mandatory=True),
+        "parse_gen": attr.string(mandatory=True),
+    },
 )

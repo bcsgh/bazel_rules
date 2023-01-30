@@ -25,6 +25,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+load(":parser.bzl", "parser_toolchain")
+
 test_suite(name = "ci")
 
 cc_library(
@@ -45,4 +47,21 @@ cc_test(
         ":parser_support",
         "@com_google_googletest//:gtest_main",
     ],
+)
+
+toolchain_type(name = "toolchain_type")
+
+parser_toolchain(
+    name = "linux_local_flex_bison_toolchain",
+    lex_gen = "/usr/bin/flex",
+    parse_gen = "/usr/bin/bison",
+)
+
+toolchain(
+    name = "linux_flex_bison",
+    # Blindly asssume this is avalable if registered.
+    # exec_compatible_with = ["@platforms//os:linux"], # TODO Would this be more correct?
+    target_compatible_with = [], # Output is OS/CPU agnostic
+    toolchain = ":linux_local_flex_bison_toolchain",
+    toolchain_type = ":toolchain_type",
 )

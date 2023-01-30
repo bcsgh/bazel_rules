@@ -30,6 +30,7 @@ bazel_skylib_workspace()
 
 #############################################
 register_toolchains("@bazel_rules//latex:linux_texlive")
+register_toolchains("@bazel_rules//parser:linux_flex_bison")
 
 #############################################
 git_repository(
