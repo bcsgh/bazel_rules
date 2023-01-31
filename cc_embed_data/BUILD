@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("@bazel_rules//build_test:build.bzl", "build_test")
+load("//build_test:build.bzl", "build_test")
 
 test_suite(name = "ci")
 

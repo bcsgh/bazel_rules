@@ -97,7 +97,7 @@ spell_test = rule(
         "_tool": attr.label(
             doc="The test script.",
             allow_single_file=True,
-            default="@bazel_rules//text:prep_dict.py",
+            default=":prep_dict.py",
         ),
     },
     toolchains = ["@bazel_tools//tools/python:toolchain_type"],

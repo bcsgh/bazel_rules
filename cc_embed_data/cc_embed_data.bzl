@@ -273,7 +273,7 @@ cc_embed_data = rule(
         "_make_emebed_data": attr.label(
             doc="The C++ file generater.",
             allow_single_file=True,
-            default="@bazel_rules//cc_embed_data:make_emebed_data",
+            default=":make_emebed_data",
         ),
         "_cc_toolchain": attr.label(  # used by find_cpp_toolchain()
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),

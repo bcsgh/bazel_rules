@@ -1,4 +1,4 @@
-load("@bazel_rules//build_test:build.bzl", "build_test")
+load("//build_test:build.bzl", "build_test")
 
 ALL = [
     "@com_github_curl_curl//:curl",

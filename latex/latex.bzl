@@ -28,7 +28,7 @@
 """Bazle/skylark rule(s) to process LaTeX."""
 
 def _tex_to_pdf_impl(ctx):
-    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"].latexinfo
+    _LATEX = ctx.toolchains[":toolchain_type"].latexinfo
 
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
     interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
@@ -170,17 +170,17 @@ tex_to_pdf = rule(
       "_tool": attr.label(
           doc="A template for the full processing.",
           allow_single_file=True,
-          default="@bazel_rules//latex:latex.py",
+          default=":latex.py",
       ),
     },
     toolchains = [
-        "@bazel_rules//latex:toolchain_type",
+        ":toolchain_type",
         "@bazel_tools//tools/python:toolchain_type",
     ],
 )
 
 def _detex_impl(ctx):
-    _LATEX = ctx.toolchains["@bazel_rules//latex:toolchain_type"].latexinfo
+    _LATEX = ctx.toolchains[":toolchain_type"].latexinfo
 
     _PYTHON = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
     interpreter = _PYTHON.interpreter.path.removeprefix(_PYTHON.interpreter.root.path + "/")
@@ -268,11 +268,11 @@ detex = rule(
             mandatory=False,
         ),
         "_tool": attr.label(
-            default="@bazel_rules//latex:detex.py",
+            default=":detex.py",
             allow_single_file=True,
         ),
         "_json": attr.label(
-            default="@bazel_rules//latex:detex.json",
+            default=":detex.json",
             allow_single_file=True,
         ),
         "out": attr.output(
@@ -281,7 +281,7 @@ detex = rule(
         ),
     },
     toolchains = [
-        "@bazel_rules//latex:toolchain_type",
+        ":toolchain_type",
         "@bazel_tools//tools/python:toolchain_type",
     ],
 )

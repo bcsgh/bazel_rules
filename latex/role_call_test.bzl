@@ -26,7 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
-load("@bazel_rules//repositories:repositories.bzl", "load_skylib")
+load("//repositories:repositories.bzl", "load_skylib")
 
 def get_deps():
     "A WORKSPACE macro to set up the external dependencies of role_call_test()."
@@ -109,7 +109,7 @@ role_call_test = rule(
         "_tool": attr.label(
             doc="The test script.",
             allow_single_file=True,
-            default="@bazel_rules//latex:role_call.py",
+            default=":role_call.py",
         ),
     },
     toolchains = ["@bazel_tools//tools/python:toolchain_type"],

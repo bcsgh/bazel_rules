@@ -28,7 +28,7 @@
 """Bazel/skylark rules for wrapping Flex/Bison builds."""
 
 def _genlex_impl(ctx):
-    _PARSER = ctx.toolchains["@bazel_rules//parser:toolchain_type"].parser_gen_info
+    _PARSER = ctx.toolchains[":toolchain_type"].parser_gen_info
 
     cc = ctx.actions.declare_file(ctx.attr.cc.name)
     h  = ctx.actions.declare_file(ctx.attr.h.name)
@@ -74,11 +74,11 @@ genlex = rule(
             mandatory=True,
         ),
     },
-    toolchains = ["@bazel_rules//parser:toolchain_type"],
+    toolchains = [":toolchain_type"],
 )
 
 def _genyacc_impl(ctx):
-    _PARSER = ctx.toolchains["@bazel_rules//parser:toolchain_type"].parser_gen_info
+    _PARSER = ctx.toolchains[":toolchain_type"].parser_gen_info
 
     if ctx.attr.graph:
         print("genyacc.graph is deprecated. " +
@@ -175,7 +175,7 @@ genyacc = rule(
             doc='Generate a "report" (`--verbose --report=all`).',
         ),
     },
-    toolchains = ["@bazel_rules//parser:toolchain_type"],
+    toolchains = [":toolchain_type"],
 )
 
 ## Parser generator Toolchain

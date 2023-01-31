@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("@bazel_rules//repositories:repositories.bzl", "load_skylib")
+load("//repositories:repositories.bzl", "load_skylib")
 
 def get_deps():
     "A WORKSPACE macro to set up the external dependencies of fail_test()."
@@ -95,7 +95,7 @@ fail_test = rule(
         "_tool": attr.label(
             doc="The test tool.",
             allow_single_file=True,
-            default="@bazel_rules//tests:fail_test.py",
+            default=":fail_test.py",
         ),
     },
     toolchains = ["@bazel_tools//tools/python:toolchain_type"],

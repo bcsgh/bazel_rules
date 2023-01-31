@@ -26,7 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """Bazle/skylark rule(s) to test LaTeX builds."""
-load("@bazel_rules//repositories:repositories.bzl", "load_skylib")
+load("//repositories:repositories.bzl", "load_skylib")
 
 def get_deps():
     "A WORKSPACE macro to set up the external dependencies of latex_ref_test()."
@@ -102,7 +102,7 @@ latex_ref_test = rule(
         "_tool": attr.label(
             doc="The test script.",
             allow_single_file=True,
-            default="@bazel_rules//latex:ref_test.py",
+            default=":ref_test.py",
         ),
     },
     toolchains = ["@bazel_tools//tools/python:toolchain_type"],
