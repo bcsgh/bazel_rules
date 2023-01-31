@@ -25,28 +25,38 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def git_stamp(name = None):
-  """Generate a .tex file defining the command \\GitCommit to give the current git commit hash.
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-  Note: for this to work the build must be built using the equivlent of the flag:
-    --workspace_status_command=.git_hooks/bazel_stamp.sh
+def _fit_stamp_impl(ctx):
+    if ctx.outputs.tex:
+        tex = ctx.actions.declare_file(ctx.outputs.tex.basename)
+    else:
+        print("git_stamp.name should be explicitly set;\n" +
+              '    name = "git_stamp",\n'+
+              "This will be reqiered at some point.")
+        tex = ctx.actions.declare_file(ctx.label.name + ".tex")
 
-  - Copy .git_hooks/bazel_stamp.sh from this repo into your workspace
-  - copy the --workspace_status_command= line from this repo's .bazelrc into yours.
-  """
-  if not name:
-      print("git_stamp.name should be explicitly set;\n" +
-            '    name = "git_stamp",\n'+
-            "This will be reqiered at some point.")
+    ctx.actions.expand_template(
+        template=ctx.file._tpl,
+        output=tex,
+        substitutions={"COMMIT": ctx.attr._git[BuildSettingInfo].value},
+    )
+    return [DefaultInfo(files=depset([tex]))]
 
-  native.genrule(
-      name = name or "git_stamp",
-      srcs = ["@bazel_rules//latex:git_stamp.tpl"],
-      outs = ["%s.tex" % name],
-      cmd = " ; ".join([
-          "COMMIT=$$(sed -n bazel-out/stable-status.txt -e '/STABLE_GIT_COMMIT/s/^[^ ]* //p')",
-          "sed -e s/COMMIT/$$COMMIT/ $(location @bazel_rules//latex:git_stamp.tpl) > $@",
-      ]),
-      stamp = True,
-      visibility = ["//visibility:public"],
-  )
+
+git_stamp = rule(
+    doc = """Generate a .tex file defining the command \\GitCommit to give the current git commit hash.
+
+Note: for this to work the WORKSPACE must include a few repositories:
+
+  load("@bazel_rules//latex:git_stamp_deps.bzl", git_stamp_deps = "get_deps")
+  git_stamp_deps()
+""",
+
+    implementation = _fit_stamp_impl,
+    attrs = {
+        "tex": attr.output(),
+        "_tpl": attr.label(default="//latex:git_stamp.tpl", allow_single_file=True),
+        "_git": attr.label(default="@workspace_status//:git-commit"),
+    },
+)

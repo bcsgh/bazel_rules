@@ -25,50 +25,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
-load("@bazel_skylib//lib:sets.bzl", "sets")
-load("//build_test:build.bzl", "build_test")
-load("//latex:git_stamp.bzl", "git_stamp")
+load("//repositories:repositories.bzl", "load_skylib")
+load("//status_repository:repo.bzl", "status_repository")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-##### SUCCESS case
+###### Setup WORKSPACE
 
-def _git_stamp_contents_test_impl(ctx):
-    env = analysistest.begin(ctx)
-
-    target_under_test = analysistest.target_under_test(env)
-    asserts.set_equals(env,
-      sets.make(["git_stamp.tex"]),
-      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
-    return analysistest.end(env)
-
-git_stamp_contents_test = analysistest.make(_git_stamp_contents_test_impl)
-
-##### Go
-
-def git_stamp_suite(name):
-    # Success
-    git_stamp(
-        name = "git_stamp",
-        tex = "git_stamp.tex",
-    )
-
-    build_test(
-        name = "git_stamp_builds_test",
-        targets = [
-            ":git_stamp",
-        ],
-    )
-
-    git_stamp_contents_test(
-        name = "git_stamp_contents_test",
-        target_under_test = ":git_stamp",
-    )
-
-    # Suit
-    native.test_suite(
-        name = name,
-        tests = [
-            ":git_stamp_builds_test",
-            ":git_stamp_contents_test",
-        ],
+def get_deps():
+    "A WORKSPACE macro to set up the external dependencies of git_stamp()."
+    load_skylib()
+    maybe(
+        status_repository,
+        name = "workspace_status",
+        alt_git_commit = "<<UNKNOWN>>",
     )

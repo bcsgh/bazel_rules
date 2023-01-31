@@ -43,9 +43,13 @@ def _status_repository_impl(ctx):
     git = ctx.which("git")
     if git:
         HEAD = ctx.execute([git, "-C", ctx.workspace_root, "rev-parse", "HEAD"])
-        if 0 == HEAD.return_code:
-            BUILD += [_GIT_COMMIT_SETTING.format(commit = HEAD.stdout.strip())]
+    else:
+        HEAD = None
 
+    if HEAD and 0 == HEAD.return_code:
+        BUILD += [_GIT_COMMIT_SETTING.format(commit = HEAD.stdout.strip())]
+    elif ctx.attr.alt_git_commit:
+        BUILD += [_GIT_COMMIT_SETTING.format(commit = ctx.attr.alt_git_commit)]
     ctx.file("BUILD", "\n\n".join(BUILD))
 
     return
@@ -64,4 +68,8 @@ status_repository = repository_rule(
     implementation = _status_repository_impl,
     local = True,
     configure = True,
+
+    attrs = {
+        "alt_git_commit": attr.string(doc="The value to use for :git-commit if the real value isn't avalable."),
+    }
 )
