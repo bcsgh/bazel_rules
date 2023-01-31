@@ -2,6 +2,7 @@ workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libcurl", "libev", "libgnutls", "libhttpserver", "libidn2", "libnettle", "microhttpd", "openssl", "zlib")
+load("@bazel_rules//status_repository:repo.bzl", "status_repository")
 
 load("@bazel_rules//cc_embed_data:cc_embed_data_deps.bzl", cc_embed_data_deps = "get_deps")
 load("@bazel_rules//tests:fail_test.bzl", fail_test_deps = "get_deps")
@@ -11,6 +12,8 @@ cc_embed_data_deps()
 fail_test_deps()
 ref_test_deps()
 role_call_test_deps()
+
+status_repository(name = "workspace_status")
 
 git_repository(
     name = "rules_foreign_cc",

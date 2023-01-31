@@ -154,4 +154,12 @@ cc_test(
     ],
 )
 
+########
+
+build_test(
+    name = "git_commit_test",
+    targets = [
+        "@workspace_status//:git-commit",
+    ],
+)
 
