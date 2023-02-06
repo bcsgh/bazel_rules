@@ -59,8 +59,10 @@ status_repository = repository_rule(
     doc = """Create a repository that contains bits of information collected
        from the workspace that's not otherwise avalable to build rules.
 
+       NOTE: this tends to be somewhat brittle as bazel is aggresive about
+       caching much of this. To force a refesh, run `bazel sync --configure`.
+
        This infromation is exposed via "setting" rules.
-       In general, values that don't exist or can't be found in the current context are not generated.
 
        - `//:git-commit`: The current git commit.
     """,
@@ -71,5 +73,8 @@ status_repository = repository_rule(
 
     attrs = {
         "alt_git_commit": attr.string(doc="The value to use for :git-commit if the real value isn't avalable."),
+        "_git_head": attr.label_list(default = [
+            "@//:.git/HEAD",  # force update if git's head updates.
+        ]),
     }
 )
