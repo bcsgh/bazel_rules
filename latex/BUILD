@@ -11,7 +11,10 @@ exports_files([
   "spelling.tex",
 ])
 
-toolchain_type(name = "toolchain_type")
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
 
 latex_toolchain(
     name = "linux_local_texlive_toolchain",

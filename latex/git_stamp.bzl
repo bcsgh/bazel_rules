@@ -31,8 +31,8 @@ def _fit_stamp_impl(ctx):
     if ctx.outputs.tex:
         tex = ctx.actions.declare_file(ctx.outputs.tex.basename)
     else:
-        print("git_stamp.name should be explicitly set;\n" +
-              '    name = "git_stamp",\n'+
+        print("git_stamp.tex should be explicitly set;\n" +
+              '    tex = "' + ctx.label.name + '.tex",\n'+
               "This will be reqiered at some point.")
         tex = ctx.actions.declare_file(ctx.label.name + ".tex")
 
