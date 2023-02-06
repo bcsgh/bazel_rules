@@ -31,7 +31,14 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
 
 #############################################
-register_toolchains("@bazel_rules//latex:linux_texlive")
+#"""
+load("@bazel_rules//latex:repo.bzl", "latex_toolchain_repository")
+latex_toolchain_repository(name="local_latex_toolchain")
+register_toolchains("@local_latex_toolchain//:local_latex")  # uses ctx.which to look things up
+"""
+register_toolchains("@bazel_rules//latex:linux_texlive")  # assumes default paths
+#"""
+
 register_toolchains("@bazel_rules//parser:linux_flex_bison")
 
 #############################################
