@@ -1,6 +1,13 @@
-build --cxxopt=-std=c++17
+build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
 
 build --copt=-fno-exceptions
 build --copt=-Werror
 
 test --test_output=errors
+
+# --config=ci is used by pre-commit which always runs in a brand
+# new dir. This is a case where external caching is very usefull
+# but not something that can be configured globaly. To configure
+# that, add that config in  one of the other .bazelrc files.
+
+common:ci --announce_rc # See https://github.com/bazelbuild/bazel/issues/7116

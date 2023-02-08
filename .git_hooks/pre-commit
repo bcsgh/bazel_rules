@@ -6,7 +6,7 @@ NEWR=$(mktemp -d -t hook-XXXXXXXXXX)
 git checkout-index --prefix=${NEWR}/ -a
 cd $NEWR
 
-if time bazel test //:ci -k;
+if time bazel --nosystem_rc test --config=ci //:ci -k;
 then
   bazel clean --expunge
 else 
