@@ -43,9 +43,18 @@ def _gen_proto_api_impl(ctx):
         js = ctx.actions.declare_file(ctx.outputs.js.basename)
         args.add("--js=%s" % js.path)
 
+    if ctx.attr.js_module:
+        args.add("--js_module=%s" % ctx.attr.js_module)
+
     if ctx.outputs.h:
         h = ctx.actions.declare_file(ctx.outputs.h.basename)
         args.add("--h=%s" % h.path)
+
+    if ctx.attr.h_namespace:
+        args.add("--h_namespace=%s" % ctx.attr.h_namespace)
+
+    if ctx.attr.include_guard:
+        args.add("--h_guard=%s" % ctx.attr.include_guard)
 
     ctx.actions.run(
         inputs=[ctx.file.proto],
@@ -70,8 +79,17 @@ gen_proto_api = rule(
         "js": attr.output(
             doc="The generated JavaScript file.",
         ),
+        "js_module": attr.string(
+            doc="Override the goog.module to use in the JS file.",
+        ),
         "h": attr.output(
             doc="The generated C++ header file.",
+        ),
+        "include_guard": attr.string(
+            doc="Override the include-guard to use in the C++ header file.",
+        ),
+        "h_namespace": attr.string(
+            doc="Override the namespace to use in the C++ header file.",
         ),
         "_tool": attr.label(
             doc="The generater.",

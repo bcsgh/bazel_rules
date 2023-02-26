@@ -1,9 +1,10 @@
-#ifndef BOILER_ENDPOINT_H_
-#define BOILER_ENDPOINT_H_
+#ifndef OVERRIDE_H_
+#define OVERRIDE_H_
 
 // GENERATED CODE -- DO NOT EDIT!
 
-namespace http_boiler_api {
+namespace proto_api::pb::gen_api {
+
 struct Endpoint {
   static constexpr const char* JSON = "/json";
   static constexpr const char* ALL[] = {JSON, };
@@ -14,5 +15,6 @@ struct StaticEndpoint {
   static constexpr const char* ALL[] = {ROOT, MAIN_JS, };
 };
 
-}  // namespace http_boiler_api
-#endif //  BOILER_ENDPOINT_H_
+}  // namespace proto_api::pb::gen_api
+
+#endif //  OVERRIDE_H_

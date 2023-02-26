@@ -40,6 +40,7 @@ def proto_api_suite(name):
         proto = ":api",
         js = "gen_metadata.js",
         h = "gen_metadata.h",
+        include_guard = "OVERRIDE_H_",
     )
 
     diff_test(

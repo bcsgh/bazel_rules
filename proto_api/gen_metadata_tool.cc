@@ -31,15 +31,45 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_replace.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "proto_api/api_meta.pb.h"
+
+ABSL_FLAG(std::string, src, "", "");
+ABSL_FLAG(std::string, js, "", "");
+ABSL_FLAG(std::string, js_module, "",
+          "Override the goog.module to use in the JS file. "
+          "(Generated from the proto c if not set here).");
+ABSL_FLAG(std::string, h, "", "");
+ABSL_FLAG(std::string, h_guard, "",
+          "Override the include-guard to use in the C++ header file. "
+          "(Generated from --h if not set here).");
+ABSL_FLAG(std::string, h_namespace, "",
+          "Override the namespace to use in the C++ header file. "
+          "(Generated from the proto module if not set here).");
 
 namespace api = proto_api::pb;
 using google::protobuf::FileDescriptorProto;
 
-void CC(const FileDescriptorProto* root, std::ostream& out) {
-  auto include_guard = "BOILER_ENDPOINT_H_";  // TODO
-  auto ns = "http_boiler_api";  // TODO
+void CC(const FileDescriptorProto* root, const std::string& path, std::ostream& out) {
+  std::string include_guard;
+  if (absl::GetFlag(FLAGS_h_guard) == "") {
+    include_guard = absl::StrCat(absl::AsciiStrToUpper(path), "_");
+  } else {
+    include_guard = absl::GetFlag(FLAGS_h_guard);
+  }
+  for (auto& c : include_guard) {
+    if (c != '_' && !absl::ascii_isalnum(c)) c = '_';
+  }
+
+  std::string ns;
+  if (absl::GetFlag(FLAGS_h_namespace) == "") {
+    ns = absl::StrCat(absl::StrReplaceAll(root->package(), {{".", "::"}}), "::gen_api");
+  } else {
+    ns = absl::GetFlag(FLAGS_h_namespace);
+  }
 
   out << R"CC(#ifndef )CC" << include_guard << R"CC(
 #define )CC" << include_guard << R"CC(
@@ -47,6 +77,7 @@ void CC(const FileDescriptorProto* root, std::ostream& out) {
 // GENERATED CODE -- DO NOT EDIT!
 
 namespace )CC" << ns << R"CC( {
+
 )CC";
 
   for (const auto &desc : root->enum_type()) {
@@ -65,6 +96,7 @@ namespace )CC" << ns << R"CC( {
 
   out << R"CC(
 }  // namespace )CC" << ns << R"CC(
+
 #endif //  )CC" << include_guard << R"CC(
 )CC";
 }
@@ -72,11 +104,17 @@ namespace )CC" << ns << R"CC( {
 void CC(const FileDescriptorProto* root, const std::string& path) {
   if (path == "") return;
   std::ofstream out(path);
-  if (out) CC(root, out);
+  if (out) CC(root, path, out);
 }
 
 void JS(const FileDescriptorProto* root, std::ostream& out) {
-  auto module = "Boiler.Endpoints";  // TODO
+  std::string module;
+  std::string ns;
+  if (absl::GetFlag(FLAGS_js_module) == "") {
+    module = absl::StrCat(root->package(), ".GenAPI");
+  } else {
+    module = absl::GetFlag(FLAGS_js_module);
+  }
 
   out << R"JS(/**
  * @fileoverview Map a proto enum with custom options into JS
@@ -113,10 +151,6 @@ void JS(const FileDescriptorProto* root, const std::string& path) {
   std::ofstream out(path);
   if (out) JS(root, out);
 }
-
-ABSL_FLAG(std::string, src, "", "");
-ABSL_FLAG(std::string, js, "", "");
-ABSL_FLAG(std::string, h, "", "");
 
 int main(int argc, char **argv) {
   auto args = absl::ParseCommandLine(argc, argv);

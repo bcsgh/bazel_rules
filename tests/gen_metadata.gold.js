@@ -6,7 +6,7 @@
 
 // GENERATED CODE -- DO NOT EDIT!
 
-goog.module('Boiler.Endpoints');
+goog.module('proto_api.pb.GenAPI');
 
 exports = {
   Endpoint: {
