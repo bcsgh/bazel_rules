@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package proto_api.pb;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions {
+  optional string target_url = 162161938;
+}
+
+enum Endpoint {
+  JSON = 1 [(target_url) = "/json"];
+
+  UNKNOWN_PATH = 404;
+}
+
+enum StaticEndpoint {
+  ROOT = 2           [(target_url) = "/"];
+  MAIN_JS = 3        [(target_url) = "/main.js"];
+}
+
+message ExampleResponce {
+  optional string errors = 1;
+  optional string value = 2;
+}

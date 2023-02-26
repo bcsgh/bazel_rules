@@ -8,11 +8,13 @@ load("@bazel_rules//tests:fail_test.bzl", fail_test_deps = "get_deps")
 load("@bazel_rules//latex:git_stamp_deps.bzl", git_stamp_deps = "get_deps")
 load("@bazel_rules//latex:ref_test.bzl", ref_test_deps = "get_deps")
 load("@bazel_rules//latex:role_call_test.bzl", role_call_test_deps = "get_deps")
+load("@bazel_rules//proto_api:proto_api.bzl", proto_api_deps = "get_deps")
 cc_embed_data_deps()
 fail_test_deps()
 git_stamp_deps()
 ref_test_deps()
 role_call_test_deps()
+proto_api_deps()
 
 git_repository(
     name = "rules_foreign_cc",
@@ -40,6 +42,32 @@ register_toolchains("@bazel_rules//latex:linux_texlive")  # assumes default path
 #"""
 
 register_toolchains("@bazel_rules//parser:linux_flex_bison")
+
+#############################################
+git_repository(
+    name = "rules_proto",
+    commit = "f371ed34ed7f1a8b83cc34ae96db277e0ba4fcb0",  # tag=5.3.0-21.5 + f371ed3
+    remote = "https://github.com/bazelbuild/rules_proto.git",
+    shallow_since = "1664409030 -0700",
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
+
+rules_proto_dependencies()
+
+#############################################
+# https://github.com/bazelbuild/rules_closure
+git_repository(
+    name = "io_bazel_rules_closure",
+    remote = "https://github.com/bazelbuild/rules_closure.git",
+    tag = "0.11.0",
+)
+
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
+
+rules_closure_dependencies()
+
+rules_closure_toolchains()
 
 #############################################
 git_repository(

@@ -35,6 +35,7 @@ load(":gen_dot_test.bzl", "gen_dot_suite")
 load(":git_stamp_test.bzl", "git_stamp_suite")
 load(":latex_ref_test_test.bzl", "latex_ref_test_suite")
 load(":parser_test.bzl", "parser_suite")
+load(":proto_api_test.bzl", "proto_api_suite")
 load(":role_call_test_test.bzl", "role_call_test_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
 load(":tex_to_pdf_test.bzl", "tex_to_pdf_suite")
@@ -54,6 +55,7 @@ test_suite(
         ":gen_dot_test",
         ":gen_latex_test",
         ":parser_test",
+        ":proto_api_test",
         ":ref_test",
         ":role_call_test",
         ":spell_test_test",
@@ -126,6 +128,11 @@ diff_test(
 
 spell_test_suite(
     name = "spell_test_test",
+)
+
+######## gen_proto_api
+proto_api_suite(
+    name = "proto_api_test",
 )
 
 ######## repositories
