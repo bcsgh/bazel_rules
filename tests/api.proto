@@ -2,11 +2,7 @@ syntax = "proto2";
 
 package proto_api.pb;
 
-import "google/protobuf/descriptor.proto";
-
-extend google.protobuf.EnumValueOptions {
-  optional string target_url = 162161938;
-}
+import "proto_api/api_meta.proto";
 
 enum Endpoint {
   JSON = 1 [(target_url) = "/json"];

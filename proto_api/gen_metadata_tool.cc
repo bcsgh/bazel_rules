@@ -27,33 +27,36 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
-#include "proto_api/api.pb.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "proto_api/api_meta.pb.h"
 
 namespace api = proto_api::pb;
+using google::protobuf::FileDescriptorProto;
 
-void CC(std::ostream& out) {
-  out << R"CC(#ifndef BOILER_ENDPOINT_H_
-#define BOILER_ENDPOINT_H_
+void CC(const FileDescriptorProto* root, std::ostream& out) {
+  auto include_guard = "BOILER_ENDPOINT_H_";  // TODO
+  auto ns = "http_boiler_api";  // TODO
+
+  out << R"CC(#ifndef )CC" << include_guard << R"CC(
+#define )CC" << include_guard << R"CC(
 
 // GENERATED CODE -- DO NOT EDIT!
 
-namespace http_boiler_api {
+namespace )CC" << ns << R"CC( {
 )CC";
 
-  auto *root = google::protobuf::GetEnumDescriptor<api::Endpoint>()->file();
-  for (int i = 0, j = root->enum_type_count(); i < j; i++) {
-    auto *desc = root->enum_type(i);
-    out << "struct " << desc->name() << " {\n";
+  for (const auto &desc : root->enum_type()) {
+    out << "struct " << desc.name() << " {\n";
     std::vector<std::string> all;
-    for (int i = 0; i < desc->value_count(); i++) {
-      auto *val = desc->value(i);
-      auto url = val->options().GetExtension(api::target_url);
+    for (const auto &val : desc.value()) {
+      auto url = val.options().GetExtension(api::target_url);
       if (url.empty()) continue;
-      all.emplace_back(val->name());
-      out << "  static constexpr const char* " << val->name() << " = \"" << url << "\";\n";
+      all.emplace_back(val.name());
+      out << "  static constexpr const char* " << val.name() << " = \"" << url << "\";\n";
     }
     out << "  static constexpr const char* ALL[] = {";
     for (const auto &e : all) out << e << ", ";
@@ -61,18 +64,20 @@ namespace http_boiler_api {
   }
 
   out << R"CC(
-}  // namespace http_boiler_api
-#endif //  BOILER_ENDPOINT_H_
+}  // namespace )CC" << ns << R"CC(
+#endif //  )CC" << include_guard << R"CC(
 )CC";
 }
 
-void CC(const std::string& path) {
+void CC(const FileDescriptorProto* root, const std::string& path) {
   if (path == "") return;
   std::ofstream out(path);
-  if (out) CC(out);
+  if (out) CC(root, out);
 }
 
-void JS(std::ostream& out) {
+void JS(const FileDescriptorProto* root, std::ostream& out) {
+  auto module = "Boiler.Endpoints";  // TODO
+
   out << R"JS(/**
  * @fileoverview Map a proto enum with custom options into JS
  * @public
@@ -81,20 +86,17 @@ void JS(std::ostream& out) {
 
 // GENERATED CODE -- DO NOT EDIT!
 
-goog.module('Boiler.Endpoints');
+goog.module(')JS" << module << R"JS(');
 
 exports = {
 )JS";
 
-  auto *root = google::protobuf::GetEnumDescriptor<api::Endpoint>();
-  for (int i = 0, j = root->file()->enum_type_count(); i < j; i++) {
-    auto *desc = root->file()->enum_type(i);
-    out << "  " << desc->name() << ": {\n";
-    for (int i = 0; i < desc->value_count(); i++) {
-      auto *val = desc->value(i);
-      auto url = val->options().GetExtension(api::target_url);
+  for (const auto &desc : root->enum_type()) {
+    out << "  " << desc.name() << ": {\n";
+    for (const auto &val : desc.value()) {
+      auto url = val.options().GetExtension(api::target_url);
       if (url.empty()) continue;
-      out << "    " << val->name() << ": '" << url << "',\n";
+      out << "    " << val.name() << ": '" << url << "',\n";
     }
     out << "  },\n";
   }
@@ -106,20 +108,41 @@ exports = {
 )JS";
 }
 
-void JS(const std::string& path) {
+void JS(const FileDescriptorProto* root, const std::string& path) {
   if (path == "") return;
   std::ofstream out(path);
-  if (out) JS(out);
+  if (out) JS(root, out);
 }
 
+ABSL_FLAG(std::string, src, "", "");
 ABSL_FLAG(std::string, js, "", "");
 ABSL_FLAG(std::string, h, "", "");
 
 int main(int argc, char **argv) {
   auto args = absl::ParseCommandLine(argc, argv);
 
-  JS(absl::GetFlag(FLAGS_js));
-  CC(absl::GetFlag(FLAGS_h));
+  if (absl::GetFlag(FLAGS_src) == "") {
+    std::cerr << "--src is requiered\n" << std::flush;
+    return 1;
+  }
+
+  std::ifstream t(absl::GetFlag(FLAGS_src));
+  std::stringstream b;
+  b << t.rdbuf();
+  google::protobuf::FileDescriptorSet file;
+  if (!file.ParseFromString(b.str())) {
+    std::cerr << "--src is not a FileDescriptorSet\n" << std::flush;
+    return 1;
+  }
+
+  if (file.file_size() != 1) {
+    std::cerr << "--src contains " << file.file_size() << " files. Expected exactly 1.\n" << std::flush;
+    return 1;
+  }
+
+  auto root = file.file(0);
+  JS(&root, absl::GetFlag(FLAGS_js));
+  CC(&root, absl::GetFlag(FLAGS_h));
 
   return 0;
 }

@@ -29,8 +29,15 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//proto_api:proto_api.bzl", "gen_proto_api")
 
 def proto_api_suite(name):
+    native.proto_library(
+        name = "api",
+        srcs = ["api.proto"],
+        deps = ["//proto_api:api_meta_proto"],
+    )
+
     gen_proto_api(
         name = "gen_metadata",
+        proto = ":api",
         js = "gen_metadata.js",
         h = "gen_metadata.h",
     )
