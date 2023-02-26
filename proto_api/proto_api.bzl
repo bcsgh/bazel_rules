@@ -39,9 +39,11 @@ def _gen_proto_api_impl(ctx):
     args = ctx.actions.args()
     args.add("--src=%s" % ctx.attr.proto[ProtoInfo].direct_descriptor_set.path)
 
+    out = []
     if ctx.outputs.js:
         js = ctx.actions.declare_file(ctx.outputs.js.basename)
         args.add("--js=%s" % js.path)
+        out += [js]
 
     if ctx.attr.js_module:
         args.add("--js_module=%s" % ctx.attr.js_module)
@@ -49,6 +51,7 @@ def _gen_proto_api_impl(ctx):
     if ctx.outputs.h:
         h = ctx.actions.declare_file(ctx.outputs.h.basename)
         args.add("--h=%s" % h.path)
+        out += [h]
 
     if ctx.attr.h_namespace:
         args.add("--h_namespace=%s" % ctx.attr.h_namespace)
@@ -58,7 +61,7 @@ def _gen_proto_api_impl(ctx):
 
     ctx.actions.run(
         inputs=[ctx.file.proto],
-        outputs=[js, h],
+        outputs=out,
         executable=ctx.file._tool,
         arguments=[args],
     )
