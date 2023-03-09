@@ -136,17 +136,18 @@ constexpr auto kJS = R"JS(/**
 
 goog.module('<module>');
 
-exports = {
-<exports>
+<bits>
 
+exports = {
+  <exports>
 };
 
 // DONE
 )JS";
 
-constexpr auto kObj = R"JS(  <name>: {
-    <bits>
-  },)JS";
+constexpr auto kObj = R"JS(const <name> = {
+  <bits>
+};)JS";
 
 void JS(const FileDescriptorProto* root, std::ostream& out) {
   std::string module;
@@ -157,7 +158,7 @@ void JS(const FileDescriptorProto* root, std::ostream& out) {
     module = absl::GetFlag(FLAGS_js_module);
   }
 
-  std::vector<std::string> lines;
+  std::vector<std::string> lines, all;
   for (const auto &desc : root->enum_type()) {
     std::vector<std::string> bits;
     for (const auto &val : desc.value()) {
@@ -165,15 +166,18 @@ void JS(const FileDescriptorProto* root, std::ostream& out) {
       if (url.empty()) continue;
       bits.emplace_back(absl::StrCat(val.name(), ": '", url, "',"));
     }
+    if (bits.size() == 0) continue;
+    all.emplace_back(desc.name());
     lines.emplace_back(absl::StrReplaceAll(kObj, {
         {"<name>", desc.name()},
-        {"<bits>", absl::StrJoin(bits, "\n    ")},
+        {"<bits>", absl::StrJoin(bits, "\n  ")},
     }));
   }
 
   out << absl::StrReplaceAll(kJS, {
       {"<module>", module},
-      {"<exports>", absl::StrJoin(lines, "\n")},
+      {"<bits>", absl::StrJoin(lines, "\n\n")},
+      {"<exports>", absl::StrJoin(all, ",\n  ")},
   });
 }
 

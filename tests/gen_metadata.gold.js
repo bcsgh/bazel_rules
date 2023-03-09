@@ -8,15 +8,18 @@
 
 goog.module('proto_api.pb.GenAPI');
 
-exports = {
-  Endpoint: {
-    JSON: '/json',
-  },
-  StaticEndpoint: {
-    ROOT: '/',
-    MAIN_JS: '/main.js',
-  },
+const Endpoint = {
+  JSON: '/json',
+};
 
+const StaticEndpoint = {
+  ROOT: '/',
+  MAIN_JS: '/main.js',
+};
+
+exports = {
+  Endpoint,
+  StaticEndpoint
 };
 
 // DONE
