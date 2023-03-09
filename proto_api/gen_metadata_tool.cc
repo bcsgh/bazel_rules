@@ -33,6 +33,7 @@
 #include "absl/flags/parse.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "absl/strings/str_replace.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "proto_api/api_meta.pb.h"
@@ -53,6 +54,27 @@ ABSL_FLAG(std::string, h_namespace, "",
 namespace api = proto_api::pb;
 using google::protobuf::FileDescriptorProto;
 
+constexpr auto kHeader = R"CC(#ifndef <include_guard>
+#define <include_guard>
+
+// GENERATED CODE -- DO NOT EDIT!
+
+namespace <ns> {
+
+<lines>
+
+}  // namespace <ns>
+
+#endif //  <include_guard>
+)CC";
+
+constexpr auto kStruct = R"CC(struct <name> {
+  <bits>
+  static constexpr const char* ALL[] = {<all>};
+};)CC";
+
+constexpr auto kLine = R"CC(static constexpr const char* <name> = "<url>";)CC";
+
 void CC(const FileDescriptorProto* root, const std::string& path, std::ostream& out) {
   std::string include_guard;
   if (absl::GetFlag(FLAGS_h_guard) == "") {
@@ -71,34 +93,31 @@ void CC(const FileDescriptorProto* root, const std::string& path, std::ostream& 
     ns = absl::GetFlag(FLAGS_h_namespace);
   }
 
-  out << R"CC(#ifndef )CC" << include_guard << R"CC(
-#define )CC" << include_guard << R"CC(
-
-// GENERATED CODE -- DO NOT EDIT!
-
-namespace )CC" << ns << R"CC( {
-
-)CC";
+  std::vector<std::string> lines;
 
   for (const auto &desc : root->enum_type()) {
-    out << "struct " << desc.name() << " {\n";
-    std::vector<std::string> all;
+    std::vector<std::string> all, bits;
     for (const auto &val : desc.value()) {
       auto url = val.options().GetExtension(api::target_url);
       if (url.empty()) continue;
       all.emplace_back(val.name());
-      out << "  static constexpr const char* " << val.name() << " = \"" << url << "\";\n";
+      bits.emplace_back(absl::StrReplaceAll(kLine, {
+          {"<name>", val.name()},
+          {"<url>", url},
+      }));
     }
-    out << "  static constexpr const char* ALL[] = {";
-    for (const auto &e : all) out << e << ", ";
-    out << "};\n};\n";
+    lines.emplace_back(absl::StrReplaceAll(kStruct, {
+        {"<name>", desc.name()},
+        {"<all>", absl::StrJoin(all, ", ")},
+        {"<bits>", absl::StrJoin(bits, "\n  ")},
+    }));
   }
 
-  out << R"CC(
-}  // namespace )CC" << ns << R"CC(
-
-#endif //  )CC" << include_guard << R"CC(
-)CC";
+  out << absl::StrReplaceAll(kHeader, {
+      {"<ns>", ns},
+      {"<include_guard>", include_guard},
+      {"<lines>", absl::StrJoin(lines, "\n")},
+  });
 }
 
 void CC(const FileDescriptorProto* root, const std::string& path) {
@@ -106,6 +125,28 @@ void CC(const FileDescriptorProto* root, const std::string& path) {
   std::ofstream out(path);
   if (out) CC(root, path, out);
 }
+
+constexpr auto kJS = R"JS(/**
+ * @fileoverview Map a proto enum with custom options into JS
+ * @public
+ */
+/* eslint-disable */
+
+// GENERATED CODE -- DO NOT EDIT!
+
+goog.module('<module>');
+
+exports = {
+<exports>
+
+};
+
+// DONE
+)JS";
+
+constexpr auto kObj = R"JS(  <name>: {
+    <bits>
+  },)JS";
 
 void JS(const FileDescriptorProto* root, std::ostream& out) {
   std::string module;
@@ -116,34 +157,24 @@ void JS(const FileDescriptorProto* root, std::ostream& out) {
     module = absl::GetFlag(FLAGS_js_module);
   }
 
-  out << R"JS(/**
- * @fileoverview Map a proto enum with custom options into JS
- * @public
- */
-/* eslint-disable */
-
-// GENERATED CODE -- DO NOT EDIT!
-
-goog.module(')JS" << module << R"JS(');
-
-exports = {
-)JS";
-
+  std::vector<std::string> lines;
   for (const auto &desc : root->enum_type()) {
-    out << "  " << desc.name() << ": {\n";
+    std::vector<std::string> bits;
     for (const auto &val : desc.value()) {
       auto url = val.options().GetExtension(api::target_url);
       if (url.empty()) continue;
-      out << "    " << val.name() << ": '" << url << "',\n";
+      bits.emplace_back(absl::StrCat(val.name(), ": '", url, "',"));
     }
-    out << "  },\n";
+    lines.emplace_back(absl::StrReplaceAll(kObj, {
+        {"<name>", desc.name()},
+        {"<bits>", absl::StrJoin(bits, "\n    ")},
+    }));
   }
 
-  out << R"JS(
-};
-
-// DONE
-)JS";
+  out << absl::StrReplaceAll(kJS, {
+      {"<module>", module},
+      {"<exports>", absl::StrJoin(lines, "\n")},
+  });
 }
 
 void JS(const FileDescriptorProto* root, const std::string& path) {
