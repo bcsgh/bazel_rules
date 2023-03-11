@@ -25,6 +25,7 @@ cc_library(
         ":deferred_response",
         ":digest_auth_fail_response",
         ":file_response",
+        ":http_arg_value",
         ":http_endpoint",
         ":http_request",
         ":http_utils",
@@ -108,6 +109,7 @@ cc_library(
     ],
     local_defines = ["HTTPSERVER_COMPILATION"],
     deps = [
+        ":http_arg_value",
         ":http_utils",
         ":file_info",
     ],
@@ -138,9 +140,20 @@ cc_library(
         "MHD_NO_DEPRECATION",  # ignore use of MHD_HTTP_UNORDERED_COLLECTION
     ],
     deps = [
+        ":http_arg_value",
         ":string_utilities",
         "@org_gnu_microhttpd//:microhttpd",
     ],
+)
+
+cc_library(
+    name = "http_arg_value",
+    hdrs = ["src/httpserver/http_arg_value.hpp"],
+    includes = [
+        "src",
+        "src/httpserver",
+    ],
+    local_defines = ["HTTPSERVER_COMPILATION"],
 )
 
 cc_library(
@@ -178,6 +191,7 @@ cc_library(
     ],
     local_defines = ["HTTPSERVER_COMPILATION"],
     deps = [
+        ":http_arg_value",
         ":http_endpoint",
         ":http_request",
         ":http_utils",
