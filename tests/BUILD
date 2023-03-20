@@ -30,6 +30,7 @@ load("//graphviz:graphviz.bzl", "gen_dot")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load(":build_test_test.bzl", "build_test_suite")
 load(":cc_embed_data_test.bzl", "cc_embed_data_suite")
+load(":css_js_test.bzl", "css_class_names_js_suite")
 load(":detex_test.bzl", "detex_suite")
 load(":gen_dot_test.bzl", "gen_dot_suite")
 load(":git_stamp_test.bzl", "git_stamp_suite")
@@ -93,6 +94,12 @@ build_test(
         "@com_github_etr_libhttpserver//:libhttpserver",
         "@org_gnu_microhttpd//:microhttpd",
     ],
+)
+
+######## css_js
+
+css_class_names_js_suite(
+    name = "css_js",
 )
 
 ######## latex

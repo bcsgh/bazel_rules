@@ -1,0 +1,9 @@
+.test_root {
+  position: relative;
+}
+
+div.test_float {
+  height: 100px;
+  width: 100px;
+  background-color: red;
+}
