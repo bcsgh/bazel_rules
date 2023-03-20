@@ -43,6 +43,7 @@
 ABSL_FLAG(std::string, json, "", "");
 ABSL_FLAG(std::string, out, "", "");
 ABSL_FLAG(std::string, module, "", "");
+ABSL_FLAG(std::string, prefix, "", "");
 
 constexpr auto kTemplate = R"JS(// Generated:
 
@@ -57,12 +58,19 @@ exports = {
 // DONE
 )JS";
 
-void JS(std::string mod, Json::Value root, std::ostream* out) {
+constexpr auto kDef = R"JS(const <name> = "<prefix><value>";)JS";
+
+void JS(const std::string &mod, const std::string& prefix,
+        Json::Value root, std::ostream* out) {
   std::vector<std::string> vals, maps;
 
   for (const auto &k : root.getMemberNames()) {
     const auto name = absl::AsciiStrToUpper(k);
-    vals.emplace_back(absl::StrCat("const ", name, " = \"", root[k].asString(), "\";"));
+    vals.emplace_back(absl::StrReplaceAll(kDef, {
+      {"<name>", name},
+      {"<prefix>", prefix},
+      {"<value>", root[k].asString()},
+    }));
     maps.emplace_back(absl::StrCat("  ", name, ","));
   }
 
@@ -73,14 +81,15 @@ void JS(std::string mod, Json::Value root, std::ostream* out) {
   });
 }
 
-void JS(std::string mod, const std::string& json, std::ostream* out) {
+void JS(const std::string &mod, const std::string& prefix,
+        const std::string& json, std::ostream* out) {
   Json::Value root;
   std::string err;
   LOG_IF(QFATAL, !absl::WrapUnique(Json::CharReaderBuilder().newCharReader())
       ->parse(json.c_str(), json.c_str() + json.size(), &root, &err))
     << err << "\n-----\n" << json;
 
-  JS(mod, root, out);
+  JS(mod, prefix, root, out);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -103,7 +112,7 @@ int main(int argc, char **argv) {
 
   LOG_IF(QFATAL, (absl::GetFlag(FLAGS_module) == "")) << "--module is requiered.";
 
-  JS(absl::GetFlag(FLAGS_module), json, &out);
+  JS(absl::GetFlag(FLAGS_module), absl::GetFlag(FLAGS_prefix), json, &out);
 
   return 0;
 }

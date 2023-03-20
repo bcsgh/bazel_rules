@@ -54,10 +54,34 @@ def css_class_names_js_suite(name):
         file2 = "css_js.gold.js",
     )
 
+    CSS_PREFIX = "test_prefix"
+
+    closure_css_binary(
+        name = "css_js_rename_bin",
+        deps = [":css_js_lib"],
+        defs = CSS_BINARY_MUNGE_DEFS + [
+            "--css-renaming-prefix=" + CSS_PREFIX,
+        ],
+    )
+
+    css_class_names_js(
+        name = "gen_css_js_rename",
+        css_binary = ":css_js_rename_bin",
+        module = "Test.Rename.Css",
+        prefix = CSS_PREFIX,
+    )
+
+    diff_test(
+        name = "css_js_rename_test",
+        file1 = "gen_css_js_rename.js",
+        file2 = "css_js_rename.gold.js",
+    )
+
     # Suit
     native.test_suite(
         name = name,
         tests = [
             ":css_js_test",
+            ":css_js_rename_test",
         ],
     )

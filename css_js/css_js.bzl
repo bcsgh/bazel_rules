@@ -45,13 +45,13 @@ load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_binary", "closure_
 def _gen_css_class_names_js_impl(ctx):
     out = ctx.actions.declare_file(ctx.outputs.out.basename)
 
-    print(ctx.attr.css_binary)
     css_binary = ctx.attr.css_binary[struct]
 
     args = ctx.actions.args()
     args.add("--json=%s" % css_binary.renaming_map.path)
     args.add("--out=%s" % out.path)
     args.add("--module=%s" % ctx.attr.module)
+    if ctx.attr.prefix: args.add("--prefix=%s" % ctx.attr.prefix)
 
     ctx.actions.run(
         inputs=[css_binary.renaming_map],
@@ -79,6 +79,9 @@ gen_css_class_names_js = rule(
             doc="The goog module name to provide.",
             mandatory=True,
         ),
+        "prefix": attr.string(
+            doc="The value (if any) of --css-renaming-prefix provided to the rule passed to css_binary.",
+        ),
         "_tool": attr.label(
             allow_single_file=True,
             default=":css_munge",
@@ -88,14 +91,13 @@ gen_css_class_names_js = rule(
 
 CSS_BINARY_MUNGE_DEFS = ["--output-renaming-map-format=JSON"]
 
-def css_class_names_js(name, css_binary, module):
+def css_class_names_js(name, **argv):
     gen = "_%s_jssrc" % name
 
     gen_css_class_names_js(
         name = gen,
-        css_binary = css_binary,
-        module = module,
         out = "%s.js" % name,
+        **argv,
     )
 
     closure_js_library(
