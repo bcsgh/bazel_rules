@@ -62,23 +62,40 @@ def _Fallback(out, alt):
         return alt
 
 def _cc_embed_data_impl(ctx):
+    if not ctx.attr.srcs and not ctx.attr.deps: fail("One of srcs or deps must be non-empty")
+    if ctx.attr.srcs and ctx.attr.deps: fail("Only one of srcs or deps must be non-empty")
+
     cc_toolchain = find_cpp_toolchain(ctx)
 
     # Construct a manifest to generate from.
     # This allows passing structured data from the ctx to the generator.
     def Munge(s):
-      is_output = not [f.is_source for f in s.files.to_list() if f.is_source]
-      name = "/".join([x for x in [s.label.package, s.label.name] if x])
-      path = ctx.expand_location("$(location %s)" % s.label, [s])
-      return struct(
+        name = "/".join([x for x in [s.owner.package, s.basename] if x])
+        return struct(
             name = name,
-            path = path,
-            src = name if is_output else path,
-            is_output = is_output,
+            path = s.path,
+            src = name if not s.is_source else s.path,
+            is_output = not s.is_source,
         )
 
+    def GetPath(target, path):
+        for b in path.split("."): target = getattr(target, b)
+        return target
+
     _json = ctx.actions.declare_file(_Fallback(ctx.outputs.json, ctx.label.name + "_emebed_data.json"))
-    ctx.actions.write(output=_json, content=json.encode([Munge(s) for s in ctx.attr.srcs]))
+
+    if ctx.files.srcs:
+        ctx.actions.write(output=_json, content=json.encode([
+            Munge(s)
+            for s in ctx.files.srcs
+        ]))
+
+    if ctx.attr.deps:
+        ctx.actions.write(output=_json, content=json.encode([
+            Munge(s)
+            for t, k in ctx.attr.deps.items()
+            for s in GetPath(t, k).to_list()
+        ]))
 
     cc = ctx.actions.declare_file(_Fallback(ctx.outputs.cc, ctx.label.name + "_emebed_data.cc"))
     h = ctx.actions.declare_file(_Fallback(ctx.outputs.h, ctx.label.name + "_emebed_data.h"))
@@ -111,6 +128,9 @@ def _cc_embed_data_impl(ctx):
 
     links = []
     for i, f in enumerate(ctx.files.srcs):
+        links += [f]
+        pack_args.add(f.path)
+    for i, f in enumerate(ctx.files.deps):
         links += [f]
         pack_args.add(f.path)
 
@@ -242,7 +262,7 @@ def _cc_embed_data_impl(ctx):
 
     ######################
     return [DefaultInfo(
-        runfiles=ctx.runfiles(files = ctx.files.srcs + ctx.files._make_emebed_data),
+        runfiles=ctx.runfiles(files = ctx.files.srcs + ctx.files.deps + ctx.files._make_emebed_data),
     ), cc_common.merge_cc_infos(
         cc_infos = [lib_info] + [dep[CcInfo] for dep in ctx.attr._cc_deps],
     )]
@@ -267,7 +287,12 @@ cc_embed_data = rule(
         "srcs": attr.label_list(
             doc="The files to embed.",
             allow_files=True,
-            allow_empty=False,
+        ),
+        "deps": attr.label_keyed_string_dict(
+            doc="""A map from build rules to embed to a path (e.g. "files") on
+            the Target object that yeilds a depset of files. (Figuring out what
+            this path should be more or less requiers mucking around with rule
+            implementations. Sorry.)""",
         ),
         "json": attr.output(),
         "_make_emebed_data": attr.label(
