@@ -63,7 +63,7 @@ def _Fallback(out, alt):
 
 def _cc_embed_data_impl(ctx):
     if not ctx.attr.srcs and not ctx.attr.deps: fail("One of srcs or deps must be non-empty")
-    if ctx.attr.srcs and ctx.attr.deps: fail("Only one of srcs or deps must be non-empty")
+    if ctx.attr.srcs and ctx.attr.deps: fail("Only one of srcs or deps may be non-empty")
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
@@ -126,13 +126,12 @@ def _cc_embed_data_impl(ctx):
     pack_args.add("-r")                 # Make relocatable output (don't resolve stuff).
     pack_args.add("--format=binary")    # Just read in the files.
 
-    links = []
-    for i, f in enumerate(ctx.files.srcs):
-        links += [f]
-        pack_args.add(f.path)
-    for i, f in enumerate(ctx.files.deps):
-        links += [f]
-        pack_args.add(f.path)
+    links = ctx.files.srcs + [
+        f
+        for t, k in ctx.attr.deps.items()
+        for f in GetPath(t, k).to_list()
+    ]
+    pack_args.add_all([f.path for f in links])
 
     ctx.actions.run(
         inputs=depset(links),
