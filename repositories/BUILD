@@ -42,5 +42,7 @@ test_suite(
     tests = [
         t.split("/")[0].replace("@", "")
         for t in MANUAL
+    ] + [
+        "@com_github_etr_libhttpserver//:all_tests",
     ],
 )

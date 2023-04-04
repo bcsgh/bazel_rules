@@ -198,3 +198,63 @@ cc_library(
         "@org_gnu_microhttpd//:microhttpd",
     ],
 )
+
+cc_library(
+    name = "littletest",
+    hdrs = ["test/littletest.hpp"],
+    includes = ["test"],
+)
+
+UNIT_TESTS = [
+    [f, "%s_unit_test" % f[f.rfind("/")+1:-9]]
+    for f in glob(["test/unit/*_test.cpp"])
+]
+
+[
+    cc_test(
+        name = f[1], #"%s_unit_test" % f[f.rfind("/")+1:-9],
+        srcs = [f[0]],
+        deps = [
+            ":libhttpserver",
+            ":littletest",
+        ],
+        copts = ["-fexceptions"],
+        local_defines = ["HTTPSERVER_COMPILATION"],
+    )
+    for f in UNIT_TESTS
+]
+
+INTEG_TESTS = [
+    [f, "%s_integ_test" % f[f.rfind("/")+1:-4]]
+    for f in glob(["test/integ/*.cpp"])
+]
+
+INTEG_TEST_PORT_START = 8081
+print("Starting integrations tests using ports %d thought %d" % (
+    INTEG_TEST_PORT_START,
+    INTEG_TEST_PORT_START + len(INTEG_TESTS) - 1,
+))
+
+[
+    cc_test(
+        name = f[1], #"%s_integ_test" % f[f.rfind("/")+1:-4],
+        srcs = [f[0]],
+        deps = [
+            ":libhttpserver",
+            ":littletest",
+            "@com_github_curl_curl//:curl",
+        ],
+        copts = ["-fexceptions"],
+        local_defines = [
+            "HTTPSERVER_COMPILATION",
+            "HTTPSERVER_NO_LOCAL_FS",
+            "HTTPSERVER_PORT=%d"  % (INTEG_TEST_PORT_START + p),
+        ],
+    )
+    for p,f in enumerate(INTEG_TESTS)
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [":%s" % f[1] for f in UNIT_TESTS + INTEG_TESTS],
+)
