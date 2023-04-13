@@ -25,10 +25,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# implementation from:
-# https://stackoverflow.com/a/7779766/1343
-# http://www.math.utah.edu/docs/info/ld_2.html
-# https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 load("//repositories:repositories.bzl", "load_skylib", "load_absl")
 
 def get_deps():

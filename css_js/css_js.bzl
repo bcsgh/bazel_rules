@@ -40,7 +40,7 @@ ability to get compile time checking of css class names.
 
 """
 
-load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_binary", "closure_js_library")
+load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library")
 
 def _gen_css_class_names_js_impl(ctx):
     out = ctx.actions.declare_file(ctx.outputs.out.basename)
