@@ -129,6 +129,29 @@ def cc_embed_data_suite(name):
         ],
     )
 
+    cc_embed_data(
+        name = "cc_embed_data_deps",
+        deps = {":cc_embed_data_example": "files"},
+        namespace = "test_ns",
+        cc = "cc_embed_data_deps_emebed_data.cc",
+        h = "cc_embed_data_deps_emebed_data.h",
+        a = "libcc_embed_data_deps.a",
+    )
+
+    build_test(
+        name = "cc_embed_data_deps_build_test",
+        targets = [":cc_embed_data_deps"],
+    )
+
+    native.cc_test(
+        name = "cc_embed_data_deps_live_test",
+        srcs = ["cc_embed_data_deps_test.cc"],
+        deps = [
+            ":cc_embed_data_deps",
+            "@com_google_googletest//:gtest_main",
+        ],
+    )
+
     # Suit
     native.test_suite(
         name = name,
@@ -138,6 +161,8 @@ def cc_embed_data_suite(name):
             ":cc_embed_data_short_build_test",
             ":cc_embed_data_short_live_test",
             ":cc_embed_data_contents_test",
+            ":cc_embed_data_deps_build_test",
+            ":cc_embed_data_deps_live_test",
         ] + [
             ":diff_%s_test" % e
             for e in EXT
