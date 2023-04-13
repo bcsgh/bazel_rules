@@ -199,6 +199,8 @@ cc_library(
     ],
 )
 
+#### TESTS:
+
 cc_library(
     name = "littletest",
     hdrs = ["test/littletest.hpp"],
@@ -212,8 +214,8 @@ UNIT_TESTS = [
 
 [
     cc_test(
-        name = f[1], #"%s_unit_test" % f[f.rfind("/")+1:-9],
-        srcs = [f[0]],
+        name = name,
+        srcs = [file],
         deps = [
             ":libhttpserver",
             ":littletest",
@@ -221,37 +223,44 @@ UNIT_TESTS = [
         copts = ["-fexceptions"],
         local_defines = ["HTTPSERVER_COMPILATION"],
     )
-    for f in UNIT_TESTS
-]
-
-INTEG_TESTS = [
-    [f, "%s_integ_test" % f[f.rfind("/")+1:-4]]
-    for f in glob(["test/integ/*.cpp"])
+    for file, name in UNIT_TESTS
 ]
 
 INTEG_TEST_PORT_START = 8081
-print("Starting integrations tests using ports %d thought %d" % (
-    INTEG_TEST_PORT_START,
-    INTEG_TEST_PORT_START + len(INTEG_TESTS) - 1,
-))
+
+INTEG_TESTS = [
+    [f, "%s_integ_test" % f[f.rfind("/")+1:-4], (INTEG_TEST_PORT_START + p)]
+    for p, f in enumerate(glob(["test/integ/*.cpp"]))
+]
+
+"""
+# If aonyone cares what ports are being assigned.
+print("Tests running on ports:\n" + "\n".join([
+  "port %d -> :%s" % (f[2], f[1])
+  for f in INTEG_TESTS
+]))
+"""
 
 [
     cc_test(
-        name = f[1], #"%s_integ_test" % f[f.rfind("/")+1:-4],
-        srcs = [f[0]],
+        name = name,
+        srcs = [file],
         deps = [
             ":libhttpserver",
             ":littletest",
             "@com_github_curl_curl//:curl",
         ],
+        data = glob(["test/test_content*"]),
         copts = ["-fexceptions"],
         local_defines = [
+            #"CASE_INSENSITIVE", # TODO
             "HTTPSERVER_COMPILATION",
             "HTTPSERVER_NO_LOCAL_FS",
-            "HTTPSERVER_PORT=%d"  % (INTEG_TEST_PORT_START + p),
+            "HTTPSERVER_PORT=%d"  % port,
+            "HTTPSERVER_DATA_ROOT=./test",
         ],
     )
-    for p,f in enumerate(INTEG_TESTS)
+    for file,name,port in INTEG_TESTS
 ]
 
 test_suite(
