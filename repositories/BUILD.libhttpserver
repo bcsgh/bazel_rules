@@ -250,7 +250,10 @@ print("Tests running on ports:\n" + "\n".join([
             ":littletest",
             "@com_github_curl_curl//:curl",
         ],
-        data = glob(["test/test_content*"]),
+        data = glob([
+            "test/test_content*",
+            "test/*.pem",
+        ]),
         copts = ["-fexceptions"],
         local_defines = [
             #"CASE_INSENSITIVE", # TODO
