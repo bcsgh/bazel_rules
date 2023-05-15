@@ -76,9 +76,9 @@ def libhttpserver(commit=None):
     new_git_repository(
         name = "com_github_etr_libhttpserver",
         build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
-        commit = commit or "8c21c4045c745b4d13b299269fef56d552be741d",  # current as of 2023/04/12
+        commit = commit or "fb58ec7a515f3c31fcf576bf49e6f65a8b67ab11",  # current as of 2023/05/14
         remote = "https://github.com/etr/libhttpserver.git",
-        shallow_since = "1681359603 -0700",
+        shallow_since = "1683783642 -0700",
     )
 
 #############################################
