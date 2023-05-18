@@ -32,13 +32,3 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
 )
-
-closure_js_library(
-    name = "gen_metadata_js",
-    srcs = [":gen_metadata.js"],
-)
-
-cc_library(
-    name = "gen_metadata_cc",
-    hdrs = [":gen_metadata.h"],
-)
