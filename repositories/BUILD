@@ -3,13 +3,13 @@ load("//build_test:build.bzl", "build_test")
 ALL = [
     "@com_github_curl_curl//:curl",
     "@com_github_enki_libev//:libev",
+    "@com_github_etr_libhttpserver//:libhttpserver",
     "@com_github_open_source_parsers_jsoncpp//:json",
     "@eigen//:eigen",
     "@zlib//:zlib",
 ]
 
 MANUAL = [
-    "@com_github_etr_libhttpserver//:libhttpserver",
     "@com_github_openssl_openssl//:openssl",           # >2m30s
     "@com_gitlab_gnutls//:gnutls",
     "@com_gitlab_libidn_libidn2//:libidn2",

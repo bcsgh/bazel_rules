@@ -220,8 +220,14 @@ UNIT_TESTS = [
             ":libhttpserver",
             ":littletest",
         ],
+        data = glob([
+            "test/test_content*",
+        ]),
         copts = ["-fexceptions"],
-        local_defines = ["HTTPSERVER_COMPILATION"],
+        local_defines = [
+            "HTTPSERVER_COMPILATION",
+            "HTTPSERVER_DATA_ROOT=./test",
+        ],
     )
     for file, name in UNIT_TESTS
 ]
@@ -239,7 +245,7 @@ print("Tests running on ports:\n" + "\n".join([
   "port %d -> :%s" % (f[2], f[1])
   for f in INTEG_TESTS
 ]))
-"""
+#"""
 
 [
     cc_test(
