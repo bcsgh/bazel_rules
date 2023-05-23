@@ -70,7 +70,12 @@ def _cc_embed_data_impl(ctx):
     # Construct a manifest to generate from.
     # This allows passing structured data from the ctx to the generator.
     def Munge(s):
-        name = "/".join([x for x in [s.owner.package, s.basename] if x])
+        name = s.path;
+        r = s.owner.workspace_root + "/"
+        if name[:len(r)] == r: name = name[len(r):]
+        r = s.root.path + "/"
+        if name[:len(r)] == r: name = name[len(r):]
+
         return struct(
             name = name,
             path = s.path,

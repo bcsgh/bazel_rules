@@ -90,6 +90,7 @@ def cc_embed_data_suite(name):
     SHORT_SRC = [
         "cc_embed_data_test.bzl",  # local static
         ":gen_detex.txt",          # local generated
+        ":testdata/nested.txt",    # dir inside a package
 
         # extern static
         "@bazel_skylib//:LICENSE",

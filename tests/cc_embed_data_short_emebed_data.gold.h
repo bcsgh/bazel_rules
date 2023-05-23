@@ -9,6 +9,9 @@ namespace test_ns {
 // bazel-out/k8-fastbuild/bin/tests/gen_detex.txt
 ::absl::string_view tests_gen_detex_txt();
 
+// tests/testdata/nested.txt
+::absl::string_view tests_testdata_nested_txt();
+
 // external/bazel_skylib/LICENSE
 ::absl::string_view LICENSE();
 
