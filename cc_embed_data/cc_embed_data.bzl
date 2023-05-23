@@ -90,17 +90,18 @@ def _cc_embed_data_impl(ctx):
     _json = ctx.actions.declare_file(_Fallback(ctx.outputs.json, ctx.label.name + "_emebed_data.json"))
 
     if ctx.files.srcs:
-        ctx.actions.write(output=_json, content=json.encode([
-            Munge(s)
-            for s in ctx.files.srcs
-        ]))
+        process = list(ctx.files.srcs)
 
     if ctx.attr.deps:
-        ctx.actions.write(output=_json, content=json.encode([
-            Munge(s)
+        process = [
+            s
             for t, k in ctx.attr.deps.items()
             for s in GetPath(t, k).to_list()
-        ]))
+        ]
+
+    ctx.actions.write(output=_json, content=json.encode([
+        Munge(s) for s in process
+    ]))
 
     cc = ctx.actions.declare_file(_Fallback(ctx.outputs.cc, ctx.label.name + "_emebed_data.cc"))
     h = ctx.actions.declare_file(_Fallback(ctx.outputs.h, ctx.label.name + "_emebed_data.h"))
@@ -131,15 +132,10 @@ def _cc_embed_data_impl(ctx):
     pack_args.add("-r")                 # Make relocatable output (don't resolve stuff).
     pack_args.add("--format=binary")    # Just read in the files.
 
-    links = ctx.files.srcs + [
-        f
-        for t, k in ctx.attr.deps.items()
-        for f in GetPath(t, k).to_list()
-    ]
-    pack_args.add_all([f.path for f in links])
+    pack_args.add_all([f.path for f in process])
 
     ctx.actions.run(
-        inputs=depset(links),
+        inputs=depset(process),
         outputs=[bin_o],
         executable=cc_toolchain.ld_executable,
         arguments=[pack_args],
