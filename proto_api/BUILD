@@ -1,6 +1,3 @@
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
-load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library")
-
 proto_library(
     name = "api_meta_proto",
     srcs = ["api_meta.proto"],
