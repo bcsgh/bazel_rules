@@ -2,6 +2,17 @@ workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libcurl", "libev", "libgnutls", "libhttpserver", "libidn2", "libnettle", "microhttpd", "openssl", "zlib")
+eigen()
+jsoncpp()
+libcurl()
+libev()
+libgnutls()
+libhttpserver()
+libidn2()
+libnettle()
+microhttpd()
+openssl()
+zlib()
 
 load("@bazel_rules//cc_embed_data:cc_embed_data_deps.bzl", cc_embed_data_deps = "get_deps")
 load("@bazel_rules//css_js:css_js_deps.bzl", css_js_deps = "get_deps")
@@ -88,24 +99,3 @@ git_repository(
 )
 
 #############################################
-eigen()
-
-jsoncpp()
-
-libcurl()
-
-libev()
-
-libgnutls()
-
-libhttpserver()
-
-libidn2()
-
-libnettle()
-
-microhttpd()
-
-openssl()
-
-zlib()

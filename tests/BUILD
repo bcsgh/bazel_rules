@@ -168,6 +168,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "zlib_ver_test",
+    srcs = ["zlib_ver_test.cc"],
+    deps = [
+        "@com_google_googletest//:gtest_main",
+        "@zlib//:zlib",
+    ],
+)
+
 ########
 
 build_test(
