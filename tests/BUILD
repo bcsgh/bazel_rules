@@ -50,9 +50,12 @@ test_suite(
     tests = [
         ":build_test_test",
         ":cc_embed_data_test",
+        ":com_github_enki_libev_ver_test",
+        ":com_github_open_source_parsers_jsoncpp_ver_test",
         ":detex_test",
         ":dictionary_gold_test",
         ":eigen_test",
+        ":eigen_ver_test",
         ":gen_dot_test",
         ":gen_latex_test",
         ":parser_test",
@@ -60,6 +63,7 @@ test_suite(
         ":ref_test",
         ":role_call_test",
         ":spell_test_test",
+        ":zlib_ver_test",
     ],
 )
 
@@ -169,11 +173,68 @@ cc_test(
 )
 
 cc_test(
+    name = "eigen_ver_test",
+    srcs = ["eigen_ver_test.cc"],
+    deps = [
+        "@com_google_googletest//:gtest_main",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_test(
+    name = "com_github_curl_curl_ver_test",
+    srcs = ["com_github_curl_curl_ver_test.cc"],
+    tags = ["manual"],
+    deps = [
+        "@com_github_curl_curl//:curl",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "zlib_ver_test",
     srcs = ["zlib_ver_test.cc"],
     deps = [
         "@com_google_googletest//:gtest_main",
         "@zlib//:zlib",
+    ],
+)
+
+cc_test(
+    name = "com_github_open_source_parsers_jsoncpp_ver_test",
+    srcs = ["com_github_open_source_parsers_jsoncpp_ver_test.cc"],
+    deps = [
+        "@com_github_open_source_parsers_jsoncpp//:json",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "se_liu_lysator_nettle_nettle_ver_test",
+    srcs = ["se_liu_lysator_nettle_nettle_ver_test.cc"],
+    tags = ["manual"],
+    deps = [
+        "@com_google_googletest//:gtest_main",
+        "@se_liu_lysator_nettle_nettle//:nettle",
+    ],
+)
+
+cc_test(
+    name = "com_github_enki_libev_ver_test",
+    srcs = ["com_github_enki_libev_ver_test.cc"],
+    deps = [
+        "@com_github_enki_libev//:libev",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "com_github_openssl_openssl_ver_test",
+    srcs = ["com_github_openssl_openssl_ver_test.cc"],
+    tags = ["manual"],
+    deps = [
+        "@com_github_openssl_openssl//:openssl",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
