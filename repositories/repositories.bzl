@@ -38,16 +38,21 @@ def libidn2(commit=None):
     )
 
 #############################################
-def zlib():
+def zlib(ver=None, sha256=None):
+    ver = ver or "1.2.11"
+    sha256 = sha256 or "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1"
+    DOMAINS = [
+        "https://mirror.bazel.build/zlib.net/zlib-%s.tar.gz",
+        "https://zlib.net/zlib-%s.tar.gz",
+    ]
+
     http_archive(
         name = "zlib",
         build_file = "@bazel_rules//repositories:BUILD.zlib",
-        sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
-        strip_prefix = "zlib-1.2.11",
-        urls = [
-            "https://mirror.bazel.build/zlib.net/zlib-1.2.11.tar.gz",
-            "https://zlib.net/zlib-1.2.11.tar.gz",
-        ],
+        canonical_id = ver,  # cache by default keys on sha256?
+        sha256 = sha256,
+        strip_prefix = "zlib-%s" % ver,
+        urls = [domain % ver for domain in DOMAINS],
     )
 
 #############################################
@@ -107,7 +112,9 @@ def libev(commit=None):
     )
 
 #############################################
-def microhttpd():
+def microhttpd(ver=None, sha256=None):
+    ver = ver or "0.9.71"
+    sha256 = sha256 or "e8f445e85faf727b89e9f9590daea4473ae00ead38b237cf1eda55172b89b182"
     DOMAINS = [
         # GNU mirrors
         "ftp.wayne.edu",
@@ -124,9 +131,10 @@ def microhttpd():
     http_archive(
         name = "org_gnu_microhttpd",
         build_file = "@bazel_rules//repositories:BUILD.microhttpd",
-        sha256 = "e8f445e85faf727b89e9f9590daea4473ae00ead38b237cf1eda55172b89b182",
-        strip_prefix = "libmicrohttpd-0.9.71",
-        urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-0.9.71.tar.gz" % domain for domain in DOMAINS],
+        canonical_id = ver,  # cache by default keys on sha256?
+        sha256 = sha256,
+        strip_prefix = "libmicrohttpd-%s" % ver,
+        urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-%s.tar.gz" % (domain, ver) for domain in DOMAINS],
     )
 
 #############################################
