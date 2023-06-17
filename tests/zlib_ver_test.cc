@@ -4,7 +4,7 @@
 namespace {
 
 TEST(ZLibTest, Version) {
-  EXPECT_STREQ("1.2.11", ZLIB_VERSION);
+  EXPECT_STREQ("1.2.13", ZLIB_VERSION);
 }
 
 }  // namespace

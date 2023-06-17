@@ -39,10 +39,11 @@ def libidn2(commit=None):
 
 #############################################
 def zlib(ver=None, sha256=None):
-    ver = ver or "1.2.11"
-    sha256 = sha256 or "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1"
+    ver = ver or "1.2.13"   # current as of 2022/10/12
+    sha256 = sha256 or "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"
     DOMAINS = [
         "https://mirror.bazel.build/zlib.net/zlib-%s.tar.gz",
+        "https://github.com/madler/zlib/archive/refs/tags/v%s.tar.gz",
         "https://zlib.net/zlib-%s.tar.gz",
     ]
 
