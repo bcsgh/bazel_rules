@@ -15,14 +15,6 @@ filegroup(
 
 configure_make(
     name = "libidn2",
-    autogen = True,
-    autogen_command = "bootstrap",
-    autogen_options = [
-        "--no-git",
-        "--gnulib-srcdir=gnulib",
-        "--skip-po",
-        "--no-bootstrap-sync",
-    ],
     env = {
         "CFLAGS": "-Wno-error",
     },

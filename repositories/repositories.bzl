@@ -41,14 +41,21 @@ def libcurl(commit=None):
     )
 
 #############################################
-def libidn2(commit=None):
-    new_git_repository(
+def libidn2(ver=None, sha256=None):
+    ver = ver or "2.3.4"   # current as of 2022/10/23
+    sha256 = sha256 or "93caba72b4e051d1f8d4f5a076ab63c99b77faee019b72b9783b267986dbb45f"
+
+    # See also: https://gitlab.com/libidn/libidn2
+    http_archive(
         name = "com_gitlab_libidn_libidn2",
-        commit = commit or "9ab0a0d651c692aee964b8d5dbed89a56669742b",  # current as of 2022/10/25
-        remote = "https://gitlab.com/libidn/libidn2.git",
-        recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.libidn2",
-        shallow_since = "1666599166 +0200",
+        canonical_id = ver,  # cache by default keys on sha256?
+        sha256 = sha256,
+        strip_prefix = "libidn2-%s" % ver,
+        urls = [
+            "https://%s/pub/gnu/libidn/libidn2-%s.tar.gz" % (domain, ver)
+            for domain in GNU_DOMAINS
+        ],
     )
 
 #############################################

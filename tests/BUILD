@@ -52,6 +52,7 @@ test_suite(
         ":cc_embed_data_test",
         ":com_github_enki_libev_ver_test",
         ":com_github_open_source_parsers_jsoncpp_ver_test",
+        ":com_gitlab_libidn_libidn2_ver_test",
         ":detex_test",
         ":dictionary_gold_test",
         ":eigen_test",
@@ -187,6 +188,15 @@ cc_test(
     tags = ["manual"],
     deps = [
         "@com_github_curl_curl//:curl",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "com_gitlab_libidn_libidn2_ver_test",
+    srcs = ["com_gitlab_libidn_libidn2_ver_test.cc"],
+    deps = [
+        "@com_gitlab_libidn_libidn2//:libidn2",
         "@com_google_googletest//:gtest_main",
     ],
 )
