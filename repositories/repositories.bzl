@@ -121,10 +121,12 @@ def microhttpd(ver=None, sha256=None):
         "ftp.wayne.edu",
         "mirrors.tripadvisor.com",
         "mirrors.kernel.org",
-        "mirror.clarkson.edu",
-        "mirrors.syringanetworks.net",
         "mirror.us-midwest-1.nexcess.net",
         "mirrors.ocf.berkeley.edu",
+        "mirror.downloadvn.com",
+        "mirror.koddos.net",
+        "ftp.fau.de",
+        "mirror.csclub.uwaterloo.ca",
         # primary
         "ftp.gnu.org",
     ]
