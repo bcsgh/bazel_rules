@@ -6,6 +6,20 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
+GNU_DOMAINS = [
+    # GNU mirrors
+    "ftp.wayne.edu",
+    "mirrors.tripadvisor.com",
+    "mirrors.kernel.org",
+    "mirror.us-midwest-1.nexcess.net",
+    "mirrors.ocf.berkeley.edu",
+    "mirror.downloadvn.com",
+    "mirror.koddos.net",
+    "ftp.fau.de",
+    "mirror.csclub.uwaterloo.ca",
+    # primary
+    "ftp.gnu.org",
+]
 #############################################
 def eigen(commit=None):
     new_git_repository(
@@ -116,20 +130,6 @@ def libev(commit=None):
 def microhttpd(ver=None, sha256=None):
     ver = ver or "0.9.71"
     sha256 = sha256 or "e8f445e85faf727b89e9f9590daea4473ae00ead38b237cf1eda55172b89b182"
-    DOMAINS = [
-        # GNU mirrors
-        "ftp.wayne.edu",
-        "mirrors.tripadvisor.com",
-        "mirrors.kernel.org",
-        "mirror.us-midwest-1.nexcess.net",
-        "mirrors.ocf.berkeley.edu",
-        "mirror.downloadvn.com",
-        "mirror.koddos.net",
-        "ftp.fau.de",
-        "mirror.csclub.uwaterloo.ca",
-        # primary
-        "ftp.gnu.org",
-    ]
 
     http_archive(
         name = "org_gnu_microhttpd",
@@ -137,7 +137,10 @@ def microhttpd(ver=None, sha256=None):
         canonical_id = ver,  # cache by default keys on sha256?
         sha256 = sha256,
         strip_prefix = "libmicrohttpd-%s" % ver,
-        urls = ["https://%s/gnu/libmicrohttpd/libmicrohttpd-%s.tar.gz" % (domain, ver) for domain in DOMAINS],
+        urls = [
+            "https://%s/gnu/libmicrohttpd/libmicrohttpd-%s.tar.gz" % (domain, ver)
+            for domain in GNU_DOMAINS
+        ],
     )
 
 #############################################
