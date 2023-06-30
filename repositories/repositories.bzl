@@ -59,6 +59,23 @@ def libidn2(ver=None, sha256=None):
     )
 
 #############################################
+def libp11(ver=None, sha256=None):
+    ver = ver or "0.24.1"   # current as of 2022/01/17
+    sha256 = sha256 or "d8be783efd5cd4ae534cee4132338e3f40f182c3205d23b200094ec85faaaef8"
+
+    # See also: https://p11-glue.github.io/p11-glue//p11-kit.html
+    http_archive(
+        name = "com_github_p11glue_p11kit",
+        build_file = "@bazel_rules//repositories:BUILD.p11kit",
+        canonical_id = ver,  # cache by default keys on sha256?
+        sha256 = sha256,
+        strip_prefix = "p11-kit-%s" % ver,
+        urls = [
+            "https://github.com/p11-glue/p11-kit/releases/download/%s/p11-kit-%s.tar.xz" % (ver, ver)
+        ],
+    )
+
+#############################################
 def zlib(ver=None, sha256=None):
     ver = ver or "1.2.13"   # current as of 2022/10/12
     sha256 = sha256 or "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"

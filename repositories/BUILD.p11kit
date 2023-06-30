@@ -1,0 +1,23 @@
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+
+filegroup(
+    name = "lib_source",
+    srcs = glob(["**"]),
+)
+
+configure_make(
+    name = "libp11kit",
+    env = {
+        "CFLAGS": "-Wno-error -Wno-deprecated",
+    },
+    configure_in_place = True,
+    configure_options = [
+        #"--help",
+        "--without-bash-completion",
+        "--disable-doc",
+    ],
+    includes = ["p11-kit-1"],
+    lib_source = ":lib_source",
+    out_shared_libs = ["libp11-kit.so"],
+    visibility = ["//visibility:public"],
+)
