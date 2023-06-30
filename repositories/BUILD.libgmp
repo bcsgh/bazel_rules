@@ -1,0 +1,38 @@
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+
+filegroup(
+    name = "lib_source",
+    srcs = glob(["**"]),
+)
+
+LIB_DIR = "all_libs"
+LIBS = [
+    ".libs/libgmp.a",
+    "./mpf/.libs/libmpf.a",
+    "./mpn/.libs/libmpn.a",
+    "./mpq/.libs/libmpq.a",
+    "./mpz/.libs/libmpz.a",
+
+    "./printf/.libs/libprintf.a",
+    "./rand/.libs/librandom.a",
+    "./scanf/.libs/libscanf.a",
+]
+
+configure_make(
+    name = "gmplib",
+    env = {
+        "CC": "$(CC)",
+        "CFLAGS": "-Wno-error",
+    },
+    configure_in_place = True,
+    lib_source = "@org_gmplib_gmp//:lib_source",
+    out_lib_dir = LIB_DIR,
+    out_static_libs = [l.split("/")[-1] for l in LIBS],
+    postfix_script = "\n".join([
+        "mkdir -p $INSTALLDIR/%s" % LIB_DIR
+    ] + [
+        "cp %s $INSTALLDIR/%s/" % (l , LIB_DIR)
+        for l in LIBS
+    ]),
+    visibility = ["//visibility:public"],
+)

@@ -92,6 +92,26 @@ def libp11(ver=None, sha256=None):
         ],
     )
 
+def libgmp(ver=None, sha256=None):
+    ver = ver or "6.2.1"   # current as of 2020/11/14
+    sha256 = sha256 or "eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c"
+
+    # See also: https://gmplib.org/devel/repo-usage
+    http_archive(
+        name = "org_gmplib_gmp",
+        build_file = "@bazel_rules//repositories:BUILD.libgmp",
+        canonical_id = ver,  # cache by default keys on sha256?
+        sha256 = sha256,
+        strip_prefix = "gmp-%s" % ver,
+        urls = [
+            "https://%s/gnu/gmp/gmp-%s.tar.bz2" % (domain, ver)
+            for domain in GNU_DOMAINS + ["gmplib.org"]
+        ] + [
+            "https://%s/download/gmp/gmp-%s.tar.bz2" % (domain, ver)
+            for domain in ["gmplib.org"]
+        ],
+    )
+
 #############################################
 def zlib(ver=None, sha256=None):
     ver = ver or "1.2.13"   # current as of 2022/10/12

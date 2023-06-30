@@ -80,6 +80,7 @@ test_suite(
         ":com_gitlab_gnutls_libtasn1_ver_test",
         ":com_gitlab_libidn_libidn2_ver_test",
         ":eigen_ver_test",
+        ":org_gmplib_gmp_ver_test",
         ":se_liu_lysator_nettle_nettle_ver_test",
         ":zlib_ver_test",
     ],
@@ -283,6 +284,14 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "org_gmplib_gmp_ver_test",
+    srcs = ["org_gmplib_gmp_ver_test.cc"],
+    deps = [
+        "@com_google_googletest//:gtest_main",
+        "@org_gmplib_gmp//:gmplib",
+    ],
+)
 ########
 
 build_test(
