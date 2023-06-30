@@ -68,6 +68,21 @@ test_suite(
     ],
 )
 
+test_suite(
+    name = "ver_tests",
+    tags = ["manual"],
+    tests = [
+        ":com_github_curl_curl_ver_test",
+        ":com_github_enki_libev_ver_test",
+        ":com_github_open_source_parsers_jsoncpp_ver_test",
+        ":com_github_openssl_openssl_ver_test",
+        ":com_gitlab_libidn_libidn2_ver_test",
+        ":eigen_ver_test",
+        ":se_liu_lysator_nettle_nettle_ver_test",
+        ":zlib_ver_test",
+    ],
+)
+
 ######## build_test
 build_test_suite(
     name = "build_test_test",
