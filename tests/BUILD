@@ -77,6 +77,7 @@ test_suite(
         ":com_github_open_source_parsers_jsoncpp_ver_test",
         ":com_github_openssl_openssl_ver_test",
         ":com_github_p11glue_p11kit_ver_test",
+        ":com_gitlab_gnutls_libtasn1_ver_test",
         ":com_gitlab_libidn_libidn2_ver_test",
         ":eigen_ver_test",
         ":se_liu_lysator_nettle_nettle_ver_test",
@@ -260,6 +261,15 @@ cc_test(
     tags = ["manual"],
     deps = [
         "@com_github_openssl_openssl//:openssl",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "com_gitlab_gnutls_libtasn1_ver_test",
+    srcs = ["com_gitlab_gnutls_libtasn1_ver_test.cc"],
+    deps = [
+        "@com_gitlab_gnutls_libtasn1//:libtasn1",
         "@com_google_googletest//:gtest_main",
     ],
 )

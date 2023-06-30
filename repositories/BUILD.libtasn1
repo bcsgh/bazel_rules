@@ -1,0 +1,21 @@
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+
+filegroup(
+    name = "lib_source",
+    srcs = glob(["**"]),
+)
+
+configure_make(
+    name = "libtasn1",
+    env = {
+        "CFLAGS": "-Wno-error -fPIC",
+    },
+    configure_in_place = True,
+    configure_options = [
+        #"--help",
+        "--disable-doc",
+        "--enable-shared=no",
+    ],
+    lib_source = ":lib_source",
+    visibility = ["//visibility:public"],
+)

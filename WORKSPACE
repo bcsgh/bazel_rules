@@ -1,9 +1,10 @@
 workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libcurl", "libev", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
+load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
 eigen()
 jsoncpp()
+libasn1()
 libcurl()
 libev()
 libgnutls()

@@ -59,6 +59,23 @@ def libidn2(ver=None, sha256=None):
     )
 
 #############################################
+def libasn1(ver=None, sha256=None):
+    ver = ver or "4.19.0"   # current as of 2022/08/23
+    sha256 = sha256 or "1613f0ac1cf484d6ec0ce3b8c06d56263cc7242f1c23b30d82d23de345a63f7a"
+
+    # See also: https://gitlab.com/gnutls/libtasn1/
+    http_archive(
+        name = "com_gitlab_gnutls_libtasn1",
+        build_file = "@bazel_rules//repositories:BUILD.libtasn1",
+        canonical_id = ver,  # cache by default keys on sha256?
+        sha256 = sha256,
+        strip_prefix = "libtasn1-%s" % ver,
+        urls = [
+            "https://%s/gnu/libtasn1/libtasn1-%s.tar.gz" % (domain, ver)
+            for domain in GNU_DOMAINS
+        ],
+    )
+
 def libp11(ver=None, sha256=None):
     ver = ver or "0.24.1"   # current as of 2022/01/17
     sha256 = sha256 or "d8be783efd5cd4ae534cee4132338e3f40f182c3205d23b200094ec85faaaef8"
