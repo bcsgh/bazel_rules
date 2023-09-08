@@ -21,11 +21,13 @@ genrule(
         "dist/json/json-forwards.h",
         "dist/json/json.h",
         "dist/jsoncpp.cpp",
+        "amalgamate.log",
     ],
     cmd = (
         "$(location :amalgamate_tool)" +
         " --top-dir=$$(dirname $(location :LICENSE))" +
-        " --source=$(RULEDIR)/dist/jsoncpp.cpp"
+        " --source=$(RULEDIR)/dist/jsoncpp.cpp" +
+        " >$(RULEDIR)/amalgamate.log"
     ),
     tools = [":amalgamate_tool"],
 )
