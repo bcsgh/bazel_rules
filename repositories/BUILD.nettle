@@ -12,7 +12,7 @@
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 
 filegroup(
-    name = "all",
+    name = "lib_source",
     srcs = glob(["**"]),
 )
 
@@ -20,14 +20,16 @@ configure_make(
     name = "nettle",
     autogen = True,
     autogen_command = ".bootstrap",
-    env = {"CFLAGS": "-Wno-error"},
+    env = {
+        "CFLAGS": "-Wno-error",
+    },
     configure_in_place = True,
     configure_options = [
         #"--help",
         "--disable-doc",
         "--disable-shared",
     ],
-    lib_source = "@se_liu_lysator_nettle_nettle//:all",
+    lib_source = ":lib_source",
     out_static_libs = ["libnettle.a"],
     visibility = ["//visibility:public"],
 )

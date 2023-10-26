@@ -12,7 +12,7 @@
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 
 filegroup(
-    name = "all",
+    name = "lib_source",
     srcs = glob(
         ["**"],
         exclude = [
@@ -47,7 +47,7 @@ configure_make(
         "--with-included-unistring",
         "--enable-shared=no",
     ],
-    lib_source = "@com_gitlab_gnutls//:all",
+    lib_source = ":lib_source",
     out_static_libs = ["gnutls.a"],
     ###
     postfix_script = "\n".join([
@@ -57,9 +57,9 @@ configure_make(
         "(cd ar_merge_tmp ; for f in ../lib/*/.libs/*.a ; do ar -x $f ; done )",
         "ar -csr $INSTALLDIR/lib/gnutls.a ar_merge_tmp/*.o",
     ]),
-    visibility = ["//visibility:public"],
     deps = [
         "@com_github_enki_libev//:libev",
         "@se_liu_lysator_nettle_nettle//:nettle",
     ],
+    visibility = ["//visibility:public"],
 )
