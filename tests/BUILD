@@ -171,12 +171,6 @@ proto_api_suite(
 
 ######## repositories
 
-cc_library(
-    name = "eigen_static_test",
-    srcs = ["eigen_static_test.cc"],
-    visibility = ["@eigen//:eigen_visibility"],
-)
-
 build_test(
     name = "eigen_test",
     targets = [

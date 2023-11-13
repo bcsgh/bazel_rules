@@ -2,16 +2,21 @@
 
 cc_library(
     name = "eigen",
-    srcs = [
-    ],
     hdrs = glob([
         "Eigen/*",
         "Eigen/**/*.h",
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "@bazel_rules//tests:eigen_static_test",
+        ":eigen_static_version_assert",
     ]
+)
+
+cc_library(
+    name = "eigen_static_version_assert",
+    srcs = [
+        "@bazel_rules//repositories:eigen_static_version_assert.cc",
+    ],
 )
 
 package_group(

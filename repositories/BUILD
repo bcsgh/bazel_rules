@@ -1,5 +1,9 @@
 load("//build_test:build.bzl", "build_test")
 
+exports_files([
+    "eigen_static_version_assert.cc",
+])
+
 ALL = [
     "@com_github_curl_curl//:curl",
     "@com_github_enki_libev//:libev",
