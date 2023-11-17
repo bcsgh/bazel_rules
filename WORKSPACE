@@ -32,7 +32,7 @@ ref_test_deps()
 role_call_test_deps()
 proto_api_deps()
 
-git_repository(
+git_repository(  # TODO: stuck here. Updateing seems to break something.
     name = "rules_foreign_cc",
     commit = "c923238c6dc5a35c233a4acca28d90a0b1816836",  # current as of 2022/10/27
     remote = "https://github.com/bazelbuild/rules_foreign_cc.git",
@@ -88,17 +88,17 @@ rules_closure_toolchains()
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25
+    commit = "b10fad38c4026a29ea6561ab15fc4818170d1c10",  # current as of 2023/11/12
     remote = "https://github.com/google/googletest.git",
-    shallow_since = "1666712359 -0700",
+    shallow_since = "1698701593 -0700",
 )
 
 #############################################
 git_repository(
     name = "com_googlesource_code_re2",
-    commit = "7a65faf439295e941baa6640a717d89c1f13e9cd",  # current as of 2022/10/27
+    commit = "974f44c8d45242e710dc0a85a4defffdb3ce07fc",  # current as of 2023/11/12
     remote = "https://github.com/google/re2.git",
-    shallow_since = "1666860568 +0000",
+    shallow_since = "1699394483 +0000",
 )
 
 #############################################

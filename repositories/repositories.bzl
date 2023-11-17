@@ -22,7 +22,7 @@ GNU_DOMAINS = [
 ]
 #############################################
 def eigen(commit=None):
-    new_git_repository(
+    git_repository(  # TODO: stuck here. Updateing seems to break something.
         name = "eigen",
         commit = commit or "c5b896c5a3eb35ed0c08a9be5e6f10cc0a465b81",  # current as of 2022/10/27
         remote = "https://gitlab.com/libeigen/eigen.git",
@@ -31,10 +31,10 @@ def eigen(commit=None):
     )
 
 #############################################
-def libcurl(commit=None):
-    new_git_repository(
+def libcurl(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
+    git_repository(
         name = "com_github_curl_curl",
-        commit = commit or "a3063fe0147e00381d149e1d3a3c57c63343e7fc",  # current as of 2022/10/27
+        commit = commit or "a3063fe0147e00381d149e1d3a3c57c63343e7fc",  # current as of 2023/11/16
         remote = "https://github.com/curl/curl.git",
         build_file = "@bazel_rules//repositories:BUILD.libcurl",
         shallow_since = "1666906547 +0200",
@@ -135,42 +135,42 @@ def zlib(ver=None, sha256=None):
 def jsoncpp(commit=None):
     new_git_repository(
         name = "com_github_open_source_parsers_jsoncpp",
-        commit = commit or "8190e061bc2d95da37479a638aa2c9e483e58ec6",  # current as of 2022/10/25
+        commit = commit or "69098a18b9af0c47549d9a271c054d13ca92b006",  # current as of 2023/11/12
         remote = "https://github.com/open-source-parsers/jsoncpp.git",
         build_file = "@bazel_rules//repositories:BUILD.jsoncpp",
-        shallow_since = "1657835857 -0400",
+        shallow_since = "1687876958 -0400",
     )
 
 #############################################
 def libgnutls(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
     new_git_repository(
         name = "com_gitlab_gnutls",
-        commit = commit or "18cf560c5518771f3d909a2a32c2c84d8cff1d9a",  # current as of 2021/12/17
+        commit = commit or "f2fbef2c50952270eeeadebfacbf718da845fadc",  # current as of 2023/11/12
         remote = "https://gitlab.com/gnutls/gnutls.git",
         recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.gnutls",
-        shallow_since = "1639757659 +0000",
+        shallow_since = "1699278575 +0000",
     )
 
 #############################################
 def libhttpserver(commit=None):
-    new_git_repository(
+    git_repository(
         name = "com_github_etr_libhttpserver",
         build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
-        commit = commit or "fb58ec7a515f3c31fcf576bf49e6f65a8b67ab11",  # current as of 2023/05/14
+        commit = commit or "d249ba682441dbb979146482aff01a7073ed165a",  # current as of 2023/11/12
         remote = "https://github.com/etr/libhttpserver.git",
-        shallow_since = "1683783642 -0700",
+        shallow_since = "1688166248 -0700",
     )
 
 #############################################
 def libnettle(commit=None):
-    new_git_repository(
+    git_repository(
         name = "se_liu_lysator_nettle_nettle",
-        commit = commit or "a19abef9c8cdaece67a418e35a23663925ef6b03",  # current as of 2022/10/25
+        commit = commit or "9b1ad3e554f1dda3b65d017b1f79debddff8e712",  # current as of 2023/11/12
         remote = "https://git.lysator.liu.se/nettle/nettle.git",
         recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.nettle",
-        shallow_since = "1666292871 +0000",
+        shallow_since = "1699793977 +0100",
     )
 
 #############################################
@@ -205,10 +205,10 @@ def microhttpd(ver=None, sha256=None):
     )
 
 #############################################
-def openssl(commit=None):
-    new_git_repository(
+def openssl(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
+    git_repository(
         name = "com_github_openssl_openssl",
-        commit = commit or "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2022/10/27
+        commit = commit or "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2023/11/16
         remote = "https://github.com/openssl/openssl.git",
         #recursive_init_submodules = True,
         build_file = "@bazel_rules//repositories:BUILD.openssl",
@@ -220,9 +220,9 @@ def load_skylib(commit=None):
     maybe(
         git_repository,
         name = "bazel_skylib",
-        commit = commit or "5bfcb1a684550626ce138fe0fe8f5f702b3764c3",  # current as of 2023/01/02
+        commit = commit or "9c9beee7411744869300f67a98d42f5081e62ab3",  # current as of 2023/11/12
         remote = "https://github.com/bazelbuild/bazel-skylib.git",
-        shallow_since = "1668623372 +0100",
+        shallow_since = "1699201005 -0500",
     )
 
 #############################################
@@ -230,7 +230,7 @@ def load_absl(commit=None):
     maybe(
         git_repository,
         name = "com_google_absl",
-        commit = commit or "827940038258b35a29279d8c65b4b4ca0a676f8d",  # current as of 2022/10/27
+        commit = commit or "483a2d59e649179ea9d9bc4d808f6c9d16646f9d",  # current as of 2023/11/12
         remote = "https://github.com/abseil/abseil-cpp.git",
-        shallow_since = "1666903548 -0700",
+        shallow_since = "1699496241 -0800",
     )
