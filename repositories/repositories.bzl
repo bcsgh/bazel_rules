@@ -234,3 +234,13 @@ def load_absl(commit=None):
         remote = "https://github.com/abseil/abseil-cpp.git",
         shallow_since = "1699496241 -0800",
     )
+
+#############################################
+def load_rules_cc(commit=None):
+    maybe(
+        git_repository,
+        name = "rules_cc",
+        commit = commit or "2f8c04c04462ab83c545ab14c0da68c3b4c96191",  # current as of 2022/06/22
+        remote = "https://github.com/bazelbuild/rules_cc.git",
+        shallow_since = "1655902949 -0700",
+    )
