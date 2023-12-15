@@ -19,7 +19,7 @@ zlib()
 
 load("@bazel_rules//cc_embed_data:cc_embed_data_deps.bzl", cc_embed_data_deps = "get_deps")
 load("@bazel_rules//css_js:css_js_deps.bzl", css_js_deps = "get_deps")
-load("@bazel_rules//tests:fail_test.bzl", fail_test_deps = "get_deps")
+load("@bazel_rules//fail_test:fail_test.bzl", fail_test_deps = "get_deps")
 load("@bazel_rules//latex:git_stamp_deps.bzl", git_stamp_deps = "get_deps")
 load("@bazel_rules//latex:ref_test.bzl", ref_test_deps = "get_deps")
 load("@bazel_rules//latex:role_call_test.bzl", role_call_test_deps = "get_deps")
