@@ -41,10 +41,6 @@ load(":role_call_test_test.bzl", "role_call_test_suite")
 load(":spell_test_test.bzl", "spell_test_suite")
 load(":tex_to_pdf_test.bzl", "tex_to_pdf_suite")
 
-exports_files([
-    "fail_test.py",
-])
-
 test_suite(
     name = "ci",
     tests = [

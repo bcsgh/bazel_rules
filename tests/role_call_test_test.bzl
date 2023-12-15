@@ -27,8 +27,8 @@
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("//fail_test:fail_test.bzl", "fail_test")
 load("//latex:role_call_test.bzl", "role_call_test")
-load(":fail_test.bzl", "fail_test")
 
 ##### SUCCESS case
 

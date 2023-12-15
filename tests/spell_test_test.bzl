@@ -27,8 +27,8 @@
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("//fail_test:fail_test.bzl", "fail_test")
 load("//text:spelling.bzl", "spell_test")
-load(":fail_test.bzl", "fail_test")
 
 ##### SUCCESS case
 
