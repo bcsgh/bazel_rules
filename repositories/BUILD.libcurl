@@ -9,7 +9,7 @@
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 
 filegroup(
-    name = "all",
+    name = "lib_source",
     srcs = glob(["**"]),
 )
 
@@ -42,7 +42,7 @@ configure_make(
         "--enable-gopher",
         "--enable-mqtt",
     ],
-    lib_source = "@com_github_curl_curl//:all",
+    lib_source = "@com_github_curl_curl//:lib_source",
     targets = [
         "",
         "install",

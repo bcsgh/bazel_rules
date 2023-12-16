@@ -12,7 +12,7 @@
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 
 filegroup(
-    name = "all",
+    name = "lib_source",
     srcs = glob(["**"]),
 )
 
@@ -27,7 +27,7 @@ configure_make(
         #"--help",
         "--enable-shared=no",
     ],
-    lib_source = "@com_github_enki_libev//:all",
+    lib_source = "@com_github_enki_libev//:lib_source",
     targets = [
         "",
         "install",

@@ -9,7 +9,7 @@
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 
 filegroup(
-    name = "all",
+    name = "lib_source",
     srcs = glob(["**"]),
 )
 
@@ -24,6 +24,6 @@ configure_make(
         "--disable-doc",
         "--enable-shared=no",
     ],
-    lib_source = "@com_gitlab_libidn_libidn2//:all",
+    lib_source = "@com_gitlab_libidn_libidn2//:lib_source",
     visibility = ["//visibility:public"],
 )

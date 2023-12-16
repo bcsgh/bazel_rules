@@ -8,7 +8,7 @@
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 
 filegroup(
-    name = "all",
+    name = "lib_source",
     srcs = glob(["**"]),
 )
 
@@ -26,7 +26,7 @@ configure_make(
         "--enable-shared=no",
     ],
     defines = ["HAVE_GNUTLS"],
-    lib_source = "@org_gnu_microhttpd//:all",
+    lib_source = "@org_gnu_microhttpd//:lib_source",
     out_static_libs = ["libmicrohttpd.a"],
     visibility = ["//visibility:public"],
 )
