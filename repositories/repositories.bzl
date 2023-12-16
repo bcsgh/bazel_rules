@@ -6,6 +6,19 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
+OOL_BUILD = """
+load("{BZL}", "BUILD")
+BUILD()
+"""
+
+def BUILD(name):
+    """
+    Any change to git_repository.build_file forces a refetch of the git repo.
+    By moving the body of the build into a .bzl file this can be avoided.
+    """
+    return OOL_BUILD.format(BZL=Label(":%s.bzl" % name))
+
+
 GNU_DOMAINS = [
     # GNU mirrors
     "ftp.wayne.edu",
@@ -148,7 +161,7 @@ def libgnutls(commit=None):  # WARNING: stuck here. Updateing seems to break too
         commit = commit or "f2fbef2c50952270eeeadebfacbf718da845fadc",  # current as of 2023/11/12
         remote = "https://gitlab.com/gnutls/gnutls.git",
         recursive_init_submodules = True,
-        build_file = "@bazel_rules//repositories:BUILD.gnutls",
+        build_file_content = BUILD("gnutls"),
         shallow_since = "1699278575 +0000",
     )
 
@@ -169,7 +182,7 @@ def libnettle(commit=None):
         commit = commit or "9b1ad3e554f1dda3b65d017b1f79debddff8e712",  # current as of 2023/11/12
         remote = "https://git.lysator.liu.se/nettle/nettle.git",
         recursive_init_submodules = True,
-        build_file = "@bazel_rules//repositories:BUILD.nettle",
+        build_file_content = BUILD("nettle"),
         shallow_since = "1699793977 +0100",
     )
 
@@ -211,7 +224,7 @@ def openssl(commit=None):  # WARNING: stuck here. Updateing seems to break too m
         commit = commit or "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2023/11/16
         remote = "https://github.com/openssl/openssl.git",
         #recursive_init_submodules = True,
-        build_file = "@bazel_rules//repositories:BUILD.openssl",
+        build_file_content = BUILD("openssl"),
         shallow_since = "1666888769 +0200",
     )
 

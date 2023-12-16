@@ -1,0 +1,50 @@
+# Building this may need one or more of the following:
+# sudo apt install \
+#   gperf \
+#   autogen \
+#   pkg-config \
+#   autotools-dev \
+#   autoconf \
+#   libtool \
+#   autopoint \
+#   libpthread-stubs0-dev
+
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+
+def BUILD():
+    native.filegroup(
+        name = "lib_source",
+        srcs = native.glob(["**"]),
+    )
+
+    configure_make(
+        name = "openssl",
+        configure_command = "Configure",
+        env = {
+            "CFLAGS": " ".join([
+                "-ldl",
+            ]),
+            "LIBS": "-ldl",  # Seem to need this for some reason?
+        },
+        configure_options = [
+            #"--help",
+            "no-shared",
+        ],
+        lib_source = "@com_github_openssl_openssl//:lib_source",
+        linkopts = ["-ldl"],
+        targets = ["", "install_sw", "install_ssldirs"],
+        postfix_script = "\n".join([
+            "echo PWD=$PWD",
+            "echo INSTALLDIR=$INSTALLDIR",
+            "find . -name '*.a'",
+            #"false",
+        ] + [
+            # Squash all the generated libraries into one.
+            # This avoids needing to know exactly which libraries are generated.
+            "mkdir ar_merge_tmp",
+            "(cd ar_merge_tmp ; for f in ../openssl/lib*/*.a ; do ar -x $f ; done )",
+            "ar -csr $INSTALLDIR/lib/openssl.a ar_merge_tmp/*.o",
+            #"mv ./openssl/lib/libssl.a $INSTALLDIR/lib/openssl.a", # rename?
+        ]),
+        visibility = ["//visibility:public"],
+    )
