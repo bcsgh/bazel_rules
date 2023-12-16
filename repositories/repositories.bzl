@@ -2,7 +2,7 @@
 Misc. imported libs.
 """
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
@@ -146,7 +146,7 @@ def zlib(ver=None, sha256=None):
 
 #############################################
 def jsoncpp(commit=None):
-    new_git_repository(
+    git_repository(
         name = "com_github_open_source_parsers_jsoncpp",
         commit = commit or "69098a18b9af0c47549d9a271c054d13ca92b006",  # current as of 2023/11/12
         remote = "https://github.com/open-source-parsers/jsoncpp.git",
@@ -156,7 +156,7 @@ def jsoncpp(commit=None):
 
 #############################################
 def libgnutls(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
-    new_git_repository(
+    git_repository(
         name = "com_gitlab_gnutls",
         commit = commit or "f2fbef2c50952270eeeadebfacbf718da845fadc",  # current as of 2023/11/12
         remote = "https://gitlab.com/gnutls/gnutls.git",
@@ -188,7 +188,7 @@ def libnettle(commit=None):
 
 #############################################
 def libev(commit=None):
-    new_git_repository(
+    git_repository(
         name = "com_github_enki_libev",
         remote = "https://github.com/enki/libev.git",
         commit = commit or "93823e6ca699df195a6c7b8bfa6006ec40ee0003",
