@@ -3,10 +3,12 @@ set -e
 
 # Create a "clean" client.
 NEWR=$(mktemp -d -t hook-XXXXXXXXXX)
+OUTPUT_BASE=$(mktemp -d -t hook-base-XXXXXXXXXX)
 git checkout-index --prefix=${NEWR}/ -a
 cd $NEWR
 
-if time bazel --nosystem_rc test --config=ci //:ci -k;
+echo common --noincompatible_sandbox_hermetic_tmp  >> .bazelrc  # See https://github.com/bazelbuild/bazel/issues/20515
+if time bazel --output_base=$OUTPUT_BASE --nosystem_rc test --config=ci //:ci -k;
 then
   bazel clean --expunge
 else
