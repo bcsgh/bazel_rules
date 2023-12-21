@@ -1,36 +1,6 @@
 workspace(name = "bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
-eigen()
-jsoncpp()
-libasn1()
-libcurl()
-libev()
-libgnutls()
-libhttpserver()
-libidn2()
-libgmp()
-libnettle()
-libp11()
-microhttpd()
-openssl()
-zlib()
-
-load("@bazel_rules//cc_embed_data:cc_embed_data_deps.bzl", cc_embed_data_deps = "get_deps")
-load("@bazel_rules//css_js:css_js_deps.bzl", css_js_deps = "get_deps")
-load("@bazel_rules//fail_test:fail_test.bzl", fail_test_deps = "get_deps")
-load("@bazel_rules//latex:git_stamp_deps.bzl", git_stamp_deps = "get_deps")
-load("@bazel_rules//latex:ref_test.bzl", ref_test_deps = "get_deps")
-load("@bazel_rules//latex:role_call_test.bzl", role_call_test_deps = "get_deps")
-load("@bazel_rules//proto_api:proto_api.bzl", proto_api_deps = "get_deps")
-cc_embed_data_deps()
-css_js_deps()
-fail_test_deps()
-git_stamp_deps()
-ref_test_deps()
-role_call_test_deps()
-proto_api_deps()
 
 git_repository(  # TODO: stuck here. Updateing seems to break something.
     name = "rules_foreign_cc",
@@ -38,26 +8,6 @@ git_repository(  # TODO: stuck here. Updateing seems to break something.
     remote = "https://github.com/bazelbuild/rules_foreign_cc.git",
     shallow_since = "1666910343 +0100",
 )
-
-load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
-
-rules_foreign_cc_dependencies([])
-
-#############################################
-load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
-
-bazel_skylib_workspace()
-
-#############################################
-#"""
-load("@bazel_rules//latex:repo.bzl", "latex_toolchain_repository")
-latex_toolchain_repository(name="local_latex_toolchain")
-register_toolchains("@local_latex_toolchain//:local_latex")  # uses ctx.which to look things up
-"""
-register_toolchains("@bazel_rules//latex:linux_texlive")  # assumes default paths
-#"""
-
-register_toolchains("@bazel_rules//parser:linux_flex_bison")
 
 #############################################
 git_repository(
@@ -67,10 +17,6 @@ git_repository(
     shallow_since = "1664409030 -0700",
 )
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
-
-rules_proto_dependencies()
-
 #############################################
 # https://github.com/bazelbuild/rules_closure
 git_repository(
@@ -78,12 +24,6 @@ git_repository(
     remote = "https://github.com/bazelbuild/rules_closure.git",
     tag = "0.11.0",
 )
-
-load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
-
-rules_closure_dependencies()
-
-rules_closure_toolchains()
 
 #############################################
 git_repository(
@@ -101,4 +41,65 @@ git_repository(
     shallow_since = "1699394483 +0000",
 )
 
+################################################################################
+################################################################################
+load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
+eigen()
+jsoncpp()
+libasn1()
+libcurl()
+libev()
+libgnutls()
+libhttpserver()
+libidn2()
+libgmp()
+libnettle()
+libp11()
+microhttpd()
+openssl()
+zlib()
+
 #############################################
+load("@bazel_rules//cc_embed_data:cc_embed_data_deps.bzl", cc_embed_data_deps = "get_deps")
+load("@bazel_rules//css_js:css_js_deps.bzl", css_js_deps = "get_deps")
+load("@bazel_rules//fail_test:fail_test.bzl", fail_test_deps = "get_deps")
+load("@bazel_rules//latex:git_stamp_deps.bzl", git_stamp_deps = "get_deps")
+load("@bazel_rules//latex:ref_test.bzl", ref_test_deps = "get_deps")
+load("@bazel_rules//latex:role_call_test.bzl", role_call_test_deps = "get_deps")
+load("@bazel_rules//proto_api:proto_api.bzl", proto_api_deps = "get_deps")
+cc_embed_data_deps()
+css_js_deps()
+fail_test_deps()
+git_stamp_deps()
+ref_test_deps()
+role_call_test_deps()
+proto_api_deps()
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+rules_foreign_cc_dependencies([])
+
+#############################################
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+bazel_skylib_workspace()
+
+#############################################
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
+rules_proto_dependencies()
+
+#############################################
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
+rules_closure_dependencies()
+rules_closure_toolchains()
+
+################################################################################
+################################################################################
+#"""
+load("@bazel_rules//latex:repo.bzl", "latex_toolchain_repository")
+latex_toolchain_repository(name="local_latex_toolchain")
+register_toolchains("@local_latex_toolchain//:local_latex")  # uses ctx.which to look things up
+"""
+register_toolchains("@bazel_rules//latex:linux_texlive")  # assumes default paths
+#"""
+
+register_toolchains("@bazel_rules//parser:linux_flex_bison")
+
