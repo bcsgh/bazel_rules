@@ -43,7 +43,16 @@ git_repository(
 
 ################################################################################
 ################################################################################
-load("@bazel_rules//repositories:repositories.bzl", "aws_sdk_cpp", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
+load("@bazel_rules//repositories:repositories.bzl", "aws_sdk_cpp", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "load_skylib", "microhttpd", "openssl", "rules_perl", "zlib")
+rules_perl()
+
+load("@rules_perl//perl:deps.bzl", "perl_register_toolchains", "perl_rules_dependencies")
+
+load_skylib()
+
+perl_rules_dependencies()
+perl_register_toolchains()
+
 aws_sdk_cpp()
 eigen()
 jsoncpp()
@@ -89,7 +98,9 @@ rules_proto_dependencies()
 
 #############################################
 load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
-rules_closure_dependencies()
+rules_closure_dependencies(
+    omit_bazel_skylib = True,
+)
 rules_closure_toolchains()
 
 ################################################################################
@@ -103,4 +114,3 @@ register_toolchains("@bazel_rules//latex:linux_texlive")  # assumes default path
 #"""
 
 register_toolchains("@bazel_rules//parser:linux_flex_bison")
-

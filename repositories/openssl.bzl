@@ -9,42 +9,92 @@
 #   autopoint \
 #   libpthread-stubs0-dev
 
-load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
+# Derived from https://github.com/bazelbuild/rules_foreign_cc/blob/main/examples/third_party/openssl/BUILD.openssl.bazel
+# (Under http://www.apache.org/licenses/ )
 
-def BUILD():
+"""An openssl build file based on a snippet found in the github issue:
+https://github.com/bazelbuild/rules_foreign_cc/issues/337
+
+Note that the $(PERL) "make variable" (https://docs.bazel.build/versions/main/be/make-variables.html)
+is populated by the perl toolchain provided by rules_perl.
+"""
+
+load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make", "configure_make_variant")
+
+def BUILD(version):
+    # Read https://wiki.openssl.org/index.php/Compilation_and_Installation
+
     native.filegroup(
-        name = "lib_source",
-        srcs = native.glob(["**"]),
+        name = "all_srcs",
+        srcs = native.glob(
+            include = ["**"],
+            exclude = [
+                "BUILD",
+                "*.bzl",
+            ],
+        ),
+    )
+
+    CONFIGURE_OPTIONS = [
+        "no-comp",
+        "no-idea",
+        "no-weak-ssl-ciphers",
+    ]
+
+    MAKE_TARGETS = [
+        "build_programs",
+        "install_sw",
+    ]
+
+    native.config_setting(
+        name = "msvc_compiler",
+        flag_values = {
+            "@bazel_tools//tools/cpp:compiler": "msvc-cl",
+        },
+    )
+
+    native.alias(
+        name = "openssl",
+        actual = select({
+            ":msvc_compiler": None,  ##### Note: the orginal has an MSVC build.
+            "//conditions:default": ":openssl_default",
+        }),
+        visibility = ["//visibility:public"],
     )
 
     configure_make(
-        name = "openssl",
-        configure_command = "Configure",
-        env = {
-            "CFLAGS": " ".join([
-                "-ldl",
-            ]),
-            "LIBS": "-ldl",  # Seem to need this for some reason?
-        },
-        configure_options = [
-            #"--help",
-            "no-shared",
-        ],
-        lib_source = "@com_github_openssl_openssl//:lib_source",
-        linkopts = ["-ldl"],
-        targets = ["", "install_sw", "install_ssldirs"],
-        postfix_script = "\n".join([
-            "echo PWD=$PWD",
-            "echo INSTALLDIR=$INSTALLDIR",
-            "find . -name '*.a'",
-            #"false",
-        ] + [
-            # Squash all the generated libraries into one.
-            # This avoids needing to know exactly which libraries are generated.
-            "mkdir ar_merge_tmp",
-            "(cd ar_merge_tmp ; for f in ../openssl/lib*/*.a ; do ar -x $f ; done )",
-            "ar -csr $INSTALLDIR/lib/openssl.a ar_merge_tmp/*.o",
-            #"mv ./openssl/lib/libssl.a $INSTALLDIR/lib/openssl.a", # rename?
-        ]),
-        visibility = ["//visibility:public"],
+        name = "openssl_default",
+        configure_command = "config",
+        configure_in_place = True,
+        configure_options = CONFIGURE_OPTIONS,
+        env = select({
+            "@platforms//os:macos": {
+                "AR": "",
+                "PERL": "$$EXT_BUILD_ROOT$$/$(PERL)",
+            },
+            "//conditions:default": {
+                "PERL": "$$EXT_BUILD_ROOT$$/$(PERL)",
+            },
+        }),
+        lib_name = "openssl",
+        lib_source = ":all_srcs",
+        # Note that for Linux builds, libssl must come before libcrypto on the linker command-line.
+        # As such, libssl must be listed before libcrypto
+        out_lib_dir = "lib64",
+        out_shared_libs = select({
+            "@platforms//os:macos": [
+                "libssl.%s.dylib" % version,  # NOT TESTED!
+                "libcrypto.%s.dylib" % version,
+            ],
+            "//conditions:default": [
+                "libssl.so.%s" % version,
+                "libcrypto.so.%s" % version,
+            ],
+        }),
+        #out_interface_libs = [
+        #    "libssl.a",
+        #    "libcrypto.a",
+        #],
+        targets = MAKE_TARGETS,
+        toolchains = ["@rules_perl//:current_toolchain"],
     )

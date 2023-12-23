@@ -8,15 +8,16 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 OOL_BUILD = """
 load("{BZL}", "BUILD")
-BUILD()
+BUILD({ARGS})
 """
 
-def BUILD(name):
+def BUILD(name, **argv):
+    args = ", ".join(["%s=%s" % (x, str([y])[1:-1]) for x, y in argv.items()])
     """
     Any change to git_repository.build_file forces a refetch of the git repo.
     By moving the body of the build into a .bzl file this can be avoided.
     """
-    return OOL_BUILD.format(BZL=Label(":%s.bzl" % name))
+    return OOL_BUILD.format(BZL = Label(":%s.bzl" % name), ARGS = args)
 
 
 GNU_DOMAINS = [
@@ -218,14 +219,28 @@ def microhttpd(ver=None, sha256=None):
     )
 
 #############################################
-def openssl(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
+def rules_perl():
+    maybe(
+        http_archive,
+        name = "rules_perl",
+        sha256 = "5cefadbf2a49bf3421ede009f2c5a2c9836abae792620ed2ff99184133755325",
+        strip_prefix = "rules_perl-0.1.0",
+        urls = [
+            "https://github.com/bazelbuild/rules_perl/archive/refs/tags/0.1.0.tar.gz",
+        ],
+    )
+
+#############################################
+def openssl(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
+    rules_perl()
+
     git_repository(
         name = "com_github_openssl_openssl",
-        commit = commit or "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2023/11/16
         remote = "https://github.com/openssl/openssl.git",
-        #recursive_init_submodules = True,
-        build_file_content = BUILD("openssl"),
+        commit = commit or "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2023/11/16
         shallow_since = "1666888769 +0200",
+        build_file_content = BUILD("openssl", version = "3"),
+        recursive_init_submodules = True,
     )
 
 #############################################
