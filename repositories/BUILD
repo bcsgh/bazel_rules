@@ -17,6 +17,7 @@ test_suite(
     name = "source_tests",
     tests = [
         "@com_github_awslabs_aws_c_common//:sources_test",
+        "@com_github_awslabs_aws_c_compression//:sources_test",
     ],
 )
 

@@ -270,3 +270,14 @@ def aws_sdk_cpp(**args):
         shallow_since = "1700172990 -0800",
         build_file_content = BUILD("aws-c-common"),
     )
+
+    git_repository(
+        name = "com_github_awslabs_aws_c_compression",
+        remote = "https://github.com/awslabs/aws-c-compression.git",
+        commit = args.get(
+            "com_github_awslabs_aws_c_compression",
+            "94f748ae244c72a2e42c63818259ce8877ad6a5a",
+        ),
+        shallow_since = "1692949169 +0200",
+        build_file_content = BUILD("aws-c-compression"),
+    )
