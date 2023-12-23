@@ -292,3 +292,14 @@ def aws_sdk_cpp(**args):
         shallow_since = "1701988425 -0500",
         build_file_content = BUILD("aws-c-sdkutils"),
     )
+
+    git_repository(
+        name = "com_github_awslabs_aws_checksums",
+        commit = args.get(
+            "com_github_awslabs_aws_checksums",
+            "64a63ea93df65e209f433b435a284ee3af54480d",
+        ),
+        remote = "https://github.com/awslabs/aws-checksums.git",
+        shallow_since = "1692949482 +0200",
+        build_file_content = BUILD("aws-checksums"),
+    )
