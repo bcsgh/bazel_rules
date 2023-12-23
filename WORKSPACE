@@ -43,7 +43,8 @@ git_repository(
 
 ################################################################################
 ################################################################################
-load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
+load("@bazel_rules//repositories:repositories.bzl", "aws_sdk_cpp", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "microhttpd", "openssl", "zlib")
+aws_sdk_cpp()
 eigen()
 jsoncpp()
 libasn1()

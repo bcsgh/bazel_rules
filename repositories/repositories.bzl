@@ -257,3 +257,16 @@ def load_rules_cc(commit=None):
         remote = "https://github.com/bazelbuild/rules_cc.git",
         shallow_since = "1655902949 -0700",
     )
+
+#############################################
+def aws_sdk_cpp(**args):
+    git_repository(
+        name = "com_github_awslabs_aws_c_common",
+        remote = "https://github.com/awslabs/aws-c-common.git",
+        commit = args.get(
+            "com_github_awslabs_aws_c_common",
+            "80f21b3cac5ac51c6b8a62c7d2a5ef58a75195ee",
+        ),
+        shallow_since = "1700172990 -0800",
+        build_file_content = BUILD("aws-c-common"),
+    )

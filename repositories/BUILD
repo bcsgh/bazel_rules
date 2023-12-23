@@ -4,6 +4,22 @@ exports_files([
     "eigen_static_version_assert.cc",
 ])
 
+cc_library(
+    name = "aws-cpp-sdk-config",
+    hdrs = [
+        "aws/common/config.h",
+    ],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)
+
+test_suite(
+    name = "source_tests",
+    tests = [
+        "@com_github_awslabs_aws_c_common//:sources_test",
+    ],
+)
+
 ALL = [
     "@com_github_curl_curl//:curl",
     "@com_github_enki_libev//:libev",
