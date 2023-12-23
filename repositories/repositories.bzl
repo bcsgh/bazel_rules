@@ -281,3 +281,14 @@ def aws_sdk_cpp(**args):
         shallow_since = "1692949169 +0200",
         build_file_content = BUILD("aws-c-compression"),
     )
+
+    git_repository(
+        name = "com_github_awslabs_aws_c_sdkutils",
+        commit = args.get(
+            "com_github_awslabs_aws_c_sdkutils",
+            "fd8c0ba2e233997eaaefe82fb818b8b444b956d3",
+        ),
+        remote = "https://github.com/awslabs/aws-c-sdkutils.git",
+        shallow_since = "1701988425 -0500",
+        build_file_content = BUILD("aws-c-sdkutils"),
+    )
