@@ -277,6 +277,17 @@ def aws_sdk_cpp(**args):
     common_crypto()
 
     git_repository(
+        name = "com_github_awslabs_aws_c_cal",
+        remote = "https://github.com/awslabs/aws-c-cal.git",
+        commit = args.get(
+            "com_github_awslabs_aws_c_cal",
+            "3d4c08b60ffa8698cda14bb8d56e5d6a27542f17",
+        ),
+        shallow_since = "1701366513 -0800",
+        build_file_content = BUILD("aws-c-cal"),
+    )
+
+    git_repository(
         name = "com_github_awslabs_aws_c_common",
         remote = "https://github.com/awslabs/aws-c-common.git",
         commit = args.get(
