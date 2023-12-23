@@ -258,8 +258,24 @@ def load_rules_cc(commit=None):
         shallow_since = "1655902949 -0700",
     )
 
+def common_crypto(commit = None):
+    maybe(
+        git_repository,
+        name = "com_github_apple_oss_common_crypto",
+        patch_cmds = [
+            "rm include/CommonCrypto include/Private/CommonCrypto include/Private/CommonNumerics",
+        ],
+        #patch_cmds_win = ["rmdir ..."],
+        build_file_content = BUILD("CommonCrypto"),
+        commit = commit or "0c0a068edd73f84671f1fba8c0e171caa114ee0a",  # current as of 2023/12/21
+        remote = "https://github.com/apple-oss-distributions/CommonCrypto.git",
+        shallow_since = "1695412822 +0000",
+    )
+
 #############################################
 def aws_sdk_cpp(**args):
+    common_crypto()
+
     git_repository(
         name = "com_github_awslabs_aws_c_common",
         remote = "https://github.com/awslabs/aws-c-common.git",
