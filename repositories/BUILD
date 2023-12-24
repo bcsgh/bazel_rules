@@ -1,6 +1,7 @@
 load("//build_test:build.bzl", "build_test")
 
 exports_files([
+    "crt_config.h.tpl",
     "eigen_static_version_assert.cc",
 ])
 
@@ -27,6 +28,7 @@ test_suite(
         "@com_github_awslabs_aws_c_io//:sources_test",
         "@com_github_awslabs_aws_c_mqtt//:sources_test",
         "@com_github_awslabs_aws_c_sdkutils//:sources_test",
+        "@com_github_awslabs_aws_c_s3//:sources_test",
         "@com_github_awslabs_aws_checksums//:sources_test",
     ],
 )

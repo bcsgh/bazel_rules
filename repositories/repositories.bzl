@@ -391,6 +391,17 @@ def aws_sdk_cpp(**args):
     )
 
     git_repository(
+        name = "com_github_awslabs_aws_c_s3",
+        commit = args.get(
+            "com_github_awslabs_aws_c_s3",
+            "20097d3cc73f244237d02d83f4898be165465cdd",
+        ),
+        remote = "https://github.com/awslabs/aws-c-s3.git",
+        shallow_since = "701988425 -0500",
+        build_file_content = BUILD("aws-c-s3"),
+    )
+
+    git_repository(
         name = "com_github_awslabs_aws_c_sdkutils",
         commit = args.get(
             "com_github_awslabs_aws_c_sdkutils",
