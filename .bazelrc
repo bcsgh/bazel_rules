@@ -5,6 +5,8 @@ build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
 build --cxxopt=-fno-exceptions --host_cxxopt=-fno-exceptions
 build --copt=-Werror
 
+build --copt=-DOPENTELEMETRY_STL_VERSION=2017  # Needed by @com_github_aws_sdk//
+
 # --config=ci is used by pre-commit which always runs in a brand
 # new dir. This is a case where external caching is very usefull
 # but not something that can be configured globaly. To configure

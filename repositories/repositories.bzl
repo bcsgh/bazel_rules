@@ -298,6 +298,7 @@ def common_crypto(commit = None):
 
 #############################################
 def aws_sdk_cpp(**args):
+    opentelemetry_cpp()
     common_crypto()
 
     git_repository(
@@ -309,6 +310,17 @@ def aws_sdk_cpp(**args):
         remote = "https://github.com/aws/s2n-tls.git",
         shallow_since = "1703269910 -0800",
         build_file_content = BUILD("aws-s2n-tls"),
+    )
+
+    git_repository(
+        name = "com_github_aws_sdk",
+        commit = args.get(
+            "com_github_aws_sdk",
+            "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
+        ),
+        remote = "https://github.com/aws/aws-sdk-cpp.git",
+        shallow_since = "1702668892 +0000",
+        build_file_content = BUILD("aws-sdk-cpp"),
     )
 
     git_repository(
