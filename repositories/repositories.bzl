@@ -300,158 +300,218 @@ def common_crypto(commit = None):
 
 #############################################
 def aws_sdk_cpp(**args):
+    """
+    Passing repo names via args allows setting a given commit
+    for each of the deps or skipping it entierly (name=False).
+    """
     opentelemetry_cpp(args.get("io_opentelemetry_cpp"))
     common_crypto(args.get("com_github_apple_oss_common_crypto"))
+    com_github_aws_s2n_tls(**args)
+    com_github_aws_sdk(**args)
+    com_github_awslabs_aws_c_auth(**args)
+    com_github_awslabs_aws_c_cal(**args)
+    com_github_awslabs_aws_c_common(**args)
+    com_github_awslabs_aws_c_compression(**args)
+    com_github_awslabs_aws_c_event_stream(**args)
+    com_github_awslabs_aws_c_http(**args)
+    com_github_awslabs_aws_c_io(**args)
+    com_github_awslabs_aws_c_mqtt(**args)
+    com_github_awslabs_aws_c_s3(**args)
+    com_github_awslabs_aws_c_sdkutils(**args)
+    com_github_awslabs_aws_checksums(**args)
+    com_github_awslabs_aws_crt_cpp(**args)
 
+def com_github_aws_s2n_tls(**args):
+    commit = args.get(
+        "com_github_aws_s2n_tls",
+        "2392bb9c207052033fdbf4dfec1d64e8e800cca3",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_aws_s2n_tls",
-        commit = args.get(
-            "com_github_aws_s2n_tls",
-            "2392bb9c207052033fdbf4dfec1d64e8e800cca3",
-        ),
+        commit = commit,
         remote = "https://github.com/aws/s2n-tls.git",
         shallow_since = "1703269910 -0800",
         build_file_content = BUILD("aws-s2n-tls"),
     )
 
+def com_github_aws_sdk(**args):
+    commit = args.get(
+        "com_github_aws_sdk",
+        "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_aws_sdk",
-        commit = args.get(
-            "com_github_aws_sdk",
-            "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
-        ),
+        commit = commit,
         remote = "https://github.com/aws/aws-sdk-cpp.git",
         shallow_since = "1702668892 +0000",
         build_file_content = BUILD("aws-sdk-cpp"),
     )
 
+def com_github_awslabs_aws_c_auth(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_auth",
+        "baeffa791d9d1cf61460662a6d9ac2186aaf05df",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_auth",
         remote = "https://github.com/awslabs/aws-c-auth.git",
-        commit = args.get(
-            "com_github_awslabs_aws_c_auth",
-            "baeffa791d9d1cf61460662a6d9ac2186aaf05df",
-        ),
+        commit = commit,
         shallow_since = "1701180766 -0800",
         build_file_content = BUILD("aws-c-auth"),
     )
 
+def com_github_awslabs_aws_c_cal(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_cal",
+        "3d4c08b60ffa8698cda14bb8d56e5d6a27542f17",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_cal",
         remote = "https://github.com/awslabs/aws-c-cal.git",
-        commit = args.get(
-            "com_github_awslabs_aws_c_cal",
-            "3d4c08b60ffa8698cda14bb8d56e5d6a27542f17",
-        ),
+        commit = commit,
         shallow_since = "1701366513 -0800",
         build_file_content = BUILD("aws-c-cal"),
     )
 
+def com_github_awslabs_aws_c_common(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_common",
+        "80f21b3cac5ac51c6b8a62c7d2a5ef58a75195ee",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_common",
         remote = "https://github.com/awslabs/aws-c-common.git",
-        commit = args.get(
-            "com_github_awslabs_aws_c_common",
-            "80f21b3cac5ac51c6b8a62c7d2a5ef58a75195ee",
-        ),
+        commit = commit,
         shallow_since = "1700172990 -0800",
         build_file_content = BUILD("aws-c-common"),
     )
 
+def com_github_awslabs_aws_c_compression(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_compression",
+        "94f748ae244c72a2e42c63818259ce8877ad6a5a",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_compression",
         remote = "https://github.com/awslabs/aws-c-compression.git",
-        commit = args.get(
-            "com_github_awslabs_aws_c_compression",
-            "94f748ae244c72a2e42c63818259ce8877ad6a5a",
-        ),
+        commit = commit,
         shallow_since = "1692949169 +0200",
         build_file_content = BUILD("aws-c-compression"),
     )
 
+def com_github_awslabs_aws_c_event_stream(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_event_stream",
+        "f18133970e871d37ca1c99fb739e65051d527d68",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_event_stream",
-        commit = args.get(
-            "com_github_awslabs_aws_c_event_stream",
-            "f18133970e871d37ca1c99fb739e65051d527d68",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-c-event-stream.git",
         shallow_since = "1692949408 +0200",
         build_file_content = BUILD("aws-c-event-stream"),
     )
 
+def com_github_awslabs_aws_c_http(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_http",
+        "2f07551a77d0e2707f58ab758f2755439870198f",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_http",
-        commit = args.get(
-            "com_github_awslabs_aws_c_http",
-            "2f07551a77d0e2707f58ab758f2755439870198f",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-c-http.git",
         shallow_since = "1703201918 -0800",
         build_file_content = BUILD("aws-c-http"),
     )
 
+def com_github_awslabs_aws_c_io(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_io",
+        "df64f57feb63ab1a489ded86a87b756a48c46f35",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_io",
-        commit = args.get(
-            "com_github_awslabs_aws_c_io",
-            "df64f57feb63ab1a489ded86a87b756a48c46f35",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-c-io.git",
         shallow_since = "1700588573 -0800",
         build_file_content = BUILD("aws-c-io"),
     )
 
+def com_github_awslabs_aws_c_mqtt(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_mqtt",
+        "eac4be396ec7499bd520724dcd91c4d5df3b729f",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_mqtt",
-        commit = args.get(
-            "com_github_awslabs_aws_c_mqtt",
-            "eac4be396ec7499bd520724dcd91c4d5df3b729f",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-c-mqtt.git",
         shallow_since = "1702505167 -0800",
         build_file_content = BUILD("aws-c-mqtt"),
     )
 
+def com_github_awslabs_aws_c_s3(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_s3",
+        "20097d3cc73f244237d02d83f4898be165465cdd",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_s3",
-        commit = args.get(
-            "com_github_awslabs_aws_c_s3",
-            "20097d3cc73f244237d02d83f4898be165465cdd",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-c-s3.git",
         shallow_since = "701988425 -0500",
         build_file_content = BUILD("aws-c-s3"),
     )
 
+def com_github_awslabs_aws_c_sdkutils(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_c_sdkutils",
+        "fd8c0ba2e233997eaaefe82fb818b8b444b956d3",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_c_sdkutils",
-        commit = args.get(
-            "com_github_awslabs_aws_c_sdkutils",
-            "fd8c0ba2e233997eaaefe82fb818b8b444b956d3",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-c-sdkutils.git",
         shallow_since = "1701988425 -0500",
         build_file_content = BUILD("aws-c-sdkutils"),
     )
 
+def com_github_awslabs_aws_checksums(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_checksums",
+        "64a63ea93df65e209f433b435a284ee3af54480d",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_checksums",
-        commit = args.get(
-            "com_github_awslabs_aws_checksums",
-            "64a63ea93df65e209f433b435a284ee3af54480d",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-checksums.git",
         shallow_since = "1692949482 +0200",
         build_file_content = BUILD("aws-checksums"),
     )
 
+def com_github_awslabs_aws_crt_cpp(**args):
+    commit = args.get(
+        "com_github_awslabs_aws_crt_cpp",
+        "dd818f608b5b3b219d525554046a1776117e3996",
+    )
+    if not commit: return
     git_repository(
         name = "com_github_awslabs_aws_crt_cpp",
-        commit = args.get(
-            "com_github_awslabs_aws_crt_cpp",
-            "dd818f608b5b3b219d525554046a1776117e3996",
-        ),
+        commit = commit,
         remote = "https://github.com/awslabs/aws-crt-cpp.git",
         shallow_since = "1701992062 -0800",
         build_file_content = BUILD("aws-crt-cpp", ver = "0.24.11"),
