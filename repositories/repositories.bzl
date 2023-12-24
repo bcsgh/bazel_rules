@@ -273,6 +273,15 @@ def load_rules_cc(commit=None):
         shallow_since = "1655902949 -0700",
     )
 
+def opentelemetry_cpp(commit = None):
+    maybe(
+        git_repository,
+        name = "io_opentelemetry_cpp",
+        commit = commit or "e8afbb8eac5bd2abb96643c36bef5818a416dbea",  # current as of 2023/12/21
+        remote = "https://github.com/open-telemetry/opentelemetry-cpp.git",
+        shallow_since = "1702744633 +0100",
+    )
+
 def common_crypto(commit = None):
     maybe(
         git_repository,
