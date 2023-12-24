@@ -273,6 +273,7 @@ def load_rules_cc(commit = None):
         shallow_since = "1655902949 -0700",
     )
 
+#############################################
 def opentelemetry_cpp(commit = None):
     maybe(
         git_repository,
@@ -282,6 +283,7 @@ def opentelemetry_cpp(commit = None):
         shallow_since = "1702744633 +0100",
     )
 
+#############################################
 def common_crypto(commit = None):
     maybe(
         git_repository,
@@ -298,8 +300,8 @@ def common_crypto(commit = None):
 
 #############################################
 def aws_sdk_cpp(**args):
-    opentelemetry_cpp()
-    common_crypto()
+    opentelemetry_cpp(args.get("io_opentelemetry_cpp"))
+    common_crypto(args.get("com_github_apple_oss_common_crypto"))
 
     git_repository(
         name = "com_github_aws_s2n_tls",
