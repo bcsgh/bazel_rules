@@ -9,9 +9,7 @@ def BUILD():
                 "**/*.%s" % (e)
                 for e in ["c", "cpp", "h"]
             ],
-            exclude = [
-                "tests/**",
-            ],
+            exclude = ["tests/**"],
         ),
         hdrs = [":aws-checksums"],
         srcs = [
@@ -25,9 +23,9 @@ def BUILD():
     )
 
     ############################################################################
-    ARCH_ARM_C      = ["source/arm/**/*.c"]
-    ARCH_INTEL_C    = ["source/intel/**/*.c"]
-    ARCH_GENERIC_C  = ["source/generic/**/*.c"]
+    ARCH_ARM_C =     ["source/arm/**/*.c"]
+    ARCH_INTEL_C =   ["source/intel/**/*.c"]
+    ARCH_GENERIC_C = ["source/generic/**/*.c"]
     native.filegroup(
         name = "aws-checksums-arch-arm.c",
         srcs = native.glob(ARCH_ARM_C),
@@ -45,7 +43,7 @@ def BUILD():
         srcs = [
             "source/intel/visualc/visualc_crc32c_sse42.c",
             "source/intel/asm/crc32c_sse42_asm.c",
-        ]
+        ],
     )
     native.filegroup(
         name = "aws-checksums-arch-generic.c",
@@ -57,18 +55,18 @@ def BUILD():
             ("@platforms//cpu:aarch32", "@platforms//cpu:aarch64"): "aws-checksums-arch-arm.c",
             ("@platforms//cpu:x86_32", "@platforms//cpu:x86_64"): "aws-checksums-arch-intel.c",
             "//conditions:default": "aws-checksums-arch-generic.c",
-        })
+        }),
     )
 
     ############################################################################
     native.filegroup(
         name = "aws-checksums.c",
-        srcs = native.glob([
-            "source/*.c",
-        ],
-        exclude =
-            ARCH_ARM_C  + ARCH_INTEL_C  + ARCH_GENERIC_C,
-        )
+        srcs = native.glob(
+            [
+                "source/*.c",
+            ],
+            exclude = ARCH_ARM_C + ARCH_INTEL_C + ARCH_GENERIC_C,
+        ),
     )
 
     native.cc_library(
@@ -81,9 +79,7 @@ def BUILD():
             "include/aws/checksums/*.h",
             "include/aws/checksums/private/*.h",
         ]),
-        includes = [
-            "include",
-        ],
+        includes = ["include"],
         deps = [
             "@com_github_awslabs_aws_c_common//:aws-c-common",
         ],

@@ -71,7 +71,7 @@ def BUILD():
         actual = select({
             ":aws_http_crt": ":aws-sdk-cpp-http-crt.cpp",
             ":aws_http_curl": ":aws-sdk-cpp-http-curl.cpp",
-            ":aws_http_windows": "aws-sdk-cpp-http-windows.cpp",
+            "@platforms//os:windows": "aws-sdk-cpp-http-windows.cpp",
         }),
     )
     native.cc_library(

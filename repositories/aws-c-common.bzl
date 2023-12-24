@@ -18,9 +18,7 @@ def BUILD():
                 "AWSCRTAndroidTestRunner/app/src/main/cpp/native-lib.cpp",
             ],
         ),
-        hdrs = [
-            ":aws-c-common",
-        ],
+        hdrs = [":aws-c-common"],
         srcs = [
             ":aws-c-common.c",
             ####
@@ -39,8 +37,8 @@ def BUILD():
 
     ############################################################################
     SYS_ANDROID_C = ["source/android/*.c"]
-    SYS_LINUX_C   = ["source/linux/*.c"]
-    SYS_POSIX_C   = ["source/posix/*.c"]
+    SYS_LINUX_C =   ["source/linux/*.c"]
+    SYS_POSIX_C =   ["source/posix/*.c"]
     SYS_WINDOWS_C = ["source/windows/*.c"]
     SYS_FALLBAK_C = ["source/platform_fallback_stubs/*.c"]
     native.filegroup(
@@ -71,13 +69,13 @@ def BUILD():
             #"@platforms//os:posix": "aws-c-common-sys-posix.c",
             "@platforms//os:windows": "aws-c-common-sys-windows.c",
             "//conditions:default": "aws-c-common-sys-fallback.c",
-        })
+        }),
     )
 
     ############################################################################
-    ARCH_ARM_C      = ["source/arch/arm/**/*.c"]
-    ARCH_INTEL_C    = ["source/arch/intel/**/*.c"]
-    ARCH_GENERIC_C  = ["source/arch/generic/**/*.c"]
+    ARCH_ARM_C =     ["source/arch/arm/**/*.c"]
+    ARCH_INTEL_C =   ["source/arch/intel/**/*.c"]
+    ARCH_GENERIC_C = ["source/arch/generic/**/*.c"]
     native.filegroup(
         name = "aws-c-common-arch-arm.c",
         srcs = native.glob(ARCH_ARM_C),
@@ -96,9 +94,9 @@ def BUILD():
         name = "aws-c-common-arch-intel-impl.c",
         testonly = True,
         srcs = [
-            ":source/arch/intel/msvc/cpuid.c",
-            ":source/arch/intel/asm/cpuid.c",
-        ]
+            "source/arch/intel/msvc/cpuid.c",
+            "source/arch/intel/asm/cpuid.c",
+        ],
     )
     native.filegroup(
         name = "aws-c-common-arch-generic.c",
@@ -110,19 +108,20 @@ def BUILD():
             ("@platforms//cpu:aarch32", "@platforms//cpu:aarch64"): "aws-c-common-arch-arm.c",
             #("@platforms//cpu:x86_32", "@platforms//cpu:x86_64"): "aws-c-common-arch-intel.c",  # TODO Doesn't compile?
             "//conditions:default": "aws-c-common-arch-generic.c",
-        })
+        }),
     )
 
     ############################################################################
     native.filegroup(
         name = "aws-c-common.c",
-        srcs = native.glob([
-            "source/**/*.c",
-        ],
-        exclude =
-            SYS_ANDROID_C + SYS_LINUX_C + SYS_POSIX_C + SYS_WINDOWS_C + SYS_FALLBAK_C +
-            ARCH_ARM_C  + ARCH_INTEL_C  + ARCH_GENERIC_C,
-        )
+        srcs = native.glob(
+            [
+                "source/**/*.c",
+            ],
+            exclude =
+                SYS_ANDROID_C + SYS_LINUX_C + SYS_POSIX_C + SYS_WINDOWS_C + SYS_FALLBAK_C +
+                ARCH_ARM_C + ARCH_INTEL_C + ARCH_GENERIC_C,
+        ),
     )
 
     native.cc_library(
@@ -140,11 +139,9 @@ def BUILD():
             "include/aws/common/private/*.h",
             "include/aws/common/private/*.inl",
         ]),
-        includes = [
-            "include",
-        ],
+        includes = ["include"],
         defines = [
-            "AWS_AFFINITY_METHOD=0" # TODO see source/posix/thread.c
+            "AWS_AFFINITY_METHOD=0",  # TODO see source/posix/thread.c
         ],
         deps = [
             Label(":aws-cpp-sdk-config"),

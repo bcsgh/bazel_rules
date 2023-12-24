@@ -29,11 +29,11 @@ def BUILD():
     )
 
     ############################################################################
-    TLS_DARWIN_C =  [
+    TLS_DARWIN_C = [
         "source/darwin/secure_transport_tls_channel_handler.c",
         "source/darwin/darwin_pki_utils.c",
     ]
-    TLS_S2N_C =     ["source/s2n/s2n_tls_channel_handler.c"]
+    TLS_S2N_C = ["source/s2n/s2n_tls_channel_handler.c"]
     TLS_WINDOWS_C = [
         "source/windows/secure_channel_tls_handler.c",
         "source/windows/windows_pki_utils.c",
@@ -71,7 +71,7 @@ def BUILD():
         deps = selects.with_or({
             ("@platforms//os:osx", "@platforms//os:ios"): [],
             "@platforms//os:windows": [],
-            "//conditions:default": ["@com_githib_aws_s2n_tls//:s2n-tls"],
+            "//conditions:default": ["@com_github_aws_s2n_tls//:s2n-tls"],
         }),
     )
 
@@ -98,7 +98,7 @@ def BUILD():
     )
     native.filegroup(
         name = "aws-c-io-other-linux.c",
-        srcs = OTHER_LINUX_C+ OTHER_POSIX_C,
+        srcs = OTHER_LINUX_C + OTHER_POSIX_C,
     )
     native.filegroup(
         name = "aws-c-io-other-windows.c",
@@ -119,15 +119,16 @@ def BUILD():
     ############################################################################
     native.filegroup(
         name = "aws-c-io.c",
-        srcs = native.glob([
-            "source/*.c",
-            "source/pkcs11/v2.40/*.h",
-            "source/pkcs11_private.h",
-        ],
-        exclude =
-            TLS_DARWIN_C + TLS_S2N_C + TLS_WINDOWS_C +
-            OTHER_BSD_C + OTHER_LINUX_C + OTHER_WINDOWS_C
-        )
+        srcs = native.glob(
+            [
+                "source/*.c",
+                "source/pkcs11/v2.40/*.h",
+                "source/pkcs11_private.h",
+            ],
+            exclude =
+                TLS_DARWIN_C + TLS_S2N_C + TLS_WINDOWS_C +
+                OTHER_BSD_C + OTHER_LINUX_C + OTHER_WINDOWS_C,
+        ),
     )
 
     native.cc_library(

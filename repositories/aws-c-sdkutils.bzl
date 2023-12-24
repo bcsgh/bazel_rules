@@ -8,9 +8,7 @@ def BUILD():
                 "**/*.%s" % (e)
                 for e in ["c", "cpp", "h"]
             ],
-            exclude = [
-                "tests/**",
-            ],
+            exclude = ["tests/**"],
         ),
         hdrs = [":aws-c-sdkutils"],
         srcs = [":aws-c-sdkutils.c"],
@@ -18,21 +16,17 @@ def BUILD():
 
     native.filegroup(
         name = "aws-c-sdkutils.c",
-        srcs = native.glob([
-            "source/*.c",
-        ])
+        srcs = native.glob(["source/*.c"]),
     )
 
     native.cc_library(
         name = "aws-c-sdkutils",
-        srcs = ["aws-c-sdkutils.c"],
+        srcs = [":aws-c-sdkutils.c"],
         hdrs = native.glob([
             "include/aws/sdkutils/*.h",
             "include/aws/sdkutils/private/*.h",
         ]),
-        includes = [
-            "include",
-        ],
+        includes = ["include"],
         deps = [
             "@com_github_awslabs_aws_c_common//:aws-c-common",
         ],

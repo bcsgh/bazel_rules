@@ -43,9 +43,9 @@ def BUILD():
     native.alias(
         name = "aws-c-cal-crypto.c",
         actual = selects.with_or({
-            ("@platforms//os:osx","@platforms//os:ios"):
+            ("@platforms//os:osx", "@platforms//os:ios"):
                 ":aws-c-cal-crypto-darwin.c",
-            ("@platforms//os:linux","@platforms//os:netbsd","@platforms//os:openbsd"):
+            ("@platforms//os:linux", "@platforms//os:netbsd", "@platforms//os:openbsd"):
                 ":aws-c-cal-crypto-unix.c",
             "@platforms//os:windows":
                 ":aws-c-cal-crypto-windows.c",
@@ -83,9 +83,7 @@ def BUILD():
             "include/aws/cal/*.h",
             "include/aws/cal/private/*.h",
         ]),
-        includes = [
-            "include",
-        ],
+        includes = ["include"],
         deps = [
             "@com_github_awslabs_aws_c_common//:aws-c-common",
             ":aws-c-cal-crypto",

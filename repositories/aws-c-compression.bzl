@@ -8,9 +8,7 @@ def BUILD():
                 "**/*.%s" % (e)
                 for e in ["c", "cpp", "h"]
             ],
-            exclude = [
-                "tests/**",
-            ],
+            exclude = ["tests/**"],
         ),
         hdrs = [":aws-c-compression"],
         srcs = [":aws-c-compression.c"],
@@ -21,19 +19,17 @@ def BUILD():
         srcs = native.glob([
             "source/*.c",
             "source/huffman_generator/*.c",
-        ])
+        ]),
     )
 
     native.cc_library(
         name = "aws-c-compression",
-        srcs = ["aws-c-compression.c"],
+        srcs = [":aws-c-compression.c"],
         hdrs = native.glob([
             "include/aws/compression/*.h",
             "include/aws/compression/private/*.h",
         ]),
-        includes = [
-            "include",
-        ],
+        includes = ["include"],
         deps = [
             "@com_github_awslabs_aws_c_common//:aws-c-common",
         ],

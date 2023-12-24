@@ -19,7 +19,7 @@ test_suite(
     name = "source_tests",
     tests = [
         "@com_github_apple_oss_common_crypto//:sources_test",
-        "@com_githib_aws_s2n_tls//:sources_test",
+        "@com_github_aws_s2n_tls//:sources_test",
         "@com_github_aws_sdk//:sources_test",
         "@com_github_awslabs_aws_c_auth//:sources_test",
         "@com_github_awslabs_aws_c_cal//:sources_test",
@@ -29,8 +29,8 @@ test_suite(
         "@com_github_awslabs_aws_c_http//:sources_test",
         "@com_github_awslabs_aws_c_io//:sources_test",
         "@com_github_awslabs_aws_c_mqtt//:sources_test",
-        "@com_github_awslabs_aws_c_sdkutils//:sources_test",
         "@com_github_awslabs_aws_c_s3//:sources_test",
+        "@com_github_awslabs_aws_c_sdkutils//:sources_test",
         "@com_github_awslabs_aws_checksums//:sources_test",
         "@com_github_awslabs_aws_crt_cpp//:sources_test",
     ],
@@ -46,11 +46,11 @@ ALL = [
 ]
 
 MANUAL = [
-    "@com_github_openssl_openssl//:openssl",           # >2m30s
+    "@com_github_openssl_openssl//:openssl",  # >2m30s
     "@com_gitlab_gnutls//:gnutls",
     "@com_gitlab_libidn_libidn2//:libidn2",
     "@org_gnu_microhttpd//:microhttpd",
-    "@se_liu_lysator_nettle_nettle//:nettle",          # >90s
+    "@se_liu_lysator_nettle_nettle//:nettle",  # >90s
 ]
 
 [build_test(

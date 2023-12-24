@@ -19,7 +19,6 @@ def BUILD(name, **argv):
     """
     return OOL_BUILD.format(BZL = Label(":%s.bzl" % name), ARGS = args)
 
-
 GNU_DOMAINS = [
     # GNU mirrors
     "ftp.wayne.edu",
@@ -34,8 +33,9 @@ GNU_DOMAINS = [
     # primary
     "ftp.gnu.org",
 ]
+
 #############################################
-def eigen(commit=None):
+def eigen(commit = None):
     git_repository(  # TODO: stuck here. Updateing seems to break something.
         name = "eigen",
         commit = commit or "c5b896c5a3eb35ed0c08a9be5e6f10cc0a465b81",  # current as of 2022/10/27
@@ -45,7 +45,7 @@ def eigen(commit=None):
     )
 
 #############################################
-def libcurl(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
+def libcurl(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
     git_repository(
         name = "com_github_curl_curl",
         commit = commit or "a3063fe0147e00381d149e1d3a3c57c63343e7fc",  # current as of 2023/11/16
@@ -55,8 +55,8 @@ def libcurl(commit=None):  # WARNING: stuck here. Updateing seems to break too m
     )
 
 #############################################
-def libidn2(ver=None, sha256=None):
-    ver = ver or "2.3.4"   # current as of 2022/10/23
+def libidn2(ver = None, sha256 = None):
+    ver = ver or "2.3.4"  # current as of 2022/10/23
     sha256 = sha256 or "93caba72b4e051d1f8d4f5a076ab63c99b77faee019b72b9783b267986dbb45f"
 
     # See also: https://gitlab.com/libidn/libidn2
@@ -73,8 +73,8 @@ def libidn2(ver=None, sha256=None):
     )
 
 #############################################
-def libasn1(ver=None, sha256=None):
-    ver = ver or "4.19.0"   # current as of 2022/08/23
+def libasn1(ver = None, sha256 = None):
+    ver = ver or "4.19.0"  # current as of 2022/08/23
     sha256 = sha256 or "1613f0ac1cf484d6ec0ce3b8c06d56263cc7242f1c23b30d82d23de345a63f7a"
 
     # See also: https://gitlab.com/gnutls/libtasn1/
@@ -90,8 +90,8 @@ def libasn1(ver=None, sha256=None):
         ],
     )
 
-def libp11(ver=None, sha256=None):
-    ver = ver or "0.24.1"   # current as of 2022/01/17
+def libp11(ver = None, sha256 = None):
+    ver = ver or "0.24.1"  # current as of 2022/01/17
     sha256 = sha256 or "d8be783efd5cd4ae534cee4132338e3f40f182c3205d23b200094ec85faaaef8"
 
     # See also: https://p11-glue.github.io/p11-glue//p11-kit.html
@@ -102,12 +102,12 @@ def libp11(ver=None, sha256=None):
         sha256 = sha256,
         strip_prefix = "p11-kit-%s" % ver,
         urls = [
-            "https://github.com/p11-glue/p11-kit/releases/download/%s/p11-kit-%s.tar.xz" % (ver, ver)
+            "https://github.com/p11-glue/p11-kit/releases/download/%s/p11-kit-%s.tar.xz" % (ver, ver),
         ],
     )
 
-def libgmp(ver=None, sha256=None):
-    ver = ver or "6.2.1"   # current as of 2020/11/14
+def libgmp(ver = None, sha256 = None):
+    ver = ver or "6.2.1"  # current as of 2020/11/14
     sha256 = sha256 or "eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c"
 
     # See also: https://gmplib.org/devel/repo-usage
@@ -127,8 +127,8 @@ def libgmp(ver=None, sha256=None):
     )
 
 #############################################
-def zlib(ver=None, sha256=None):
-    ver = ver or "1.2.13"   # current as of 2022/10/12
+def zlib(ver = None, sha256 = None):
+    ver = ver or "1.2.13"  # current as of 2022/10/12
     sha256 = sha256 or "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"
     DOMAINS = [
         "https://mirror.bazel.build/zlib.net/zlib-%s.tar.gz",
@@ -146,7 +146,7 @@ def zlib(ver=None, sha256=None):
     )
 
 #############################################
-def jsoncpp(commit=None):
+def jsoncpp(commit = None):
     git_repository(
         name = "com_github_open_source_parsers_jsoncpp",
         commit = commit or "69098a18b9af0c47549d9a271c054d13ca92b006",  # current as of 2023/11/12
@@ -156,7 +156,7 @@ def jsoncpp(commit=None):
     )
 
 #############################################
-def libgnutls(commit=None):  # WARNING: stuck here. Updateing seems to break too many things.
+def libgnutls(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
     git_repository(
         name = "com_gitlab_gnutls",
         commit = commit or "f2fbef2c50952270eeeadebfacbf718da845fadc",  # current as of 2023/11/12
@@ -167,7 +167,7 @@ def libgnutls(commit=None):  # WARNING: stuck here. Updateing seems to break too
     )
 
 #############################################
-def libhttpserver(commit=None):
+def libhttpserver(commit = None):
     git_repository(
         name = "com_github_etr_libhttpserver",
         build_file = "@bazel_rules//repositories:BUILD.libhttpserver",
@@ -177,7 +177,7 @@ def libhttpserver(commit=None):
     )
 
 #############################################
-def libnettle(commit=None):
+def libnettle(commit = None):
     git_repository(
         name = "se_liu_lysator_nettle_nettle",
         commit = commit or "9b1ad3e554f1dda3b65d017b1f79debddff8e712",  # current as of 2023/11/12
@@ -188,7 +188,7 @@ def libnettle(commit=None):
     )
 
 #############################################
-def libev(commit=None):
+def libev(commit = None):
     git_repository(
         name = "com_github_enki_libev",
         remote = "https://github.com/enki/libev.git",
@@ -202,7 +202,7 @@ def libev(commit=None):
     )
 
 #############################################
-def microhttpd(ver=None, sha256=None):
+def microhttpd(ver = None, sha256 = None):
     ver = ver or "0.9.71"
     sha256 = sha256 or "e8f445e85faf727b89e9f9590daea4473ae00ead38b237cf1eda55172b89b182"
 
@@ -244,7 +244,7 @@ def openssl(commit = None):  # WARNING: stuck here. Updateing seems to break too
     )
 
 #############################################
-def load_skylib(commit=None):
+def load_skylib(commit = None):
     maybe(
         git_repository,
         name = "bazel_skylib",
@@ -254,7 +254,7 @@ def load_skylib(commit=None):
     )
 
 #############################################
-def load_absl(commit=None):
+def load_absl(commit = None):
     maybe(
         git_repository,
         name = "com_google_absl",
@@ -264,7 +264,7 @@ def load_absl(commit=None):
     )
 
 #############################################
-def load_rules_cc(commit=None):
+def load_rules_cc(commit = None):
     maybe(
         git_repository,
         name = "rules_cc",
@@ -302,9 +302,9 @@ def aws_sdk_cpp(**args):
     common_crypto()
 
     git_repository(
-        name = "com_githib_aws_s2n_tls",
+        name = "com_github_aws_s2n_tls",
         commit = args.get(
-            "com_githib_aws_s2n_tls",
+            "com_github_aws_s2n_tls",
             "2392bb9c207052033fdbf4dfec1d64e8e800cca3",
         ),
         remote = "https://github.com/aws/s2n-tls.git",
