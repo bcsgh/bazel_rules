@@ -303,6 +303,17 @@ def aws_sdk_cpp(**args):
     )
 
     git_repository(
+        name = "com_github_awslabs_aws_c_auth",
+        remote = "https://github.com/awslabs/aws-c-auth.git",
+        commit = args.get(
+            "com_github_awslabs_aws_c_auth",
+            "baeffa791d9d1cf61460662a6d9ac2186aaf05df",
+        ),
+        shallow_since = "1701180766 -0800",
+        build_file_content = BUILD("aws-c-auth"),
+    )
+
+    git_repository(
         name = "com_github_awslabs_aws_c_cal",
         remote = "https://github.com/awslabs/aws-c-cal.git",
         commit = args.get(
