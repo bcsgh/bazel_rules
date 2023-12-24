@@ -347,6 +347,17 @@ def aws_sdk_cpp(**args):
     )
 
     git_repository(
+        name = "com_github_awslabs_aws_c_event_stream",
+        commit = args.get(
+            "com_github_awslabs_aws_c_event_stream",
+            "f18133970e871d37ca1c99fb739e65051d527d68",
+        ),
+        remote = "https://github.com/awslabs/aws-c-event-stream.git",
+        shallow_since = "1692949408 +0200",
+        build_file_content = BUILD("aws-c-event-stream"),
+    )
+
+    git_repository(
         name = "com_github_awslabs_aws_c_http",
         commit = args.get(
             "com_github_awslabs_aws_c_http",

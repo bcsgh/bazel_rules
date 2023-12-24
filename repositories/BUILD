@@ -22,6 +22,7 @@ test_suite(
         "@com_github_awslabs_aws_c_cal//:sources_test",
         "@com_github_awslabs_aws_c_common//:sources_test",
         "@com_github_awslabs_aws_c_compression//:sources_test",
+        "@com_github_awslabs_aws_c_event_stream//:sources_test",
         "@com_github_awslabs_aws_c_http//:sources_test",
         "@com_github_awslabs_aws_c_io//:sources_test",
         "@com_github_awslabs_aws_c_sdkutils//:sources_test",
