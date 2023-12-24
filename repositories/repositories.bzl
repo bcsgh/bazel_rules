@@ -380,6 +380,17 @@ def aws_sdk_cpp(**args):
     )
 
     git_repository(
+        name = "com_github_awslabs_aws_c_mqtt",
+        commit = args.get(
+            "com_github_awslabs_aws_c_mqtt",
+            "eac4be396ec7499bd520724dcd91c4d5df3b729f",
+        ),
+        remote = "https://github.com/awslabs/aws-c-mqtt.git",
+        shallow_since = "1702505167 -0800",
+        build_file_content = BUILD("aws-c-mqtt"),
+    )
+
+    git_repository(
         name = "com_github_awslabs_aws_c_sdkutils",
         commit = args.get(
             "com_github_awslabs_aws_c_sdkutils",
