@@ -30,6 +30,7 @@ test_suite(
         "@com_github_awslabs_aws_c_sdkutils//:sources_test",
         "@com_github_awslabs_aws_c_s3//:sources_test",
         "@com_github_awslabs_aws_checksums//:sources_test",
+        "@com_github_awslabs_aws_crt_cpp//:sources_test",
     ],
 )
 

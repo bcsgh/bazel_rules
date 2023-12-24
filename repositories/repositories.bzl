@@ -422,3 +422,14 @@ def aws_sdk_cpp(**args):
         shallow_since = "1692949482 +0200",
         build_file_content = BUILD("aws-checksums"),
     )
+
+    git_repository(
+        name = "com_github_awslabs_aws_crt_cpp",
+        commit = args.get(
+            "com_github_awslabs_aws_crt_cpp",
+            "dd818f608b5b3b219d525554046a1776117e3996",
+        ),
+        remote = "https://github.com/awslabs/aws-crt-cpp.git",
+        shallow_since = "1701992062 -0800",
+        build_file_content = BUILD("aws-crt-cpp", ver = "0.24.11"),
+    )
