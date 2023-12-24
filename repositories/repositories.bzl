@@ -336,6 +336,17 @@ def aws_sdk_cpp(**args):
     )
 
     git_repository(
+        name = "com_github_awslabs_aws_c_http",
+        commit = args.get(
+            "com_github_awslabs_aws_c_http",
+            "2f07551a77d0e2707f58ab758f2755439870198f",
+        ),
+        remote = "https://github.com/awslabs/aws-c-http.git",
+        shallow_since = "1703201918 -0800",
+        build_file_content = BUILD("aws-c-http"),
+    )
+
+    git_repository(
         name = "com_github_awslabs_aws_c_io",
         commit = args.get(
             "com_github_awslabs_aws_c_io",
