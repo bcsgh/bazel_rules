@@ -14,6 +14,20 @@ def flag_set(root, vals, default_value = None):
         flag_values = {":%s" % root: v},
     ) for v in vals]
 
+DEPS = {
+    "access-management": ["cognito-identity", "iam"],
+    "identity-management": ["cognito-identity", "sts"],
+    "queues": ["sqs"],
+    "s3-encryption": ["kms", "s3"],
+    "text-to-speech": ["polly"],
+    "transfer": ["s3"],
+}
+
+SKIP = [
+    #### needs special handeling.
+    "text-to-speech",
+]
+
 def BUILD():
     ALL = [
         d.rsplit("/", 1)[-2]
@@ -43,6 +57,10 @@ def BUILD():
         name = "source_tests",
         tests = [
             ":sources_test_core",
+        ] + [
+            ":sources_test.%s" % n
+            for n in mapping.keys()
+            if n not in SKIP  ## TODO should be included anyway!
         ],
     )
 
@@ -280,3 +298,45 @@ def BUILD():
             ":aws-sdk-cpp-core-http",
         ],
     )
+
+    ############################################################################
+    ############################################################################
+    [
+        (
+            compare_cc_deps_test(
+                name = "sources_test.%s" % n,
+                glob = native.glob(
+                    [
+                        "%s/**/*.%s" % (p, e)
+                        for e in ["c", "cpp", "h", "inc"]
+                    ],
+                ),
+                hdrs = [":aws-sdk-cpp.%s" % n],
+                srcs = [":aws-sdk-cpp.%s.cpp" % n],
+            ),
+
+            native.filegroup(
+                name = "aws-sdk-cpp.%s.cpp" % n,
+                srcs = native.glob([
+                    "{p}/source/**/*.cpp".format(p = p)
+                ]),
+            ),
+
+            native.cc_library(
+                name = "aws-sdk-cpp.%s" % n,
+                srcs = [":aws-sdk-cpp.%s.cpp" % n],
+                hdrs = native.glob([
+                    "{p}/include/aws/{n}/**/*.h".format(p = p, n = n)
+                ]),
+                includes = ["%s/include" % p],
+                deps = [
+                    ":aws-sdk-cpp-core",
+                ] + [
+                    ":aws-sdk-cpp.%s" % d
+                    for d in DEPS.get(n, [])
+                ],
+            ),
+        )
+        for n, p in mapping.items()
+        if n not in SKIP
+    ]
