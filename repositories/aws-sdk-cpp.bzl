@@ -23,12 +23,19 @@ DEPS = {
     "transfer": ["s3"],
 }
 
+DEFAULTS = [
+    "iam",
+    "s3",
+    "access-management",
+    "identity-management",
+]
+
 SKIP = [
     #### needs special handeling.
     "text-to-speech",
 ]
 
-def BUILD():
+def BUILD(apis = DEFAULTS):
     ALL = [
         d.rsplit("/", 1)[-2]
         for d in native.glob(
@@ -52,6 +59,29 @@ def BUILD():
         content = sorted(mapping.keys()),
         out = "all-aws-apis.txt",
     )
+
+    if apis:
+        unknown = [k for k in apis if k not in mapping]
+        if unknown: fail("Unknown APIs:", unknown)
+
+        missing = [
+            (k, a)
+            for a in apis
+            for k in DEPS.get(a, [])
+            if k not in apis
+        ]
+        if missing:
+            print(sorted(dict([(v, 0) for k, v in missing]).keys()))
+            fail("Missing requiered APIs:\n%s" % "\n".join([
+                ">>> %s needs %s" % (y, x)
+                for x, y in dict(missing).items()
+            ]))
+
+        mapping = dict([
+            (k, d)
+            for k, d in mapping.items()
+            if k in apis
+        ])
 
     native.test_suite(
         name = "sources_tests",
