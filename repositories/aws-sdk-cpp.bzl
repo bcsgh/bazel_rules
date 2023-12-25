@@ -14,33 +14,42 @@ def flag_set(root, vals, default_value = None):
     ) for v in vals]
 
 def BUILD():
+    native.test_suite(
+        name = "source_tests",
+        tests = [
+            ":sources_test_core",
+        ],
+    )
+
+    ############################################################################
+    ############################################################################
     compare_cc_deps_test(
-        name = "sources_test",
+        name = "sources_test_core",
         glob = native.glob(
             [
                 "src/aws-cpp-sdk-core/**/*.%s" % (e)
                 for e in ["c", "cpp", "h", "inc"]
             ],
         ),
-        hdrs = [":aws-sdk-cpp-base"],
+        hdrs = [":aws-sdk-cpp-core"],
         srcs = [
-            ":aws-sdk-cpp-base.cpp",
+            ":aws-sdk-cpp-core.cpp",
             ####
-            ":aws-sdk-cpp-crypto-bcrypt.cpp",
-            ":aws-sdk-cpp-crypto-commoncrypto.cpp",
-            ":aws-sdk-cpp-crypto-openssl.cpp",
+            ":aws-sdk-cpp-core-crypto-bcrypt.cpp",
+            ":aws-sdk-cpp-core-crypto-commoncrypto.cpp",
+            ":aws-sdk-cpp-core-crypto-openssl.cpp",
             ####
-            ":aws-sdk-cpp-http-crt.cpp",
-            ":aws-sdk-cpp-http-curl.cpp",
-            ":aws-sdk-cpp-http-windows.cpp",
+            ":aws-sdk-cpp-core-http-crt.cpp",
+            ":aws-sdk-cpp-core-http-curl.cpp",
+            ":aws-sdk-cpp-core-http-windows.cpp",
             ####
-            ":aws-sdk-cpp-net-windows.cpp",
-            ":aws-sdk-cpp-net-linux.cpp",
-            ":aws-sdk-cpp-net-none.cpp",
+            ":aws-sdk-cpp-core-net-windows.cpp",
+            ":aws-sdk-cpp-core-net-linux.cpp",
+            ":aws-sdk-cpp-core-net-none.cpp",
             ####
-            ":aws-sdk-cpp-platform-android.cpp",
-            ":aws-sdk-cpp-platform-linux.cpp",
-            ":aws-sdk-cpp-platform-windows.cpp",
+            ":aws-sdk-cpp-core-platform-android.cpp",
+            ":aws-sdk-cpp-core-platform-linux.cpp",
+            ":aws-sdk-cpp-core-platform-windows.cpp",
         ],
     )
 
@@ -55,27 +64,27 @@ def BUILD():
     HTTP_CURL_CPP =    ["src/aws-cpp-sdk-core/source/http/curl/*.cpp"]
     HTTP_WINDOWS_CPP = ["src/aws-cpp-sdk-core/source/http/windows/*.cpp"]
     native.filegroup(
-        name = "aws-sdk-cpp-http-crt.cpp",
+        name = "aws-sdk-cpp-core-http-crt.cpp",
         srcs = native.glob(HTTP_CRT_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-http-curl.cpp",
+        name = "aws-sdk-cpp-core-http-curl.cpp",
         srcs = native.glob(HTTP_CURL_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-http-windows.cpp",
+        name = "aws-sdk-cpp-core-http-windows.cpp",
         srcs = native.glob(HTTP_WINDOWS_CPP),
     )
     native.alias(
-        name = "aws-sdk-cpp-http.cpp",
+        name = "aws-sdk-cpp-core-http.cpp",
         actual = select({
-            ":aws_http_crt": ":aws-sdk-cpp-http-crt.cpp",
-            ":aws_http_curl": ":aws-sdk-cpp-http-curl.cpp",
-            "@platforms//os:windows": "aws-sdk-cpp-http-windows.cpp",
+            ":aws_http_crt": ":aws-sdk-cpp-core-http-crt.cpp",
+            ":aws_http_curl": ":aws-sdk-cpp-core-http-curl.cpp",
+            "@platforms//os:windows": "aws-sdk-cpp-core-http-windows.cpp",
         }),
     )
     native.cc_library(
-        name = "aws-sdk-cpp-http",
+        name = "aws-sdk-cpp-core-http",
         deps = select({
             ":aws_http_crt": ["@com_github_awslabs_aws_crt_cpp//:aws-crt-cpp"],
             ":aws_http_curl": ["@com_github_curl_curl//:curl"],
@@ -94,27 +103,27 @@ def BUILD():
     CRYPTO_COMMON_CPP =  ["src/aws-cpp-sdk-core/source/utils/crypto/commoncrypto/*.cpp"]
     CRYPTO_OPENSSL_CPP = ["src/aws-cpp-sdk-core/source/utils/crypto/openssl/*.cpp"]
     native.filegroup(
-        name = "aws-sdk-cpp-crypto-bcrypt.cpp",
+        name = "aws-sdk-cpp-core-crypto-bcrypt.cpp",
         srcs = native.glob(CRYPTO_BCRYPT_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-crypto-commoncrypto.cpp",
+        name = "aws-sdk-cpp-core-crypto-commoncrypto.cpp",
         srcs = native.glob(CRYPTO_COMMON_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-crypto-openssl.cpp",
+        name = "aws-sdk-cpp-core-crypto-openssl.cpp",
         srcs = native.glob(CRYPTO_OPENSSL_CPP),
     )
     native.alias(
-        name = "aws-sdk-cpp-crypto.cpp",
+        name = "aws-sdk-cpp-core-crypto.cpp",
         actual = select({
-            ":aws_crypto_bcrypt": ":aws-sdk-cpp-crypto-bcrypt.cpp",
-            ":aws_crypto_commoncrypto": ":aws-sdk-cpp-crypto-commoncrypto.cpp",
-            ":aws_crypto_openssl": ":aws-sdk-cpp-crypto-openssl.cpp",
+            ":aws_crypto_bcrypt": ":aws-sdk-cpp-core-crypto-bcrypt.cpp",
+            ":aws_crypto_commoncrypto": ":aws-sdk-cpp-core-crypto-commoncrypto.cpp",
+            ":aws_crypto_openssl": ":aws-sdk-cpp-core-crypto-openssl.cpp",
         }),
     )
     native.cc_library(
-        name = "aws-sdk-cpp-crypto",
+        name = "aws-sdk-cpp-core-crypto",
         deps = select({
             #":aws_crypto_bcrypt": [":not-implemented"],
             ":aws_crypto_commoncrypto": ["@com_github_apple_oss_common_crypto//:common_crypto"],
@@ -127,23 +136,23 @@ def BUILD():
     PLATFORM_LINUX_CPP =   ["src/aws-cpp-sdk-core/source/platform/linux-shared/*.cpp"]
     PLATFORM_WINDOWS_CPP = ["src/aws-cpp-sdk-core/source/platform/windows/*.cpp"]
     native.filegroup(
-        name = "aws-sdk-cpp-platform-android.cpp",
+        name = "aws-sdk-cpp-core-platform-android.cpp",
         srcs = native.glob(PLATFORM_ANDROID_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-platform-linux.cpp",
+        name = "aws-sdk-cpp-core-platform-linux.cpp",
         srcs = native.glob(PLATFORM_LINUX_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-platform-windows.cpp",
+        name = "aws-sdk-cpp-core-platform-windows.cpp",
         srcs = native.glob(PLATFORM_WINDOWS_CPP),
     )
     native.alias(
-        name = "aws-sdk-cpp-platform.cpp",
+        name = "aws-sdk-cpp-core-platform.cpp",
         actual = select({
-            "@platforms//os:android": ":aws-sdk-cpp-platform-android.cpp",
-            "@platforms//os:linux": ":aws-sdk-cpp-platform-linux.cpp",
-            "@platforms//os:windows": ":aws-sdk-cpp-platform-windows.cpp",
+            "@platforms//os:android": ":aws-sdk-cpp-core-platform-android.cpp",
+            "@platforms//os:linux": ":aws-sdk-cpp-core-platform-linux.cpp",
+            "@platforms//os:windows": ":aws-sdk-cpp-core-platform-windows.cpp",
         }),
     )
 
@@ -152,29 +161,29 @@ def BUILD():
     NET_WINDOWS_CPP = ["src/aws-cpp-sdk-core/source/net/windows/*.cpp"]
     NET_NONE_CPP =    ["src/aws-cpp-sdk-core/source/net/*.cpp"]
     native.filegroup(
-        name = "aws-sdk-cpp-net-linux.cpp",
+        name = "aws-sdk-cpp-core-net-linux.cpp",
         srcs = native.glob(NET_LINUX_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-net-windows.cpp",
+        name = "aws-sdk-cpp-core-net-windows.cpp",
         srcs = native.glob(NET_WINDOWS_CPP),
     )
     native.filegroup(
-        name = "aws-sdk-cpp-net-none.cpp",
+        name = "aws-sdk-cpp-core-net-none.cpp",
         srcs = native.glob(NET_NONE_CPP),
     )
     native.alias(
-        name = "aws-sdk-cpp-net.cpp",
+        name = "aws-sdk-cpp-core-net.cpp",
         actual = select({
-            "@platforms//os:linux": ":aws-sdk-cpp-net-linux.cpp",
-            "@platforms//os:windows": ":aws-sdk-cpp-net-windows.cpp",
-            "//conditions:default": ":aws-sdk-cpp-net-none.cpp",
+            "@platforms//os:linux": ":aws-sdk-cpp-core-net-linux.cpp",
+            "@platforms//os:windows": ":aws-sdk-cpp-core-net-windows.cpp",
+            "//conditions:default": ":aws-sdk-cpp-core-net-none.cpp",
         }),
     )
 
     ############################################################################
     native.filegroup(
-        name = "aws-sdk-cpp-base.cpp",
+        name = "aws-sdk-cpp-core.cpp",
         srcs = native.glob(
             [
                 "src/aws-cpp-sdk-core/source/*.cpp",
@@ -220,13 +229,13 @@ def BUILD():
     )
 
     native.cc_library(
-        name = "aws-sdk-cpp-base",
+        name = "aws-sdk-cpp-core",
         srcs = [
-            ":aws-sdk-cpp-base.cpp",
-            ":aws-sdk-cpp-crypto.cpp",
-            ":aws-sdk-cpp-http.cpp",
-            ":aws-sdk-cpp-net.cpp",
-            ":aws-sdk-cpp-platform.cpp",
+            ":aws-sdk-cpp-core.cpp",
+            ":aws-sdk-cpp-core-crypto.cpp",
+            ":aws-sdk-cpp-core-http.cpp",
+            ":aws-sdk-cpp-core-net.cpp",
+            ":aws-sdk-cpp-core-platform.cpp",
         ],
         hdrs = native.glob([
             "src/aws-cpp-sdk-core/include/aws/core/**/*.h",
@@ -242,7 +251,7 @@ def BUILD():
             "@io_opentelemetry_cpp//exporters/ostream:ostream_metric_exporter",
             "@io_opentelemetry_cpp//exporters/ostream:ostream_span_exporter",
             "@io_opentelemetry_cpp//sdk:headers",
-            ":aws-sdk-cpp-crypto",
-            ":aws-sdk-cpp-http",
+            ":aws-sdk-cpp-core-crypto",
+            ":aws-sdk-cpp-core-http",
         ],
     )
