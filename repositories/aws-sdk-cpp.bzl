@@ -54,7 +54,7 @@ def BUILD():
     )
 
     native.test_suite(
-        name = "source_tests",
+        name = "sources_tests",
         tests = [
             ":sources_test_core",
         ] + [
