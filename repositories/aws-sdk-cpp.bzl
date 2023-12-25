@@ -1,5 +1,6 @@
 load("@bazel_rules//repositories:compare_cc_deps_test.bzl", "compare_cc_deps_test")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 def flag_set(root, vals, default_value = None):
     string_flag(
@@ -14,6 +15,30 @@ def flag_set(root, vals, default_value = None):
     ) for v in vals]
 
 def BUILD():
+    ALL = [
+        d.rsplit("/", 1)[-2]
+        for d in native.glob(
+            ["**/src/aws-cpp-sdk-*/CMakeLists.txt"],
+            exclude = [
+                "src/aws-cpp-sdk-core/**",
+                "tests/**",
+            ],
+        )
+    ]
+
+    mapping = dict([
+        (d.split("-", 3)[-1], d)
+        for d in ALL
+    ])
+    if len(mapping) != len(ALL): fail(len(mapping), len(ALL))
+
+    write_file(
+        # dump the list of all the API's that can be ask for.
+        name = "all-aws-apis",
+        content = sorted(mapping.keys()),
+        out = "all-aws-apis.txt",
+    )
+
     native.test_suite(
         name = "source_tests",
         tests = [
