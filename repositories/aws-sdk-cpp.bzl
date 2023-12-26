@@ -329,49 +329,51 @@ def BUILD(apis = DEFAULTS):
         ],
     )
 
+    ############################################################################
+    ############################################################################
+
     if "text-to-speech" in mapping: _text_to_speach()
 
-    ############################################################################
-    ############################################################################
-    [
-        (
-            compare_cc_deps_test(
-                name = "sources_test.%s" % n,
-                glob = native.glob(
-                    [
-                        "%s/**/*.%s" % (p, e)
-                        for e in ["c", "cpp", "h", "inc"]
-                    ],
-                ),
-                hdrs = [":aws-sdk-cpp.%s" % n],
-                srcs = [":aws-sdk-cpp.%s.cpp" % n],
-            ),
+    for n, p in mapping.items():
+        if n in SKIP: continue
 
-            native.filegroup(
-                name = "aws-sdk-cpp.%s.cpp" % n,
-                srcs = native.glob([
-                    "{p}/source/**/*.cpp".format(p = p)
-                ]),
-            ),
+        _generic_api(n, p)
 
-            native.cc_library(
-                name = "aws-sdk-cpp.%s" % n,
-                srcs = [":aws-sdk-cpp.%s.cpp" % n],
-                hdrs = native.glob([
-                    "{p}/include/aws/{n}/**/*.h".format(p = p, n = n)
-                ]),
-                includes = ["%s/include" % p],
-                deps = [
-                    ":aws-sdk-cpp-core",
-                ] + [
-                    ":aws-sdk-cpp.%s" % d
-                    for d in DEPS.get(n, [])
-                ],
-            ),
-        )
-        for n, p in mapping.items()
-        if n not in SKIP
-    ]
+
+def _generic_api(name, path):
+    compare_cc_deps_test(
+        name = "sources_test.%s" % name,
+        glob = native.glob(
+            [
+                "%s/**/*.%s" % (path, e)
+                for e in ["c", "cpp", "h", "inc"]
+            ],
+        ),
+        hdrs = [":aws-sdk-cpp.%s" % name],
+        srcs = [":aws-sdk-cpp.%s.cpp" % name],
+    )
+
+    native.filegroup(
+        name = "aws-sdk-cpp.%s.cpp" % name,
+        srcs = native.glob([
+            "{p}/source/**/*.cpp".format(p = path)
+        ]),
+    )
+
+    native.cc_library(
+        name = "aws-sdk-cpp.%s" % name,
+        srcs = [":aws-sdk-cpp.%s.cpp" % name],
+        hdrs = native.glob([
+            "{p}/include/aws/{n}/**/*.h".format(p = path, n = name)
+        ]),
+        includes = ["%s/include" % path],
+        deps = [
+            ":aws-sdk-cpp-core",
+        ] + [
+            ":aws-sdk-cpp.%s" % d
+            for d in DEPS.get(name, [])
+        ],
+    )
 
 def _text_to_speach():
     compare_cc_deps_test(
