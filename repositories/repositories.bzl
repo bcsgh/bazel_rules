@@ -341,12 +341,14 @@ def com_github_aws_sdk(**args):
         "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
     )
     if not commit: return
+    bargs = {}
+    if "apis" in args: bargs["apis"] = args["apis"]
     git_repository(
         name = "com_github_aws_sdk",
         commit = commit,
         remote = "https://github.com/aws/aws-sdk-cpp.git",
         shallow_since = "1702668892 +0000",
-        build_file_content = BUILD("aws-sdk-cpp"),
+        build_file_content = BUILD("aws-sdk-cpp", **bargs),
     )
 
 def com_github_awslabs_aws_c_auth(**args):

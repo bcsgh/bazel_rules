@@ -1,5 +1,6 @@
 load("@bazel_rules//repositories:compare_cc_deps_test.bzl", "compare_cc_deps_test")
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//lib:selects.bzl", "selects")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 def flag_set(root, vals, default_value = None):
@@ -90,7 +91,6 @@ def BUILD(apis = DEFAULTS):
         ] + [
             ":sources_test.%s" % n
             for n in mapping.keys()
-            if n not in SKIP  ## TODO should be included anyway!
         ],
     )
 
@@ -329,6 +329,8 @@ def BUILD(apis = DEFAULTS):
         ],
     )
 
+    if "text-to-speech" in mapping: _text_to_speach()
+
     ############################################################################
     ############################################################################
     [
@@ -370,3 +372,91 @@ def BUILD(apis = DEFAULTS):
         for n, p in mapping.items()
         if n not in SKIP
     ]
+
+def _text_to_speach():
+    compare_cc_deps_test(
+        name = "sources_test.text-to-speech",
+        glob = native.glob([
+            "src/aws-cpp-sdk-text-to-speech/**/*.%s" % e
+            for e in ["c", "cpp", "h", "inc"]
+        ]),
+        hdrs = [":aws-sdk-cpp.text-to-speech-hdrs"],
+        srcs = [
+            ":aws-sdk-cpp.text-to-speech.cpp",
+            ":aws-sdk-cpp.text-to-speech.apple.cpp",
+            ":aws-sdk-cpp.text-to-speech.linux.cpp",
+            ":aws-sdk-cpp.text-to-speech.windows.cpp",
+        ],
+    )
+
+    ###########
+    native.filegroup(
+        name = "aws-sdk-cpp.text-to-speech.apple.cpp",
+        srcs = ["src/aws-cpp-sdk-text-to-speech/source/text-to-speech/apple/CoreAudioPCMOutputDriver.cpp"],
+    )
+    native.filegroup(
+        name = "aws-sdk-cpp.text-to-speech.linux.cpp",
+        srcs = ["src/aws-cpp-sdk-text-to-speech/source/text-to-speech/linux/PulseAudioPCMOutputDriver.cpp"],
+    )
+    native.filegroup(
+        name = "aws-sdk-cpp.text-to-speech.windows.cpp",
+        srcs = ["src/aws-cpp-sdk-text-to-speech/source/text-to-speech/windows/WaveOutPCMOutputDriver.cpp"],
+    )
+
+    bool_flag(name = "pulse_audio", build_setting_default = False)
+    native.config_setting(
+        name = "pulse_audio_avalable",
+        flag_values = {":pulse_audio": "true"},
+    )
+    native.alias(
+        name = "aws-sdk-cpp.text-to-output-driver.cpp",
+        actual = selects.with_or({
+            ("@platforms//os:osx", "@platforms//os:ios"):
+                ":aws-sdk-cpp.text-to-speech.apple.cpp",
+            ":pulse_audio_avalable":  # TODO? "@platforms//os:linux":
+                ":aws-sdk-cpp.text-to-speech.linux.cpp",
+            "@platforms//os:windows":
+                ":aws-sdk-cpp.text-to-speech.windows.cpp",
+            "//conditions:default": ":not-implemented",
+        }),
+    )
+
+    ###########
+    native.filegroup(
+        name = "aws-sdk-cpp.text-to-speech.cpp",
+        srcs = native.glob(
+            [
+                "src/aws-cpp-sdk-text-to-speech/source/**/*.cpp",
+            ],
+            exclude = [
+                "src/aws-cpp-sdk-text-to-speech/source/text-to-speech/apple/**",
+                "src/aws-cpp-sdk-text-to-speech/source/text-to-speech/linux/**",
+                "src/aws-cpp-sdk-text-to-speech/source/text-to-speech/windows/**",
+                "src/aws-cpp-sdk-text-to-speech/source/text-to-speech/*/*OutputDriver.cpp",
+            ],
+        ),
+    )
+
+    native.cc_library(
+        name = "aws-sdk-cpp.text-to-speech-hdrs",
+        hdrs = native.glob([
+            "src/aws-cpp-sdk-text-to-speech/include/aws/text-to-speech/**/*.h",
+        ]),
+        includes = ["src/aws-cpp-sdk-text-to-speech/include"],
+    )
+
+    native.cc_library(
+        name = "aws-sdk-cpp.text-to-speech",
+        tags = ["manual"],
+        srcs = [
+            ":aws-sdk-cpp.text-to-speech.cpp",
+            ":aws-sdk-cpp.text-to-output-driver.cpp",
+        ],
+        deps = [
+            ":aws-sdk-cpp-core",
+            ":aws-sdk-cpp.text-to-speech-hdrs",
+        ] + [
+            ":aws-sdk-cpp.%s" % d
+            for d in DEPS.get("text-to-speech", [])
+        ],
+    )
