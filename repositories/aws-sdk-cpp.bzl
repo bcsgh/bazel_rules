@@ -161,6 +161,11 @@ def BUILD(apis = DEFAULTS):
             ":aws_http_curl": ["@com_github_curl_curl//:curl"],
             "@platforms//os:windows": [],  # NOTE: not tested
         }),
+        defines = select({
+            ":aws_http_crt": ["AWS_SDK_USE_CRT_HTTP"],
+            ":aws_http_curl": ["ENABLE_CURL_CLIENT"],
+            "@platforms//os:windows": ["ENABLE_WINDOWS_CLIENT"],
+        }),
     )
 
     ############################################################################
