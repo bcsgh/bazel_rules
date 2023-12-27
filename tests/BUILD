@@ -295,3 +295,37 @@ build_test(
     ],
 )
 
+########
+test_suite(
+    name = "aws_smoke_tests",
+    tests = [
+        ":com_github_awslabs_aws_c_cal_smoke_test",
+        ":com_github_awslabs_aws_c_common_smoke_test",
+        ":com_github_awslabs_aws_c_compression_smoke_test",
+        ":com_github_awslabs_aws_c_sdkutils_smoke_test",
+    ]
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_cal_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_cal//:aws-c-cal"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_common_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_common//:aws-c-common"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_compression_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_compression//:aws-c-compression"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_sdkutils_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_sdkutils//:aws-c-sdkutils"],
+)
