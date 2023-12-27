@@ -2,6 +2,15 @@ load("@bazel_rules//repositories:compare_cc_deps_test.bzl", "compare_cc_deps_tes
 load("@bazel_skylib//lib:selects.bzl", "selects")
 
 def BUILD():
+    # Not used anywhere in here?
+    ITTNOTIFY = ["include/aws/common/external/ittnotify.h"]
+    native.cc_library(
+        name = "ittnotify-intel",
+        hdrs = ITTNOTIFY,
+        visibility = ["//visibility:public"],
+    )
+
+    ############################################################################
     compare_cc_deps_test(
         name = "sources_test",
         glob = native.glob(
@@ -18,7 +27,10 @@ def BUILD():
                 "AWSCRTAndroidTestRunner/app/src/main/cpp/native-lib.cpp",
             ],
         ),
-        hdrs = [":aws-c-common"],
+        hdrs = [
+            ":aws-c-common",
+            ":ittnotify-intel",
+        ],
         srcs = [
             ":aws-c-common.c",
             ####
@@ -159,7 +171,7 @@ def BUILD():
             "include/aws/common/posix/*.inl",
             "include/aws/common/private/*.h",
             "include/aws/common/private/*.inl",
-        ]),
+        ], exclude = ITTNOTIFY),
         includes = ["include"],
         defines = [
             "AWS_AFFINITY_METHOD=0",  # TODO see source/posix/thread.c

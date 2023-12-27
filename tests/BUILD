@@ -299,11 +299,21 @@ build_test(
 test_suite(
     name = "aws_smoke_tests",
     tests = [
+        ":com_github_awslabs_aws_c_auth_smoke_test",
         ":com_github_awslabs_aws_c_cal_smoke_test",
         ":com_github_awslabs_aws_c_common_smoke_test",
         ":com_github_awslabs_aws_c_compression_smoke_test",
+        ":com_github_awslabs_aws_c_http_smoke_test",
+        ":com_github_awslabs_aws_c_io_smoke_test",
+        ":com_github_awslabs_aws_c_s3_smoke_test",
         ":com_github_awslabs_aws_c_sdkutils_smoke_test",
     ]
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_auth_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_auth//:aws-c-auth"],
 )
 
 cc_test(
@@ -322,6 +332,24 @@ cc_test(
     name = "com_github_awslabs_aws_c_compression_smoke_test",
     srcs = ["basic_smoke_test.cc"],
     deps = ["@com_github_awslabs_aws_c_compression//:aws-c-compression"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_http_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_http//:aws-c-http"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_io_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_io//:aws-c-io"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_c_s3_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_s3//:aws-c-s3"],
 )
 
 cc_test(

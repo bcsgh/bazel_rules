@@ -15,6 +15,13 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "ittnotify-noop",
+    hdrs = ["aws/common/external/ittnotify.h"],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)
+
 test_suite(
     name = "source_tests",
     tests = [

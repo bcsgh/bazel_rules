@@ -146,6 +146,9 @@ def BUILD():
             "@com_github_awslabs_aws_c_cal//:aws-c-cal",
             "@com_github_awslabs_aws_c_common//:aws-c-common",
             ":aws-c-io-tls",
+            #### It's not clear when each of these should be used.
+            Label(":ittnotify-noop"),
+            #"@com_github_awslabs_aws_c_common//:ittnotify-intel",
         ],
         visibility = ["//visibility:public"],
     )
