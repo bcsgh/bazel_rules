@@ -23,10 +23,11 @@ def BUILD():
             ":aws-c-common.c",
             ####
             ":aws-c-common-sys-android.c",
-            ":aws-c-common-sys-linux.c",
             ":aws-c-common-sys-posix.c",
             ":aws-c-common-sys-windows.c",
-            ":aws-c-common-sys-fallback.c",
+            ####
+            ":aws-c-common-sysenv-linux.c",
+            ":aws-c-common-sysenv-fallback.c",
             ####
             ":aws-c-common-arch-arm.c",
             ":aws-c-common-arch-intel.c",
@@ -36,19 +37,8 @@ def BUILD():
     )
 
     ############################################################################
-    SYS_ANDROID_C = ["source/android/*.c"]
-    SYS_LINUX_C =   ["source/linux/*.c"]
     SYS_POSIX_C =   ["source/posix/*.c"]
     SYS_WINDOWS_C = ["source/windows/*.c"]
-    SYS_FALLBAK_C = ["source/platform_fallback_stubs/*.c"]
-    native.filegroup(
-        name = "aws-c-common-sys-android.c",
-        srcs = native.glob(SYS_ANDROID_C),
-    )
-    native.filegroup(
-        name = "aws-c-common-sys-linux.c",
-        srcs = native.glob(SYS_LINUX_C),
-    )
     native.filegroup(
         name = "aws-c-common-sys-posix.c",
         srcs = native.glob(SYS_POSIX_C),
@@ -57,18 +47,11 @@ def BUILD():
         name = "aws-c-common-sys-windows.c",
         srcs = native.glob(SYS_WINDOWS_C),
     )
-    native.filegroup(
-        name = "aws-c-common-sys-fallback.c",
-        srcs = native.glob(SYS_FALLBAK_C),
-    )
     native.alias(
         name = "aws-c-common-sys.c",
         actual = select({
-            "@platforms//os:android": "aws-c-common-sys-android.c",
-            "@platforms//os:linux": "aws-c-common-sys-linux.c",
-            #"@platforms//os:posix": "aws-c-common-sys-posix.c",
             "@platforms//os:windows": "aws-c-common-sys-windows.c",
-            "//conditions:default": "aws-c-common-sys-fallback.c",
+            "//conditions:default": "aws-c-common-sys-posix.c",
         }),
     )
     native.cc_library(
@@ -79,6 +62,32 @@ def BUILD():
         }),
     )
 
+    ############################################################################
+    SYS_ANDROID_C = ["source/android/*.c"]
+    native.filegroup(
+        name = "aws-c-common-sys-android.c",
+        srcs = ["source/android/logging.c"],
+    )
+
+
+    ############################################################################
+    SYSENV_LINUX_C =   ["source/linux/system_info.c"]
+    SYSENV_FALLBAK_C = ["source/platform_fallback_stubs/system_info.c"]
+    native.filegroup(
+        name = "aws-c-common-sysenv-linux.c",
+        srcs = native.glob(SYSENV_LINUX_C),
+    )
+    native.filegroup(
+        name = "aws-c-common-sysenv-fallback.c",
+        srcs = native.glob(SYSENV_FALLBAK_C),
+    )
+    native.alias(
+        name = "aws-c-common-sysenv.c",
+        actual = select({
+            "@platforms//os:linux": "aws-c-common-sysenv-linux.c",
+            "//conditions:default": "aws-c-common-sysenv-fallback.c",
+        }),
+    )
     ############################################################################
     ARCH_ARM_C =     ["source/arch/arm/**/*.c"]
     ARCH_INTEL_C =   ["source/arch/intel/**/*.c"]
@@ -126,7 +135,8 @@ def BUILD():
                 "source/**/*.c",
             ],
             exclude =
-                SYS_ANDROID_C + SYS_LINUX_C + SYS_POSIX_C + SYS_WINDOWS_C + SYS_FALLBAK_C +
+                SYSENV_LINUX_C + SYSENV_FALLBAK_C +
+                SYS_ANDROID_C + SYS_POSIX_C + SYS_WINDOWS_C +
                 ARCH_ARM_C + ARCH_INTEL_C + ARCH_GENERIC_C,
         ),
     )
@@ -137,7 +147,11 @@ def BUILD():
             ":aws-c-common.c",
             ":aws-c-common-arch.c",
             ":aws-c-common-sys.c",
-        ],
+            ":aws-c-common-sysenv.c",
+        ] + select({
+            "@platforms//os:android": [":aws-c-common-sys-android.c"],
+            "//conditions:default": [],
+        }),
         hdrs = native.glob([
             "include/aws/common/*.h",
             "include/aws/common/*.inl",
