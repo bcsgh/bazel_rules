@@ -205,6 +205,11 @@ def BUILD(apis = DEFAULTS):
             ":aws_crypto_commoncrypto": ["@com_github_apple_oss_common_crypto//:common_crypto"],
             ":aws_crypto_openssl": ["@com_github_openssl_openssl//:openssl"],
         }),
+        defines = select({
+            ":aws_crypto_bcrypt": ["ENABLE_BCRYPT_ENCRYPTION"],
+            ":aws_crypto_commoncrypto": ["ENABLE_COMMONCRYPTO_ENCRYPTION"],
+            ":aws_crypto_openssl": ["ENABLE_OPENSSL_ENCRYPTION"],
+        }),
     )
 
     ############################################################################
