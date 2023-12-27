@@ -27,8 +27,6 @@ DEPS = {
 DEFAULTS = [
     "iam",
     "s3",
-    "access-management",
-    "identity-management",
 ]
 
 SKIP = [

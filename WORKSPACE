@@ -71,7 +71,7 @@ zlib()
 
 # Make sure the special cases get built
 load("@bazel_rules//repositories:aws-sdk-cpp.bzl", aws_default_apis = "DEFAULTS", aws_skips = "SKIP")
-com_github_aws_sdk(apis = aws_default_apis + aws_skips)
+com_github_aws_sdk(apis = aws_default_apis + aws_skips + ["polly"])
 
 #############################################
 load("@bazel_rules//cc_embed_data:cc_embed_data_deps.bzl", cc_embed_data_deps = "get_deps")
