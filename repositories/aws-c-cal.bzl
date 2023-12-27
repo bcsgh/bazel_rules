@@ -78,7 +78,10 @@ def BUILD():
 
     native.cc_library(
         name = "aws-c-cal",
-        srcs = [":aws-c-cal.c"],
+        srcs = [
+            ":aws-c-cal.c",
+            ":aws-c-cal-crypto.c",
+        ],
         hdrs = native.glob([
             "include/aws/cal/*.h",
             "include/aws/cal/private/*.h",

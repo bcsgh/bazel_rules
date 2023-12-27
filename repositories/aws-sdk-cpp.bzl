@@ -327,6 +327,7 @@ def BUILD(apis = DEFAULTS):
             ":aws-sdk-cpp-core-crypto",
             ":aws-sdk-cpp-core-http",
         ],
+        visibility = ["//visibility:public"],
     )
 
     ############################################################################
@@ -373,6 +374,7 @@ def _generic_api(name, path):
             ":aws-sdk-cpp.%s" % d
             for d in DEPS.get(name, [])
         ],
+        visibility = ["//visibility:public"],
     )
 
 def _text_to_speach():
@@ -461,4 +463,5 @@ def _text_to_speach():
             ":aws-sdk-cpp.%s" % d
             for d in DEPS.get("text-to-speech", [])
         ],
+        visibility = ["//visibility:public"],
     )

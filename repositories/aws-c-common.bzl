@@ -71,6 +71,13 @@ def BUILD():
             "//conditions:default": "aws-c-common-sys-fallback.c",
         }),
     )
+    native.cc_library(
+        name = "aws-c-common-sys",
+        linkopts = select({
+            "@platforms//os:linux": ["-lpthread", "-ldl"],
+            "//conditions:default": [],
+        }),
+    )
 
     ############################################################################
     ARCH_ARM_C =     ["source/arch/arm/**/*.c"]
@@ -145,6 +152,7 @@ def BUILD():
         ],
         deps = [
             Label(":aws-cpp-sdk-config"),
+            ":aws-c-common-sys",
         ],
         visibility = ["//visibility:public"],
     )
