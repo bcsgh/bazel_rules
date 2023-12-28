@@ -23,7 +23,7 @@ cc_library(
 )
 
 test_suite(
-    name = "source_tests",
+    name = "sources_tests",
     tests = [
         "@com_github_apple_oss_common_crypto//:sources_test",
         "@com_github_aws_s2n_tls//:sources_test",

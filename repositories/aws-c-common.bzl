@@ -81,7 +81,6 @@ def BUILD():
         srcs = ["source/android/logging.c"],
     )
 
-
     ############################################################################
     SYSENV_LINUX_C =   ["source/linux/system_info.c"]
     SYSENV_FALLBAK_C = ["source/platform_fallback_stubs/system_info.c"]
@@ -100,6 +99,7 @@ def BUILD():
             "//conditions:default": "aws-c-common-sysenv-fallback.c",
         }),
     )
+
     ############################################################################
     ARCH_ARM_C =     ["source/arch/arm/**/*.c"]
     ARCH_INTEL_C =   ["source/arch/intel/**/*.c"]

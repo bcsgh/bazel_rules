@@ -473,7 +473,7 @@ def com_github_awslabs_aws_c_s3(**args):
         name = "com_github_awslabs_aws_c_s3",
         commit = commit,
         remote = "https://github.com/awslabs/aws-c-s3.git",
-        shallow_since = "701988425 -0500",
+        shallow_since = "1703278910 -0800",
         build_file_content = BUILD("aws-c-s3"),
     )
 
