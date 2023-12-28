@@ -6,15 +6,6 @@ exports_files([
 ])
 
 cc_library(
-    name = "aws-cpp-sdk-config",
-    hdrs = [
-        "aws/common/config.h",
-    ],
-    includes = ["."],
-    visibility = ["//visibility:public"],
-)
-
-cc_library(
     name = "ittnotify-noop",
     hdrs = ["aws/common/external/ittnotify.h"],
     includes = ["."],

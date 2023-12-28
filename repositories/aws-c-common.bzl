@@ -1,5 +1,6 @@
 load("@bazel_rules//repositories:compare_cc_deps_test.bzl", "compare_cc_deps_test")
 load("@bazel_skylib//lib:selects.bzl", "selects")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 def BUILD():
     # Not used anywhere in here?
@@ -16,6 +17,18 @@ def BUILD():
             #"???": ":ittnotify-intel",
         }),
         visibility = ["//visibility:public"],
+    )
+
+    ############################################################################
+    write_file(
+        name = "aws-c-common-config-hdr",
+        out = "aws/common/config.h",
+        content = [],  # blank. (for now?)
+    )
+    native.cc_library(
+        name = "aws-c-common-config",
+        hdrs = ["aws/common/config.h"],
+        includes = ["."],
     )
 
     ############################################################################
@@ -185,7 +198,7 @@ def BUILD():
             "AWS_AFFINITY_METHOD=0",  # TODO see source/posix/thread.c
         ],
         deps = [
-            Label(":aws-cpp-sdk-config"),
+            ":aws-c-common-config",
             ":aws-c-common-sys",
         ],
         visibility = ["//visibility:public"],
