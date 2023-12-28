@@ -274,26 +274,34 @@ def load_rules_cc(commit = None):
     )
 
 #############################################
-def opentelemetry_cpp(commit = None):
-    maybe(
-        git_repository,
+def opentelemetry_cpp(**args):
+    commit = args.get(
+        "io_opentelemetry_cpp",
+        "e8afbb8eac5bd2abb96643c36bef5818a416dbea",  # current as of 2023/12/21
+    )
+    if not commit: return
+    git_repository(  # OPENTELEMETRY_STL_VERSION=2017
         name = "io_opentelemetry_cpp",
-        commit = commit or "e8afbb8eac5bd2abb96643c36bef5818a416dbea",  # current as of 2023/12/21
+        commit = commit,
         remote = "https://github.com/open-telemetry/opentelemetry-cpp.git",
         shallow_since = "1702744633 +0100",
     )
 
 #############################################
-def common_crypto(commit = None):
-    maybe(
-        git_repository,
+def common_crypto(**args):
+    commit = args.get(
+        "com_github_apple_oss_common_crypto",
+        "0c0a068edd73f84671f1fba8c0e171caa114ee0a",  # current as of 2023/12/21
+    )
+    if not commit: return
+    git_repository(
         name = "com_github_apple_oss_common_crypto",
         patch_cmds = [
             "rm include/CommonCrypto include/Private/CommonCrypto include/Private/CommonNumerics",
         ],
         #patch_cmds_win = ["rmdir ..."],
         build_file_content = BUILD("CommonCrypto"),
-        commit = commit or "0c0a068edd73f84671f1fba8c0e171caa114ee0a",  # current as of 2023/12/21
+        commit = commit,
         remote = "https://github.com/apple-oss-distributions/CommonCrypto.git",
         shallow_since = "1695412822 +0000",
     )
@@ -304,8 +312,8 @@ def aws_sdk_cpp(**args):
     Passing repo names via args allows setting a given commit
     for each of the deps or skipping it entierly (name=False).
     """
-    opentelemetry_cpp(args.get("io_opentelemetry_cpp"))
-    common_crypto(args.get("com_github_apple_oss_common_crypto"))
+    opentelemetry_cpp(**args)
+    common_crypto(**args)
     com_github_aws_s2n_tls(**args)
     com_github_aws_sdk(**args)
     com_github_awslabs_aws_c_auth(**args)
