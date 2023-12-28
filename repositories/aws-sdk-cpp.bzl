@@ -185,7 +185,10 @@ def BUILD(apis = DEFAULTS):
         defines = select({
             ":aws_http_crt": ["AWS_SDK_USE_CRT_HTTP"],
             ":aws_http_curl": ["ENABLE_CURL_CLIENT"],
-            "@platforms//os:windows": ["ENABLE_WINDOWS_CLIENT"],
+            "@platforms//os:windows": [
+                "ENABLE_WINDOWS_CLIENT",
+                "PLATFORM_WINDOWS",
+            ],
         }),
     )
 
