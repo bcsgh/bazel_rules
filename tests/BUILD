@@ -303,10 +303,14 @@ test_suite(
         ":com_github_awslabs_aws_c_cal_smoke_test",
         ":com_github_awslabs_aws_c_common_smoke_test",
         ":com_github_awslabs_aws_c_compression_smoke_test",
+        ":com_github_awslabs_aws_c_event_stream_smoke_test",
         ":com_github_awslabs_aws_c_http_smoke_test",
         ":com_github_awslabs_aws_c_io_smoke_test",
+        ":com_github_awslabs_aws_c_mqtt_smoke_test",
         ":com_github_awslabs_aws_c_s3_smoke_test",
         ":com_github_awslabs_aws_c_sdkutils_smoke_test",
+        ":com_github_awslabs_aws_checksums_smoke_test",
+        ":com_github_awslabs_aws_crt_cpp_smoke_test",
     ]
 )
 
@@ -335,6 +339,12 @@ cc_test(
 )
 
 cc_test(
+    name = "com_github_awslabs_aws_c_event_stream_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_event_stream//:aws-c-event-stream"],
+)
+
+cc_test(
     name = "com_github_awslabs_aws_c_http_smoke_test",
     srcs = ["basic_smoke_test.cc"],
     deps = ["@com_github_awslabs_aws_c_http//:aws-c-http"],
@@ -347,6 +357,12 @@ cc_test(
 )
 
 cc_test(
+    name = "com_github_awslabs_aws_c_mqtt_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_c_mqtt//:aws-c-mqtt"],
+)
+
+cc_test(
     name = "com_github_awslabs_aws_c_s3_smoke_test",
     srcs = ["basic_smoke_test.cc"],
     deps = ["@com_github_awslabs_aws_c_s3//:aws-c-s3"],
@@ -356,4 +372,16 @@ cc_test(
     name = "com_github_awslabs_aws_c_sdkutils_smoke_test",
     srcs = ["basic_smoke_test.cc"],
     deps = ["@com_github_awslabs_aws_c_sdkutils//:aws-c-sdkutils"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_checksums_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_checksums//:aws-checksums"],
+)
+
+cc_test(
+    name = "com_github_awslabs_aws_crt_cpp_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_awslabs_aws_crt_cpp//:aws-crt-cpp"],
 )
