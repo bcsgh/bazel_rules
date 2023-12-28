@@ -108,9 +108,20 @@ def BUILD(apis = DEFAULTS):
             "//conditions:default": []
         }) + [""],
     )
+
+    flag_set(
+        root = "aws_memory",
+        vals = ["aws", "std"],
+        default_value = "std",
+    )
+
     native.cc_library(
         name = "aws-sdk-cpp-config",
         hdrs = ["aws/core/SDKConfig.h"],
+        defines = select({
+            ":aws_memory_aws": ["USE_AWS_MEMORY_MANAGEMENT"],
+            ":aws_memory_std": [],
+        }),
         includes = ["."],
     )
     ############################################################################
