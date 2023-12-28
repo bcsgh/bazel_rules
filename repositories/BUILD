@@ -9,7 +9,6 @@ cc_library(
     name = "aws-cpp-sdk-config",
     hdrs = [
         "aws/common/config.h",
-        "aws/core/SDKConfig.h",
     ],
     includes = ["."],
     visibility = ["//visibility:public"],

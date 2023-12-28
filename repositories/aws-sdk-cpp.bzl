@@ -93,6 +93,26 @@ def BUILD(apis = DEFAULTS):
     )
 
     ############################################################################
+    write_file(
+        name = "all-aws-sdk-config-hdr",
+        out = "aws/coreSDKConfig.h",
+        content = select({
+            "@platforms//os:windows": [
+                # Pulled from https://github.com/tensorflow/io
+                "#define WIN32_LEAN_AND_MEAN",
+                "#if defined(_MSC_VER)",
+                "#  include <Windows.h>",
+                "#  undef IGNORE",
+                "#endif",
+            ],
+            "//conditions:default": []
+        }),
+    )
+    native.cc_library(
+        name = "aws-sdk-cpp-config",
+        hdrs = ["aws/coreSDKConfig.h"],
+    )
+    ############################################################################
     ############################################################################
     compare_cc_deps_test(
         name = "sources_test_core",
@@ -325,13 +345,13 @@ def BUILD(apis = DEFAULTS):
         ]),
         includes = ["src/aws-cpp-sdk-core/include"],
         deps = [
-            Label(":aws-cpp-sdk-config"),
             "@com_github_awslabs_aws_c_common//:aws-c-common",
             "@com_github_awslabs_aws_crt_cpp//:aws-crt-cpp",
             "@io_opentelemetry_cpp//api",
             "@io_opentelemetry_cpp//exporters/ostream:ostream_metric_exporter",
             "@io_opentelemetry_cpp//exporters/ostream:ostream_span_exporter",
             "@io_opentelemetry_cpp//sdk:headers",
+            ":aws-sdk-cpp-config",
             ":aws-sdk-cpp-core-crypto",
             ":aws-sdk-cpp-core-http",
         ],
