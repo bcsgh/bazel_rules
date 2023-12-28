@@ -7,6 +7,14 @@ def BUILD():
     native.cc_library(
         name = "ittnotify-intel",
         hdrs = ITTNOTIFY,
+    )
+    native.alias(
+        name = "ittnotify",
+        actual = select({
+            #### It's not clear when each of these should be used.
+            "//conditions:default": Label(":ittnotify-noop"),
+            #"???": ":ittnotify-intel",
+        }),
         visibility = ["//visibility:public"],
     )
 
