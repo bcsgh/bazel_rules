@@ -296,9 +296,20 @@ build_test(
 )
 
 ########
+AWS_SDK = [
+    "aws-sdk-cpp-core",
+    "aws-sdk-cpp.iam",
+    "aws-sdk-cpp.polly",
+    "aws-sdk-cpp.s3",
+    "aws-sdk-cpp.text-to-speech",
+]
+
 test_suite(
     name = "aws_smoke_tests",
     tests = [
+        ":com_github_%s_smoke_test" % n
+        for n in AWS_SDK
+    ] + [
         ":com_github_awslabs_aws_c_auth_smoke_test",
         ":com_github_awslabs_aws_c_cal_smoke_test",
         ":com_github_awslabs_aws_c_common_smoke_test",
@@ -313,6 +324,12 @@ test_suite(
         ":com_github_awslabs_aws_crt_cpp_smoke_test",
     ]
 )
+
+[cc_test(
+    name = "com_github_%s_smoke_test" % n,
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_aws_sdk//:%s" % n],
+) for n in AWS_SDK]
 
 cc_test(
     name = "com_github_awslabs_aws_c_auth_smoke_test",

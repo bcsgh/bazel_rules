@@ -95,7 +95,7 @@ def BUILD(apis = DEFAULTS):
     ############################################################################
     write_file(
         name = "all-aws-sdk-config-hdr",
-        out = "aws/coreSDKConfig.h",
+        out = "aws/core/SDKConfig.h",
         content = select({
             "@platforms//os:windows": [
                 # Pulled from https://github.com/tensorflow/io
@@ -106,11 +106,12 @@ def BUILD(apis = DEFAULTS):
                 "#endif",
             ],
             "//conditions:default": []
-        }),
+        }) + [""],
     )
     native.cc_library(
         name = "aws-sdk-cpp-config",
-        hdrs = ["aws/coreSDKConfig.h"],
+        hdrs = ["aws/core/SDKConfig.h"],
+        includes = ["."],
     )
     ############################################################################
     ############################################################################
@@ -483,6 +484,12 @@ def _text_to_speach():
         srcs = [
             ":aws-sdk-cpp.text-to-speech.cpp",
             ":aws-sdk-cpp.text-to-output-driver.cpp",
+        ],
+        target_compatible_with = [
+            "@platforms//os:ios",
+            "@platforms//os:osx",
+            "@platforms//os:windows",
+            ":pulse_audio_avalable",
         ],
         deps = [
             ":aws-sdk-cpp-core",
