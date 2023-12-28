@@ -45,6 +45,7 @@ def BUILD():
             "utils/*.h",
         ]),
         copts = ["-Wno-deprecated-declarations"],
+        linkopts = ["-lpthread"],
         includes = ["api"],
         deps = [
             "@com_github_openssl_openssl//:openssl",

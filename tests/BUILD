@@ -310,6 +310,7 @@ test_suite(
         ":com_github_%s_smoke_test" % n
         for n in AWS_SDK
     ] + [
+        ":com_github_aws_s2n_tls_smoke_test",
         ":com_github_awslabs_aws_c_auth_smoke_test",
         ":com_github_awslabs_aws_c_cal_smoke_test",
         ":com_github_awslabs_aws_c_common_smoke_test",
@@ -330,6 +331,12 @@ test_suite(
     srcs = ["basic_smoke_test.cc"],
     deps = ["@com_github_aws_sdk//:%s" % n],
 ) for n in AWS_SDK]
+
+cc_test(
+    name = "com_github_aws_s2n_tls_smoke_test",
+    srcs = ["basic_smoke_test.cc"],
+    deps = ["@com_github_aws_s2n_tls//:s2n-tls"],
+)
 
 cc_test(
     name = "com_github_awslabs_aws_c_auth_smoke_test",
