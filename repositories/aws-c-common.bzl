@@ -42,7 +42,6 @@ def BUILD():
             exclude = [
                 "bin/**",
                 "tests/**",
-                "verification/cbmc/**",
                 ###
                 "include/aws/testing/aws_test_harness.h",
                 "AWSCRTAndroidTestRunner/app/src/main/cpp/native-lib.cpp",
@@ -50,10 +49,12 @@ def BUILD():
         ),
         hdrs = [
             ":aws-c-common",
+            ":aws-c-common-verification",
             ":ittnotify-intel",
         ],
         srcs = [
             ":aws-c-common.c",
+            ":aws-c-common-verification.c",
             ####
             ":aws-c-common-sys-android.c",
             ":aws-c-common-sys-posix.c",
@@ -201,5 +202,25 @@ def BUILD():
             ":aws-c-common-config",
             ":aws-c-common-sys",
         ],
+        visibility = ["//visibility:public"],
+    )
+
+    ############################################################################
+    native.filegroup(
+        name = "aws-c-common-verification.c",
+        srcs = native.glob(["verification/cbmc/**/*.c"]),
+    )
+
+    native.cc_library(
+        name = "aws-c-common-verification",
+        tags = ["manual"],
+        srcs = ["aws-c-common-verification.c"],
+        hdrs = native.glob([
+            "verification/cbmc/include/*.h",
+            "verification/cbmc/include/aws/*.h",
+            "verification/cbmc/include/aws/common/*.h",
+            "verification/cbmc/include/proof_helpers/*.h",
+        ]),
+        includes = ["verification/cbmc/include"],
         visibility = ["//visibility:public"],
     )
