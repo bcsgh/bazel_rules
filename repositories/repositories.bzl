@@ -46,13 +46,25 @@ def eigen(commit = None):
 
 #############################################
 def libcurl(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
+    args = {"com_github_curl_curl": commit} if commit else {}
+    com_github_curl_curl(**args)
+
+def com_github_curl_curl(**args):
+    ret = {}
+    commit = args.get(
+        "com_github_curl_curl",
+        "a3063fe0147e00381d149e1d3a3c57c63343e7fc",  # current as of 2023/11/16
+    )
+    if not commit: return ret
+    ret["com_github_curl_curl"] = commit
     git_repository(
         name = "com_github_curl_curl",
-        commit = commit or "a3063fe0147e00381d149e1d3a3c57c63343e7fc",  # current as of 2023/11/16
+        commit = commit,
         remote = "https://github.com/curl/curl.git",
         build_file = "@bazel_rules//repositories:BUILD.libcurl",
         shallow_since = "1666906547 +0200",
     )
+    return ret
 
 #############################################
 def libidn2(ver = None, sha256 = None):
@@ -232,16 +244,28 @@ def rules_perl():
 
 #############################################
 def openssl(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
+    args = {"com_github_openssl_openssl": commit} if commit else {}
+    com_github_openssl_openssl(**args)
+
+def com_github_openssl_openssl(**args):
+    ret = {}
     rules_perl()
 
+    commit = args.get(
+        "com_github_openssl_openssl",
+        "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2023/11/16
+    )
+    if not commit: return ret
+    ret["com_github_openssl_openssl"] = commit
     git_repository(
         name = "com_github_openssl_openssl",
         remote = "https://github.com/openssl/openssl.git",
-        commit = commit or "d8eb0e1988aba5d86aa6570357853cad0ab3f532",  # current as of 2023/11/16
+        commit = commit,
         shallow_since = "1666888769 +0200",
         build_file_content = BUILD("openssl", version = "3"),
         recursive_init_submodules = True,
     )
+    return ret
 
 #############################################
 def load_skylib(commit = None):
