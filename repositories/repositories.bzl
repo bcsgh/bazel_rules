@@ -303,7 +303,7 @@ def load_rules_cc(commit = None):
     )
 
 #############################################
-def opentelemetry_cpp(**args):
+def io_opentelemetry_cpp(**args):
     ret = {}
     commit = args.get(
         "io_opentelemetry_cpp",
@@ -320,7 +320,7 @@ def opentelemetry_cpp(**args):
     return ret
 
 #############################################
-def common_crypto(**args):
+def com_github_apple_oss_common_crypto(**args):
     ret = {}
     commit = args.get(
         "com_github_apple_oss_common_crypto",
@@ -348,8 +348,8 @@ def aws_sdk_cpp(**args):
     for each of the deps or skipping it entierly (name=False).
     """
     ret = {}
-    ret.update(opentelemetry_cpp(**_ver(args, ret)))
-    ret.update(common_crypto(**_ver(args, ret)))
+    ret.update(io_opentelemetry_cpp(**_ver(args, ret)))
+    ret.update(com_github_apple_oss_common_crypto(**_ver(args, ret)))
     ret.update(com_github_aws_s2n_tls(**_ver(args, ret)))
     ret.update(com_github_aws_sdk(**_ver(args, ret)))
     ret.update(com_github_awslabs_aws_c_auth(**_ver(args, ret)))
@@ -386,12 +386,12 @@ def com_github_aws_s2n_tls(**args):
 
 def com_github_aws_sdk(**args):
     ret = {}
-    ret.update(common_crypto(**_ver(args, ret)))
+    ret.update(com_github_apple_oss_common_crypto(**_ver(args, ret)))
     ret.update(com_github_awslabs_aws_c_common(**_ver(args, ret)))
     ret.update(com_github_awslabs_aws_crt_cpp(**_ver(args, ret)))
     ret.update(com_github_curl_curl(**_ver(args, ret)))
     ret.update(com_github_openssl_openssl(**_ver(args, ret)))
-    ret.update(opentelemetry_cpp(**_ver(args, ret)))
+    ret.update(io_opentelemetry_cpp(**_ver(args, ret)))
     commit = args.get(
         "com_github_aws_sdk",
         "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
@@ -431,7 +431,7 @@ def com_github_awslabs_aws_c_auth(**args):
 
 def com_github_awslabs_aws_c_cal(**args):
     ret = {}
-    ret.update(common_crypto(**_ver(args, ret)))
+    ret.update(com_github_apple_oss_common_crypto(**_ver(args, ret)))
     ret.update(com_github_awslabs_aws_c_common(**_ver(args, ret)))
     ret.update(com_github_openssl_openssl(**_ver(args, ret)))
     commit = args.get(
