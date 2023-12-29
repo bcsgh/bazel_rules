@@ -363,6 +363,7 @@ def aws_sdk_cpp(**args):
 
 def com_github_aws_s2n_tls(**args):
     ret = {}
+    ret.update(com_github_openssl_openssl(**args))
     commit = args.get(
         "com_github_aws_s2n_tls",
         "2392bb9c207052033fdbf4dfec1d64e8e800cca3",
@@ -380,6 +381,12 @@ def com_github_aws_s2n_tls(**args):
 
 def com_github_aws_sdk(**args):
     ret = {}
+    ret.update(common_crypto(**args))
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_awslabs_aws_crt_cpp(**args))
+    ret.update(com_github_curl_curl(**args))
+    ret.update(com_github_openssl_openssl(**args))
+    ret.update(opentelemetry_cpp(**args))
     commit = args.get(
         "com_github_aws_sdk",
         "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
@@ -399,6 +406,9 @@ def com_github_aws_sdk(**args):
 
 def com_github_awslabs_aws_c_auth(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_http(**args))
+    ret.update(com_github_awslabs_aws_c_io(**args))
+    ret.update(com_github_awslabs_aws_c_sdkutils(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_auth",
         "baeffa791d9d1cf61460662a6d9ac2186aaf05df",
@@ -416,6 +426,9 @@ def com_github_awslabs_aws_c_auth(**args):
 
 def com_github_awslabs_aws_c_cal(**args):
     ret = {}
+    ret.update(common_crypto(**args))
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_openssl_openssl(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_cal",
         "3d4c08b60ffa8698cda14bb8d56e5d6a27542f17",
@@ -450,6 +463,7 @@ def com_github_awslabs_aws_c_common(**args):
 
 def com_github_awslabs_aws_c_compression(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_common(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_compression",
         "94f748ae244c72a2e42c63818259ce8877ad6a5a",
@@ -467,6 +481,9 @@ def com_github_awslabs_aws_c_compression(**args):
 
 def com_github_awslabs_aws_c_event_stream(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_awslabs_aws_checksums(**args))
+    ret.update(com_github_awslabs_aws_c_io(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_event_stream",
         "f18133970e871d37ca1c99fb739e65051d527d68",
@@ -484,6 +501,9 @@ def com_github_awslabs_aws_c_event_stream(**args):
 
 def com_github_awslabs_aws_c_http(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_awslabs_aws_c_compression(**args))
+    ret.update(com_github_awslabs_aws_c_io(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_http",
         "2f07551a77d0e2707f58ab758f2755439870198f",
@@ -501,6 +521,9 @@ def com_github_awslabs_aws_c_http(**args):
 
 def com_github_awslabs_aws_c_io(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_cal(**args))
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_aws_s2n_tls(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_io",
         "df64f57feb63ab1a489ded86a87b756a48c46f35",
@@ -518,6 +541,9 @@ def com_github_awslabs_aws_c_io(**args):
 
 def com_github_awslabs_aws_c_mqtt(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_awslabs_aws_c_http(**args))
+    ret.update(com_github_awslabs_aws_c_io(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_mqtt",
         "eac4be396ec7499bd520724dcd91c4d5df3b729f",
@@ -535,6 +561,8 @@ def com_github_awslabs_aws_c_mqtt(**args):
 
 def com_github_awslabs_aws_c_s3(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_auth(**args))
+    ret.update(com_github_awslabs_aws_checksums(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_s3",
         "20097d3cc73f244237d02d83f4898be165465cdd",
@@ -552,6 +580,7 @@ def com_github_awslabs_aws_c_s3(**args):
 
 def com_github_awslabs_aws_c_sdkutils(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_common(**args))
     commit = args.get(
         "com_github_awslabs_aws_c_sdkutils",
         "fd8c0ba2e233997eaaefe82fb818b8b444b956d3",
@@ -573,6 +602,7 @@ def com_github_awslabs_aws_checksums(**args):
         "com_github_awslabs_aws_checksums",
         "64a63ea93df65e209f433b435a284ee3af54480d",
     )
+    ret.update(com_github_awslabs_aws_c_common(**args))
     if not commit: return ret
     ret["com_github_awslabs_aws_checksums"] = commit
     git_repository(
@@ -586,6 +616,13 @@ def com_github_awslabs_aws_checksums(**args):
 
 def com_github_awslabs_aws_crt_cpp(**args):
     ret = {}
+    ret.update(com_github_awslabs_aws_c_auth(**args))
+    ret.update(com_github_awslabs_aws_c_cal(**args))
+    ret.update(com_github_awslabs_aws_c_common(**args))
+    ret.update(com_github_awslabs_aws_c_event_stream(**args))
+    ret.update(com_github_awslabs_aws_c_io(**args))
+    ret.update(com_github_awslabs_aws_c_mqtt(**args))
+    ret.update(com_github_awslabs_aws_c_s3(**args))
     commit = args.get(
         "com_github_awslabs_aws_crt_cpp",
         "dd818f608b5b3b219d525554046a1776117e3996",
