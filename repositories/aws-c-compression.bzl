@@ -8,7 +8,10 @@ def BUILD():
                 "**/*.%s" % (e)
                 for e in ["c", "cpp", "h"]
             ],
-            exclude = ["tests/**"],
+            exclude = [
+                "tests/**",
+                "source/huffman_generator/generator.c", # includes a main()
+            ],
         ),
         hdrs = [":aws-c-compression"],
         srcs = [":aws-c-compression.c"],
@@ -18,7 +21,6 @@ def BUILD():
         name = "aws-c-compression.c",
         srcs = native.glob([
             "source/*.c",
-            "source/huffman_generator/*.c",
         ]),
     )
 
