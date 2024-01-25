@@ -56,6 +56,7 @@ def _status_repository_impl(ctx):
         BZL += [_GIT_COMMIT_BZL.format(commit = HEAD.stdout.strip())]
     elif ctx.attr.alt_git_commit:
         BUILD += [_GIT_COMMIT_SETTING.format(commit = ctx.attr.alt_git_commit)]
+        BZL += [_GIT_COMMIT_BZL.format(commit = ctx.attr.alt_git_commit)]
     ctx.file("BUILD", "\n\n".join(BUILD))
     ctx.file("git.bzl", "\n\n".join(BZL))
 
