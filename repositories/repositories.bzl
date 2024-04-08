@@ -394,7 +394,7 @@ def com_github_aws_sdk(**args):
     ret.update(io_opentelemetry_cpp(**_ver(args, ret)))
     commit = args.get(
         "com_github_aws_sdk",
-        "3a536864870e9d4edb6d753ed4882e1ce229d1c8",
+        "72f6f98023db8132111eb907168b9fbdba25888b",  # current as of 2024/03/05
     )
     if not commit: return ret
     ret["com_github_aws_sdk"] = commit
@@ -404,7 +404,7 @@ def com_github_aws_sdk(**args):
         name = "com_github_aws_sdk",
         commit = commit,
         remote = "https://github.com/aws/aws-sdk-cpp.git",
-        shallow_since = "1702668892 +0000",
+        shallow_since = "1712340566 +0000",
         build_file_content = BUILD("aws-sdk-cpp", **bargs),
     )
     return ret
