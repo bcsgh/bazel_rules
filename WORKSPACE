@@ -43,7 +43,7 @@ git_repository(
 
 ################################################################################
 ################################################################################
-load("@bazel_rules//repositories:repositories.bzl", "aws_sdk_cpp", "com_github_aws_sdk", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "libnettle", "libp11", "load_skylib", "microhttpd", "openssl", "rules_perl", "zlib")
+load("@bazel_rules//repositories:repositories.bzl", "aws_sdk_cpp", "com_github_aws_sdk", "eigen", "jsoncpp", "libasn1", "libcurl", "libev", "libgmp", "libgnutls", "libhttpserver", "libidn2", "liblua", "libnettle", "libp11", "load_skylib", "microhttpd", "openssl", "rules_perl", "zlib")
 rules_perl()
 
 load("@rules_perl//perl:deps.bzl", "perl_register_toolchains", "perl_rules_dependencies")
@@ -61,6 +61,7 @@ libev()
 libgnutls()
 libhttpserver()
 libidn2()
+liblua()
 libgmp()
 libnettle()
 libp11()

@@ -173,6 +173,16 @@ def jsoncpp(commit = None):
     )
 
 #############################################
+def liblua(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
+    git_repository(
+        name = "com_github_lua_lua",
+        commit = commit or "0897c0a4289ef3a8d45761266124613f364bef60",  # current as of 2024/04/19
+        remote = "https://github.com/lua/lua.git",
+        build_file_content = BUILD("lua"),
+        shallow_since = "1712597306 -0300",
+    )
+
+#############################################
 def libgnutls(commit = None):  # WARNING: stuck here. Updateing seems to break too many things.
     git_repository(
         name = "com_gitlab_gnutls",
