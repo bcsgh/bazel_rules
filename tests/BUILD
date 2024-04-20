@@ -208,7 +208,7 @@ cc_test(
     name = "com_github_lua_lua_test",
     srcs = ["com_github_lua_lua_test.cc"],
     deps = [
-        "@com_github_lua_lua//:lua",
+        "@com_github_lua_lua//:lua++",
         "@com_google_googletest//:gtest_main",
     ],
 )

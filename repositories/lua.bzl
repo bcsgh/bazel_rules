@@ -4,6 +4,14 @@ def BUILD():
     srcs = native.glob(["*.c"], exclude = skip)
 
     native.cc_library(
+        name = "lua++",
+        hdrs = hdrs,
+        srcs = srcs,
+        copts = ["-xc++"],
+        visibility = ["//visibility:public"],
+    )
+
+    native.cc_library(
         name = "lua",
         hdrs = hdrs,
         srcs = srcs,

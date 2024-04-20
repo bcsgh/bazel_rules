@@ -1,11 +1,8 @@
 #include <memory>
 
-extern "C" {
+#include "gtest/gtest.h"
 #include "lauxlib.h"
 #include "lua.h"
-}
-
-#include "gtest/gtest.h"
 
 namespace {
 
