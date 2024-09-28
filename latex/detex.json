@@ -7,5 +7,6 @@
 {"re": "\\\\makeindex[\\[][^]]*]", "sub": ""},
 {"re": "\\\\printindex[\\[][^]]*]", "sub": ""},
 {"re": "\\\\excludecomment{[^}]*}", "sub": ""},
-{"re": "\\\\excludeversion{[^}]*}", "sub": ""}
+{"re": "\\\\excludeversion{[^}]*}", "sub": ""},
+{"re":"\\\\NoSpellCheck{[^}]*}", "sub":""}
 ]
